@@ -254,6 +254,7 @@ const AdminPage: React.FC = () => {
         <AdminStats 
           moviesCount={movies.length} 
           seriesCount={series.length} 
+          animesCount={animes.length}
           pinsCount={pins.length} 
         />
         
