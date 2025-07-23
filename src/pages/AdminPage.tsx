@@ -587,6 +587,7 @@ const AdminPage: React.FC = () => {
                 <thead className="bg-gray-800">
                   <tr>
                     <th className="px-4 py-3 text-left">PIN</th>
+                    <th className="px-4 py-3 text-left">Cliente</th>
                     <th className="px-4 py-3 text-left">Validade</th>
                     <th className="px-4 py-3 text-left">Status</th>
                     <th className="px-4 py-3 text-center w-32">Ações</th>
@@ -599,6 +600,9 @@ const AdminPage: React.FC = () => {
                     return (
                       <tr key={pin.id} className="border-t border-gray-700">
                         <td className="px-4 py-3 font-mono">{pin.pin}</td>
+                        <td className="px-4 py-3">
+                          <div className="text-sm font-medium">{pin.clientName}</div>
+                        </td>
                         <td className="px-4 py-3">
                           <div>
                             <div className="text-sm">{formatDate(pin.expiryDate)}</div>

@@ -21,7 +21,7 @@ export const getAllPins = async (): Promise<PinAccess[]> => {
 };
 
 // Create a new PIN
-export const createPin = async (daysValid: number): Promise<PinAccess> => {
+export const createPin = async (daysValid: number, clientName: string): Promise<PinAccess> => {
   const pin = generatePin();
   const expiryDate = calculateExpiryDate(daysValid);
   const createdAt = new Date().toISOString();
@@ -31,7 +31,8 @@ export const createPin = async (daysValid: number): Promise<PinAccess> => {
     expiryDate,
     createdAt,
     daysValid,
-    isActive: true
+    isActive: true,
+    clientName
   };
   
   const pinsRef = ref(database, 'pins');
@@ -46,7 +47,7 @@ export const createPin = async (daysValid: number): Promise<PinAccess> => {
 };
 
 // Create a custom PIN
-export const createCustomPin = async (customPin: string, daysValid: number): Promise<PinAccess> => {
+export const createCustomPin = async (customPin: string, daysValid: number, clientName: string): Promise<PinAccess> => {
   const expiryDate = calculateExpiryDate(daysValid);
   const createdAt = new Date().toISOString();
   
@@ -55,7 +56,8 @@ export const createCustomPin = async (customPin: string, daysValid: number): Pro
     expiryDate,
     createdAt,
     daysValid,
-    isActive: true
+    isActive: true,
+    clientName
   };
   
   const pinsRef = ref(database, 'pins');
@@ -69,7 +71,7 @@ export const createCustomPin = async (customPin: string, daysValid: number): Pro
   };
 };
 
-// Validate a PIN
+// Validate a PIN and manage single session
 export const validatePin = async (pinCode: string): Promise<PinAccess | null> => {
   const pinsRef = ref(database, 'pins');
   const snapshot = await get(pinsRef);
@@ -88,12 +90,50 @@ export const validatePin = async (pinCode: string): Promise<PinAccess | null> =>
       const expiryDate = new Date(matchedPin.expiryDate);
       
       if (currentDate <= expiryDate) {
-        return matchedPin;
+        // Generate new session ID and update PIN
+        const newSessionId = generateSessionId();
+        await update(ref(database, `pins/${matchedPin.id}`), { 
+          sessionId: newSessionId 
+        });
+        
+        return {
+          ...matchedPin,
+          sessionId: newSessionId
+        };
       }
     }
   }
   
   return null;
+};
+
+// Generate unique session ID
+const generateSessionId = (): string => {
+  return Date.now().toString() + Math.random().toString(36).substr(2, 9);
+};
+
+// Check if session is still valid
+export const validateSession = async (pinCode: string, sessionId: string): Promise<boolean> => {
+  const pinsRef = ref(database, 'pins');
+  const snapshot = await get(pinsRef);
+  
+  if (snapshot.exists()) {
+    const data = snapshot.val();
+    const pinsArray = Object.keys(data).map(key => ({
+      id: key,
+      ...data[key]
+    }));
+    
+    const matchedPin = pinsArray.find(p => p.pin === pinCode && p.isActive);
+    
+    if (matchedPin && matchedPin.sessionId === sessionId) {
+      const currentDate = new Date();
+      const expiryDate = new Date(matchedPin.expiryDate);
+      return currentDate <= expiryDate;
+    }
+  }
+  
+  return false;
 };
 
 // Deactivate a PIN

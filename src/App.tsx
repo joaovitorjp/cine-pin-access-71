@@ -16,6 +16,7 @@ import SeriesPlayerPage from "@/pages/SeriesPlayerPage";
 import AnimePage from "@/pages/AnimePage";
 import AnimeDetailsPage from "@/pages/AnimeDetailsPage";
 import AnimePlayerPage from "@/pages/AnimePlayerPage";
+import ClientInfo from "@/components/ClientInfo";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -38,6 +39,7 @@ const App = () => (
               <Route path="/anime" element={<AnimePage />} />
               <Route path="/anime/:id" element={<AnimeDetailsPage />} />
               <Route path="/player/anime/:animeId/:seasonNumber/:episodeNumber" element={<AnimePlayerPage />} />
+              <Route path="/info" element={<ClientInfo />} />
               <Route path="/admin" element={<AdminPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

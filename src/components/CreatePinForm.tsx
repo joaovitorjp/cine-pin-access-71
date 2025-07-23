@@ -13,13 +13,20 @@ interface CreatePinFormProps {
 
 const CreatePinForm: React.FC<CreatePinFormProps> = ({ onSuccess }) => {
   const [daysValid, setDaysValid] = useState(7);
+  const [clientName, setClientName] = useState("");
   const [customPin, setCustomPin] = useState("");
   const [customDaysValid, setCustomDaysValid] = useState(7);
+  const [customClientName, setCustomClientName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const handleRandomPinSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!clientName.trim()) {
+      setError("Por favor, digite o nome do cliente");
+      return;
+    }
     
     if (daysValid <= 0) {
       setError("O número de dias deve ser maior que zero");
@@ -30,11 +37,11 @@ const CreatePinForm: React.FC<CreatePinFormProps> = ({ onSuccess }) => {
     setError("");
     
     try {
-      const newPin = await createPin(daysValid);
+      const newPin = await createPin(daysValid, clientName.trim());
       
       toast({
         title: "PIN criado com sucesso",
-        description: `PIN: ${newPin.pin} - Válido por ${daysValid} dias`,
+        description: `PIN: ${newPin.pin} - Cliente: ${clientName} - Válido por ${daysValid} dias`,
       });
       
       onSuccess();
@@ -48,6 +55,11 @@ const CreatePinForm: React.FC<CreatePinFormProps> = ({ onSuccess }) => {
 
   const handleCustomPinSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!customClientName.trim()) {
+      setError("Por favor, digite o nome do cliente");
+      return;
+    }
     
     if (!customPin.trim()) {
       setError("Por favor, digite um PIN personalizado");
@@ -68,11 +80,11 @@ const CreatePinForm: React.FC<CreatePinFormProps> = ({ onSuccess }) => {
     setError("");
     
     try {
-      const newPin = await createCustomPin(customPin.trim(), customDaysValid);
+      const newPin = await createCustomPin(customPin.trim(), customDaysValid, customClientName.trim());
       
       toast({
         title: "PIN personalizado criado com sucesso",
-        description: `PIN: ${newPin.pin} - Válido por ${customDaysValid} dias`,
+        description: `PIN: ${newPin.pin} - Cliente: ${customClientName} - Válido por ${customDaysValid} dias`,
       });
       
       onSuccess();
@@ -93,6 +105,22 @@ const CreatePinForm: React.FC<CreatePinFormProps> = ({ onSuccess }) => {
       
       <TabsContent value="random">
         <form onSubmit={handleRandomPinSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="clientName">Nome do Cliente</Label>
+            <Input
+              id="clientName"
+              type="text"
+              value={clientName}
+              onChange={(e) => setClientName(e.target.value)}
+              placeholder="Digite o nome do cliente"
+              className="bg-gray-700 border-gray-600"
+              required
+            />
+            <p className="text-sm text-netflix-gray">
+              Nome da pessoa que irá usar este PIN.
+            </p>
+          </div>
+          
           <div className="space-y-2">
             <Label htmlFor="daysValid">Dias de Validade</Label>
             <Input
@@ -125,6 +153,22 @@ const CreatePinForm: React.FC<CreatePinFormProps> = ({ onSuccess }) => {
       
       <TabsContent value="custom">
         <form onSubmit={handleCustomPinSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="customClientName">Nome do Cliente</Label>
+            <Input
+              id="customClientName"
+              type="text"
+              value={customClientName}
+              onChange={(e) => setCustomClientName(e.target.value)}
+              placeholder="Digite o nome do cliente"
+              className="bg-gray-700 border-gray-600"
+              required
+            />
+            <p className="text-sm text-netflix-gray">
+              Nome da pessoa que irá usar este PIN.
+            </p>
+          </div>
+          
           <div className="space-y-2">
             <Label htmlFor="customPin">PIN Personalizado</Label>
             <Input
