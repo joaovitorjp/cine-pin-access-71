@@ -257,24 +257,35 @@ const AdminPage: React.FC = () => {
       />
       
       <Tabs defaultValue="movies" className="w-full">
-        <TabsList className="mb-6">
-          <TabsTrigger value="movies" className="flex items-center">
-            <Film className="w-4 h-4 mr-2" />
-            Filmes
-          </TabsTrigger>
-          <TabsTrigger value="series" className="flex items-center">
-            <Tv className="w-4 h-4 mr-2" />
-            Séries
-          </TabsTrigger>
-          <TabsTrigger value="animes" className="flex items-center">
-            <Sparkles className="w-4 h-4 mr-2" />
-            Animes
-          </TabsTrigger>
-          <TabsTrigger value="pins" className="flex items-center">
-            <Key className="w-4 h-4 mr-2" />
-            PINs de Acesso
-          </TabsTrigger>
-        </TabsList>
+        <div className="mb-6 space-y-4">
+          {/* Grupo principal: Filmes, Séries e Animes */}
+          <div className="flex flex-col sm:flex-row gap-2">
+            <TabsList className="grid w-full grid-cols-3 sm:w-auto">
+              <TabsTrigger value="movies" className="flex items-center justify-center sm:justify-start">
+                <Film className="w-4 h-4 mr-1 sm:mr-2" />
+                <span className="text-xs sm:text-sm">Filmes</span>
+              </TabsTrigger>
+              <TabsTrigger value="series" className="flex items-center justify-center sm:justify-start">
+                <Tv className="w-4 h-4 mr-1 sm:mr-2" />
+                <span className="text-xs sm:text-sm">Séries</span>
+              </TabsTrigger>
+              <TabsTrigger value="animes" className="flex items-center justify-center sm:justify-start">
+                <Sparkles className="w-4 h-4 mr-1 sm:mr-2" />
+                <span className="text-xs sm:text-sm">Animes</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
+          
+          {/* Grupo separado: PINs de Acesso */}
+          <div className="flex justify-center sm:justify-start">
+            <TabsList className="w-full sm:w-auto">
+              <TabsTrigger value="pins" className="flex items-center justify-center sm:justify-start w-full">
+                <Key className="w-4 h-4 mr-2" />
+                <span className="text-sm">PINs de Acesso</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
+        </div>
         
         <TabsContent value="movies">
           <div className="flex justify-between items-center mb-6">
