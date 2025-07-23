@@ -34,12 +34,12 @@ const AnimatedBackground: React.FC = () => {
   return (
     <div className="fixed inset-0 overflow-hidden -z-10">
       {/* Overlay escuro para melhor legibilidade */}
-      <div className="absolute inset-0 bg-black/70 z-10" />
+      <div className="absolute inset-0 bg-black/80 z-10" />
       
       {/* Container das 8 linhas horizontais */}
-      <div className="absolute inset-0 flex flex-col">
+      <div className="absolute inset-0 flex flex-col gap-[3px] py-[3px]">
         {/* Primeira linha - Esquerda para Direita */}
-        <div className="h-[12.5vh] flex items-center overflow-hidden">
+        <div className="flex-1 flex items-center overflow-hidden">
           <div className="flex animate-scroll-left-right">
             {extendedImages.map((image, index) => (
               <div 
@@ -58,7 +58,7 @@ const AnimatedBackground: React.FC = () => {
         </div>
 
         {/* Segunda linha - Direita para Esquerda */}
-        <div className="h-[12.5vh] flex items-center overflow-hidden">
+        <div className="flex-1 flex items-center overflow-hidden">
           <div className="flex animate-scroll-right-left">
             {extendedImages.map((image, index) => (
               <div 
@@ -77,7 +77,7 @@ const AnimatedBackground: React.FC = () => {
         </div>
 
         {/* Terceira linha - Esquerda para Direita */}
-        <div className="h-[12.5vh] flex items-center overflow-hidden">
+        <div className="flex-1 flex items-center overflow-hidden">
           <div className="flex animate-scroll-left-right-slow">
             {extendedImages.map((image, index) => (
               <div 
@@ -96,7 +96,7 @@ const AnimatedBackground: React.FC = () => {
         </div>
 
         {/* Quarta linha - Direita para Esquerda */}
-        <div className="h-[12.5vh] flex items-center overflow-hidden">
+        <div className="flex-1 flex items-center overflow-hidden">
           <div className="flex animate-scroll-right-left-slow">
             {extendedImages.map((image, index) => (
               <div 
@@ -115,7 +115,7 @@ const AnimatedBackground: React.FC = () => {
         </div>
 
         {/* Quinta linha - Esquerda para Direita */}
-        <div className="h-[12.5vh] flex items-center overflow-hidden">
+        <div className="flex-1 flex items-center overflow-hidden">
           <div className="flex animate-scroll-left-right">
             {extendedImages.map((image, index) => (
               <div 
@@ -134,7 +134,7 @@ const AnimatedBackground: React.FC = () => {
         </div>
 
         {/* Sexta linha - Direita para Esquerda */}
-        <div className="h-[12.5vh] flex items-center overflow-hidden">
+        <div className="flex-1 flex items-center overflow-hidden">
           <div className="flex animate-scroll-right-left">
             {extendedImages.map((image, index) => (
               <div 
@@ -153,7 +153,7 @@ const AnimatedBackground: React.FC = () => {
         </div>
 
         {/* Sétima linha - Esquerda para Direita */}
-        <div className="h-[12.5vh] flex items-center overflow-hidden">
+        <div className="flex-1 flex items-center overflow-hidden">
           <div className="flex animate-scroll-left-right-slow">
             {extendedImages.map((image, index) => (
               <div 
@@ -172,7 +172,7 @@ const AnimatedBackground: React.FC = () => {
         </div>
 
         {/* Oitava linha - Direita para Esquerda */}
-        <div className="h-[12.5vh] flex items-center overflow-hidden">
+        <div className="flex-1 flex items-center overflow-hidden">
           <div className="flex animate-scroll-right-left-slow">
             {extendedImages.map((image, index) => (
               <div 
