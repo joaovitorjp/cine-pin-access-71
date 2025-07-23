@@ -9,7 +9,7 @@ import { getAllPins, deactivatePin, deletePin } from "@/services/pinService";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Trash, Edit, Plus, Film, Key, Tv, Sparkles } from "lucide-react";
+import { Trash, Edit, Plus, Film, Key, Tv, Sparkles, Image as ImageIcon } from "lucide-react";
 import AddEditMovieForm from "@/components/AddEditMovieForm";
 import CreatePinForm from "@/components/CreatePinForm";
 import { formatDate, isPinValid } from "@/lib/utils";
@@ -18,6 +18,7 @@ import AddEditSeriesForm from "@/components/AddEditSeriesForm";
 import AddEditAnimeForm from "@/components/AddEditAnimeForm";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import AdminStats from "@/components/AdminStats";
+import BackgroundImageManager from "@/components/BackgroundImageManager";
 import AdminSearchBar from "@/components/AdminSearchBar";
 import { ChevronLeft } from "lucide-react";
 
@@ -287,15 +288,22 @@ const AdminPage: React.FC = () => {
               </TabsList>
             </div>
             
-            {/* Grupo separado: PINs de Acesso */}
+            {/* Grupo separado: PINs de Acesso e Imagens */}
             <div className="flex justify-center">
-              <TabsList className="w-full max-w-xs">
+              <TabsList className="w-full max-w-md">
                 <TabsTrigger 
                   value="pins" 
-                  className="flex items-center justify-center gap-2 w-full py-2 px-4 text-sm"
+                  className="flex items-center justify-center gap-2 flex-1 py-2 px-2 text-xs sm:text-sm"
                 >
                   <Key className="w-4 h-4 flex-shrink-0" />
                   <span className="truncate">PINs de Acesso</span>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="background" 
+                  className="flex items-center justify-center gap-2 flex-1 py-2 px-2 text-xs sm:text-sm"
+                >
+                  <ImageIcon className="w-4 h-4 flex-shrink-0" />
+                  <span className="truncate">Imagens de Fundo</span>
                 </TabsTrigger>
               </TabsList>
             </div>
@@ -691,6 +699,10 @@ const AdminPage: React.FC = () => {
             </div>
           </div>
           )}
+        </TabsContent>
+
+        <TabsContent value="background">
+          <BackgroundImageManager />
         </TabsContent>
         </Tabs>
         

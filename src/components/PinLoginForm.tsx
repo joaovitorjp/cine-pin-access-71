@@ -6,6 +6,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Lock } from "lucide-react";
 import AdminModal from "@/components/AdminModal";
+import AnimatedBackground from "@/components/AnimatedBackground";
 import { useNavigate } from "react-router-dom";
 
 const PinLoginForm: React.FC = () => {
@@ -62,8 +63,9 @@ const PinLoginForm: React.FC = () => {
   };
 
   return (
-    <div className="h-screen w-screen overflow-hidden flex items-center justify-center p-4">
-      <div className="w-full max-w-sm mx-auto">
+    <div className="h-screen w-screen overflow-hidden flex items-center justify-center p-4 relative">
+      <AnimatedBackground />
+      <div className="w-full max-w-sm mx-auto relative z-20">
         <div className="p-6 rounded-lg bg-netflix-dark">
           <h2 className="text-xl font-bold mb-3 text-center">CINE FLEX</h2>
           {!loadingMessage && welcomeMessage && (
