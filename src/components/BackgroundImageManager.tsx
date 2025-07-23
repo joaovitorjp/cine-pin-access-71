@@ -111,18 +111,18 @@ const BackgroundImageManager: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold">Gerenciar Imagens de Fundo</h2>
+        <h2 className="text-xl font-semibold">Imagem de Fundo da Tela de Login</h2>
         <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
           <DialogTrigger asChild>
-            <Button onClick={() => setFormData({ url: '', alt: '', order: images.length + 1, active: true })}>
+            <Button onClick={() => setFormData({ url: '', alt: 'Imagem de fundo da tela de login', order: 1, active: true })}>
               <Plus className="w-4 h-4 mr-2" />
-              Adicionar Imagem
+              {images.length > 0 ? 'Alterar Imagem' : 'Adicionar Imagem'}
             </Button>
           </DialogTrigger>
           <DialogContent className="bg-netflix-dark text-white">
             <DialogHeader>
               <DialogTitle>
-                {editingImage ? 'Editar Imagem' : 'Adicionar Nova Imagem'}
+                {editingImage ? 'Alterar Imagem de Fundo' : 'Adicionar Imagem de Fundo'}
               </DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -138,24 +138,12 @@ const BackgroundImageManager: React.FC = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="alt">Texto Alternativo</Label>
+                <Label htmlFor="alt">Descrição da Imagem</Label>
                 <Input
                   id="alt"
                   value={formData.alt}
                   onChange={(e) => setFormData({ ...formData, alt: e.target.value })}
-                  placeholder="Descrição da imagem"
-                  required
-                  className="bg-gray-700 border-gray-600"
-                />
-              </div>
-              <div>
-                <Label htmlFor="order">Ordem</Label>
-                <Input
-                  id="order"
-                  type="number"
-                  value={formData.order}
-                  onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) })}
-                  min="1"
+                  placeholder="Imagem de fundo da tela de login"
                   required
                   className="bg-gray-700 border-gray-600"
                 />
@@ -166,7 +154,7 @@ const BackgroundImageManager: React.FC = () => {
                   checked={formData.active}
                   onCheckedChange={(checked) => setFormData({ ...formData, active: checked })}
                 />
-                <Label htmlFor="active">Ativar imagem</Label>
+                <Label htmlFor="active">Usar como imagem de fundo</Label>
               </div>
               <div className="flex space-x-2">
                 <Button type="submit" disabled={loading} className="flex-1 bg-netflix-red hover:bg-red-700">
@@ -181,7 +169,59 @@ const BackgroundImageManager: React.FC = () => {
         </Dialog>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {images.length > 0 && (
+        <Card className="bg-netflix-dark border-gray-700 max-w-md">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-white">Imagem de Fundo Atual</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="aspect-video bg-gray-800 rounded-md overflow-hidden">
+              <img
+                src={images[0].url}
+                alt={images[0].alt}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  const target = e.currentTarget as HTMLImageElement;
+                  target.style.display = 'none';
+                  const sibling = target.nextElementSibling as HTMLDivElement;
+                  if (sibling) sibling.style.display = 'flex';
+                }}
+              />
+              <div className="w-full h-full flex items-center justify-center text-gray-500 hidden">
+                <ImageIcon className="w-8 h-8" />
+              </div>
+            </div>
+            <div>
+              <p className="text-xs text-gray-400">{images[0].alt}</p>
+              <div className="flex items-center justify-between mt-2">
+                <span className={`text-xs px-2 py-1 rounded ${images[0].active ? 'bg-green-600' : 'bg-gray-600'}`}>
+                  {images[0].active ? 'Ativa' : 'Inativa'}
+                </span>
+                <div className="flex space-x-2">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => openEditDialog(images[0])}
+                    className="h-6 w-6 text-gray-400 hover:text-white"
+                  >
+                    <Edit className="w-3 h-3" />
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => handleDelete(images[0].id)}
+                    className="h-6 w-6 text-red-400 hover:text-red-300"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 hidden">
         {images.map((image) => (
           <Card key={image.id} className="bg-netflix-dark border-gray-700">
             <CardHeader className="pb-2">
@@ -248,8 +288,8 @@ const BackgroundImageManager: React.FC = () => {
       {images.length === 0 && (
         <div className="text-center py-8 text-gray-400">
           <ImageIcon className="w-12 h-12 mx-auto mb-4" />
-          <p>Nenhuma imagem de fundo cadastrada.</p>
-          <p className="text-sm">Adicione até 21 imagens para criar o efeito animado na tela de login.</p>
+          <p>Nenhuma imagem de fundo configurada.</p>
+          <p className="text-sm">Adicione uma imagem para personalizar o fundo da tela de login.</p>
         </div>
       )}
     </div>
