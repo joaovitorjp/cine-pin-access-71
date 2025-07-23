@@ -97,6 +97,30 @@ const PinLoginForm: React.FC = () => {
             </Button>
           </form>
           
+          {/* Informações sobre tokens */}
+          <div className="mt-6 space-y-3 border-t border-gray-700 pt-4">
+            <h3 className="text-sm font-semibold text-white text-center">Planos Disponíveis</h3>
+            
+            <div className="space-y-2">
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-netflix-gray">Teste Grátis (2 dias)</span>
+                <span className="text-green-400 font-medium">1 Token</span>
+              </div>
+              
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-netflix-gray">Acesso Mensal (30 dias)</span>
+                <span className="text-netflix-red font-medium">R$ 5,99 - 1 Token</span>
+              </div>
+            </div>
+            
+            <Button 
+              className="w-full bg-green-600 hover:bg-green-700 text-white text-xs py-2 mt-3"
+              onClick={() => window.open('https://wa.me/5566984640346?text=Olá! Gostaria de adquirir um token de acesso para o CINE FLEX.', '_blank')}
+            >
+              💬 Solicitar Token via WhatsApp
+            </Button>
+          </div>
+
           {/* Cadeado de admin abaixo do botão */}
           <div className="flex justify-center mt-4">
             <Button 
