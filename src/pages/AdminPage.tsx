@@ -18,6 +18,7 @@ import AddEditSeriesForm from "@/components/AddEditSeriesForm";
 import AddEditAnimeForm from "@/components/AddEditAnimeForm";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import AdminStats from "@/components/AdminStats";
+import AdminSearchBar from "@/components/AdminSearchBar";
 import { ChevronLeft } from "lucide-react";
 
 const AdminPage: React.FC = () => {
@@ -38,6 +39,9 @@ const AdminPage: React.FC = () => {
   const [loadingSeries, setLoadingSeries] = useState(true);
   const [loadingAnimes, setLoadingAnimes] = useState(true);
   const [loadingPins, setLoadingPins] = useState(true);
+  const [movieSearchTerm, setMovieSearchTerm] = useState("");
+  const [seriesSearchTerm, setSeriesSearchTerm] = useState("");
+  const [animeSearchTerm, setAnimeSearchTerm] = useState("");
 
   useEffect(() => {
     if (!isLoggedIn || !isAdmin) {
@@ -214,6 +218,22 @@ const AdminPage: React.FC = () => {
     navigate("/");
   };
 
+  // Filtros de pesquisa
+  const filteredMovies = movies.filter(movie =>
+    movie.title.toLowerCase().includes(movieSearchTerm.toLowerCase()) ||
+    movie.description.toLowerCase().includes(movieSearchTerm.toLowerCase())
+  );
+
+  const filteredSeries = series.filter(s =>
+    s.title.toLowerCase().includes(seriesSearchTerm.toLowerCase()) ||
+    s.description.toLowerCase().includes(seriesSearchTerm.toLowerCase())
+  );
+
+  const filteredAnimes = animes.filter(anime =>
+    anime.title.toLowerCase().includes(animeSearchTerm.toLowerCase()) ||
+    anime.description.toLowerCase().includes(animeSearchTerm.toLowerCase())
+  );
+
   return (
     <div className="container mx-auto py-8 px-4">
       {/* Back button and title */}
@@ -270,12 +290,18 @@ const AdminPage: React.FC = () => {
               Adicionar Filme
             </Button>
           </div>
+
+          <AdminSearchBar
+            value={movieSearchTerm}
+            onChange={setMovieSearchTerm}
+            placeholder="Pesquisar filmes por título ou descrição..."
+          />
           
           {loadingMovies ? (
             <div className="animate-pulse text-netflix-gray">Carregando filmes...</div>
-          ) : movies.length === 0 ? (
+          ) : filteredMovies.length === 0 ? (
             <div className="text-netflix-gray bg-netflix-dark p-6 rounded-md text-center">
-              Nenhum filme cadastrado. Clique em "Adicionar Filme" para começar.
+              {movieSearchTerm ? "Nenhum filme encontrado com essa pesquisa." : "Nenhum filme cadastrado. Clique em \"Adicionar Filme\" para começar."}
             </div>
           ) : (
             <div className="bg-netflix-dark rounded-md overflow-hidden">
@@ -287,8 +313,8 @@ const AdminPage: React.FC = () => {
                     <th className="px-4 py-3 text-center w-32">Ações</th>
                   </tr>
                 </thead>
-                <tbody>
-                  {movies.map((movie) => (
+                 <tbody>
+                   {filteredMovies.map((movie) => (
                     <tr key={movie.id} className="border-t border-gray-700">
                       <td className="px-4 py-3">
                         <div className="flex items-center space-x-3">
@@ -354,12 +380,18 @@ const AdminPage: React.FC = () => {
               Adicionar Série
             </Button>
           </div>
+
+          <AdminSearchBar
+            value={seriesSearchTerm}
+            onChange={setSeriesSearchTerm}
+            placeholder="Pesquisar séries por título ou descrição..."
+          />
           
           {loadingSeries ? (
             <div className="animate-pulse text-netflix-gray">Carregando séries...</div>
-          ) : series.length === 0 ? (
+          ) : filteredSeries.length === 0 ? (
             <div className="text-netflix-gray bg-netflix-dark p-6 rounded-md text-center">
-              Nenhuma série cadastrada. Clique em "Adicionar Série" para começar.
+              {seriesSearchTerm ? "Nenhuma série encontrada com essa pesquisa." : "Nenhuma série cadastrada. Clique em \"Adicionar Série\" para começar."}
             </div>
           ) : (
             <div className="bg-netflix-dark rounded-md overflow-hidden">
@@ -371,8 +403,8 @@ const AdminPage: React.FC = () => {
                     <th className="px-4 py-3 text-center w-32">Ações</th>
                   </tr>
                 </thead>
-                <tbody>
-                  {series.map((series) => (
+                 <tbody>
+                   {filteredSeries.map((series) => (
                     <tr key={series.id} className="border-t border-gray-700">
                       <td className="px-4 py-3">
                         <div className="flex items-center space-x-3">
@@ -441,12 +473,18 @@ const AdminPage: React.FC = () => {
               Adicionar Anime
             </Button>
           </div>
+
+          <AdminSearchBar
+            value={animeSearchTerm}
+            onChange={setAnimeSearchTerm}
+            placeholder="Pesquisar animes por título ou descrição..."
+          />
           
           {loadingAnimes ? (
             <div className="animate-pulse text-netflix-gray">Carregando animes...</div>
-          ) : animes.length === 0 ? (
+          ) : filteredAnimes.length === 0 ? (
             <div className="text-netflix-gray bg-netflix-dark p-6 rounded-md text-center">
-              Nenhum anime cadastrado. Clique em "Adicionar Anime" para começar.
+              {animeSearchTerm ? "Nenhum anime encontrado com essa pesquisa." : "Nenhum anime cadastrado. Clique em \"Adicionar Anime\" para começar."}
             </div>
           ) : (
             <div className="bg-netflix-dark rounded-md overflow-hidden">
@@ -458,8 +496,8 @@ const AdminPage: React.FC = () => {
                     <th className="px-4 py-3 text-center w-32">Ações</th>
                   </tr>
                 </thead>
-                <tbody>
-                  {animes.map((anime) => (
+                 <tbody>
+                   {filteredAnimes.map((anime) => (
                     <tr key={anime.id} className="border-t border-gray-700">
                       <td className="px-4 py-3">
                         <div className="flex items-center space-x-3">
