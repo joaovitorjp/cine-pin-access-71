@@ -29,64 +29,89 @@ const AnimatedBackground: React.FC = () => {
   }
 
   // Duplica as imagens para criar efeito contínuo
-  const allImages = [...images, ...images, ...images];
+  const extendedImages = [...images, ...images, ...images, ...images];
 
   return (
     <div className="fixed inset-0 overflow-hidden -z-10">
       {/* Overlay escuro para melhor legibilidade */}
       <div className="absolute inset-0 bg-black/70 z-10" />
       
-      {/* Container das imagens animadas */}
-      <div className="absolute inset-0 flex">
-        {/* Primeira coluna */}
-        <div className="flex-1 flex flex-col animate-scroll-diagonal-1">
-          {allImages.slice(0, Math.ceil(allImages.length / 3)).map((image, index) => (
-            <div 
-              key={`col1-${index}`}
-              className="w-full h-48 mb-4 transform rotate-12 opacity-80 hover:opacity-100 transition-opacity duration-500"
-            >
-              <img
-                src={image.url}
-                alt={image.alt}
-                className="w-full h-full object-cover rounded-lg shadow-2xl"
-                loading="lazy"
-              />
-            </div>
-          ))}
+      {/* Container das 4 linhas horizontais */}
+      <div className="absolute inset-0 flex flex-col">
+        {/* Primeira linha - Esquerda para Direita */}
+        <div className="flex-1 flex items-center overflow-hidden">
+          <div className="flex animate-scroll-left-right">
+            {extendedImages.map((image, index) => (
+              <div 
+                key={`row1-${index}`}
+                className="w-64 h-36 mx-2 flex-shrink-0 opacity-70 hover:opacity-100 transition-opacity duration-500"
+              >
+                <img
+                  src={image.url}
+                  alt={image.alt}
+                  className="w-full h-full object-cover rounded-lg shadow-xl"
+                  loading="lazy"
+                />
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* Segunda coluna - offset */}
-        <div className="flex-1 flex flex-col animate-scroll-diagonal-2" style={{ marginTop: '-100px' }}>
-          {allImages.slice(Math.ceil(allImages.length / 3), Math.ceil(allImages.length * 2 / 3)).map((image, index) => (
-            <div 
-              key={`col2-${index}`}
-              className="w-full h-48 mb-4 transform rotate-12 opacity-80 hover:opacity-100 transition-opacity duration-500"
-            >
-              <img
-                src={image.url}
-                alt={image.alt}
-                className="w-full h-full object-cover rounded-lg shadow-2xl"
-                loading="lazy"
-              />
-            </div>
-          ))}
+        {/* Segunda linha - Direita para Esquerda */}
+        <div className="flex-1 flex items-center overflow-hidden">
+          <div className="flex animate-scroll-right-left">
+            {extendedImages.map((image, index) => (
+              <div 
+                key={`row2-${index}`}
+                className="w-64 h-36 mx-2 flex-shrink-0 opacity-70 hover:opacity-100 transition-opacity duration-500"
+              >
+                <img
+                  src={image.url}
+                  alt={image.alt}
+                  className="w-full h-full object-cover rounded-lg shadow-xl"
+                  loading="lazy"
+                />
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* Terceira coluna - offset maior */}
-        <div className="flex-1 flex flex-col animate-scroll-diagonal-3" style={{ marginTop: '-200px' }}>
-          {allImages.slice(Math.ceil(allImages.length * 2 / 3)).map((image, index) => (
-            <div 
-              key={`col3-${index}`}
-              className="w-full h-48 mb-4 transform rotate-12 opacity-80 hover:opacity-100 transition-opacity duration-500"
-            >
-              <img
-                src={image.url}
-                alt={image.alt}
-                className="w-full h-full object-cover rounded-lg shadow-2xl"
-                loading="lazy"
-              />
-            </div>
-          ))}
+        {/* Terceira linha - Esquerda para Direita */}
+        <div className="flex-1 flex items-center overflow-hidden">
+          <div className="flex animate-scroll-left-right-slow">
+            {extendedImages.map((image, index) => (
+              <div 
+                key={`row3-${index}`}
+                className="w-64 h-36 mx-2 flex-shrink-0 opacity-70 hover:opacity-100 transition-opacity duration-500"
+              >
+                <img
+                  src={image.url}
+                  alt={image.alt}
+                  className="w-full h-full object-cover rounded-lg shadow-xl"
+                  loading="lazy"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Quarta linha - Direita para Esquerda */}
+        <div className="flex-1 flex items-center overflow-hidden">
+          <div className="flex animate-scroll-right-left-slow">
+            {extendedImages.map((image, index) => (
+              <div 
+                key={`row4-${index}`}
+                className="w-64 h-36 mx-2 flex-shrink-0 opacity-70 hover:opacity-100 transition-opacity duration-500"
+              >
+                <img
+                  src={image.url}
+                  alt={image.alt}
+                  className="w-full h-full object-cover rounded-lg shadow-xl"
+                  loading="lazy"
+                />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
