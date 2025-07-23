@@ -41,7 +41,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           <div className="container mx-auto">
             <div className="flex justify-between items-center">
               <Link to="/" className="flex-shrink-0">
-                <h1 className="text-netflix-red text-xl sm:text-2xl font-bold">CineAdrian</h1>
+                <h1 className="text-netflix-red text-xl sm:text-2xl font-bold">CINE FLEX</h1>
               </Link>
               
               {isLoggedIn && (
@@ -98,7 +98,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       <footer className={`bg-netflix-black py-4 px-6 border-t border-gray-800 relative ${isPlayerPage ? 'hidden' : ''}`}>
         <div className="container mx-auto flex justify-between items-center">
           <p className="text-netflix-gray text-sm">
-            &copy; {new Date().getFullYear()} CineAdrian. Todos os direitos reservados.
+            &copy; {new Date().getFullYear()} CINE FLEX. Todos os direitos reservados.
           </p>
           
           <Button 

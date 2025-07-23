@@ -201,16 +201,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Logout
   const logout = () => {
-    localStorage.removeItem("authState");
-    setIsLoggedIn(false);
-    setIsAdmin(false);
-    setClientName("");
-    setDaysRemaining(0);
-    
-    toast({
-      title: "Logout efetuado com sucesso",
-      description: "Você foi desconectado.",
-    });
+    try {
+      localStorage.removeItem("authState");
+      setIsLoggedIn(false);
+      setIsAdmin(false);
+      setClientName("");
+      setDaysRemaining(0);
+      
+      toast({
+        title: "Logout efetuado com sucesso",
+        description: "Você foi desconectado.",
+      });
+      
+      // Força redirect para página inicial após logout
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 500);
+    } catch (error) {
+      console.error("Erro no logout:", error);
+      // Mesmo com erro, força logout
+      localStorage.removeItem("authState");
+      setIsLoggedIn(false);
+      setIsAdmin(false);
+      setClientName("");
+      setDaysRemaining(0);
+      window.location.href = "/";
+    }
   };
 
   return (

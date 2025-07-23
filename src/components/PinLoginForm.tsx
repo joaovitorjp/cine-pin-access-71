@@ -65,7 +65,7 @@ const PinLoginForm: React.FC = () => {
     <div className="h-screen w-screen overflow-hidden flex items-center justify-center p-4">
       <div className="w-full max-w-sm mx-auto">
         <div className="p-6 rounded-lg bg-netflix-dark">
-          <h2 className="text-xl font-bold mb-3 text-center">UltraCine Login</h2>
+          <h2 className="text-xl font-bold mb-3 text-center">CINE FLEX</h2>
           {!loadingMessage && welcomeMessage && (
             <p className="text-netflix-gray text-center text-sm mb-4 animate-fade-in">
               {welcomeMessage}
