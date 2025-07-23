@@ -37,7 +37,7 @@ const AnimatedBackground: React.FC = () => {
       <div className="absolute inset-0 bg-black/70 z-10" />
       
       {/* Container das 4 linhas horizontais */}
-      <div className="absolute inset-0 flex flex-col">
+      <div className="absolute inset-0 flex flex-col gap-0.5">
         {/* Primeira linha - Esquerda para Direita */}
         <div className="flex-1 flex items-center overflow-hidden">
           <div className="flex animate-scroll-left-right">
