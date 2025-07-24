@@ -13,9 +13,7 @@ import AdminPage from "@/pages/AdminPage";
 import SeriesPage from "@/pages/SeriesPage";
 import SeriesDetailsPage from "@/pages/SeriesDetailsPage";
 import SeriesPlayerPage from "@/pages/SeriesPlayerPage";
-import AnimePage from "@/pages/AnimePage";
-import AnimeDetailsPage from "@/pages/AnimeDetailsPage";
-import AnimePlayerPage from "@/pages/AnimePlayerPage";
+import LiveTVPage from "@/pages/LiveTVPage";
 import ClientInfo from "@/components/ClientInfo";
 import NotFound from "./pages/NotFound";
 
@@ -36,9 +34,7 @@ const App = () => (
               <Route path="/series" element={<SeriesPage />} />
               <Route path="/series/:id" element={<SeriesDetailsPage />} />
               <Route path="/player/series/:seriesId/:seasonNumber/:episodeNumber" element={<SeriesPlayerPage />} />
-              <Route path="/anime" element={<AnimePage />} />
-              <Route path="/anime/:id" element={<AnimeDetailsPage />} />
-              <Route path="/player/anime/:animeId/:seasonNumber/:episodeNumber" element={<AnimePlayerPage />} />
+            <Route path="/livetv" element={<LiveTVPage />} />
               <Route path="/info" element={<ClientInfo />} />
               <Route path="/admin" element={<AdminPage />} />
               <Route path="*" element={<NotFound />} />

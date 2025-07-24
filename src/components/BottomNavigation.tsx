@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Film, Tv, Sparkles, User } from "lucide-react";
+import { Film, Tv, User } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 const BottomNavigation: React.FC = () => {
@@ -9,7 +9,7 @@ const BottomNavigation: React.FC = () => {
   const { isAdmin } = useAuth();
   const isMoviesActive = location.pathname === "/" || location.pathname.startsWith("/movie");
   const isSeriesActive = location.pathname === "/series" || location.pathname.startsWith("/series");
-  const isAnimesActive = location.pathname === "/anime" || location.pathname.startsWith("/anime");
+  const isLiveTVActive = location.pathname === "/livetv" || location.pathname.startsWith("/livetv");
   const isInfoActive = location.pathname === "/info";
   const isPlayerPage = location.pathname.includes('/player/');
   
@@ -59,21 +59,21 @@ const BottomNavigation: React.FC = () => {
             </div>
           </Link>
 
-          <Link to="/anime" className="flex-1">
+          <Link to="/livetv" className="flex-1">
             <div 
               className={`flex flex-col items-center py-3 transition-all duration-300 ${
-                isAnimesActive 
+                isLiveTVActive 
                   ? "text-white translate-y-[-4px]" 
                   : "text-gray-400 hover:text-gray-200"
               }`}
             >
-              <Sparkles className={`w-6 h-6 transition-transform duration-300 ${
-                isAnimesActive ? 'scale-110' : ''
+              <Tv className={`w-6 h-6 transition-transform duration-300 ${
+                isLiveTVActive ? 'scale-110' : ''
               }`} />
               <span className={`text-xs mt-1 transition-all duration-300 ${
-                isAnimesActive ? 'opacity-100' : 'opacity-70'
+                isLiveTVActive ? 'opacity-100' : 'opacity-70'
               }`}>
-                Animes
+                TV Ao Vivo
               </span>
             </div>
           </Link>
