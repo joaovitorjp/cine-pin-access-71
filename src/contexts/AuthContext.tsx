@@ -2,6 +2,8 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { validatePin, validateSession } from "@/services/pinService";
 import { toast } from "@/components/ui/use-toast";
+import { getConfig } from "@/lib/env";
+import { encryptData, decryptData, adminRateLimiter, getClientIdentifier, sanitizeInput } from "@/lib/security";
 
 interface AuthContextType {
   isLoggedIn: boolean;
@@ -39,39 +41,48 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const checkAuthState = async () => {
       const storedAuthState = localStorage.getItem("authState");
       if (storedAuthState) {
-        const { isLoggedIn, isAdmin, expiry, clientName: storedClientName, pinCode, sessionId } = JSON.parse(storedAuthState);
-        if (new Date(expiry) > new Date()) {
-          // For PIN users, validate session to ensure single device login
-          if (!isAdmin && pinCode && sessionId) {
-            const sessionValid = await validateSession(pinCode, sessionId);
-            if (sessionValid) {
+        try {
+          // Try to decrypt and parse auth state
+          const decryptedData = decryptData(storedAuthState);
+          const authData = JSON.parse(decryptedData || storedAuthState);
+          const { isLoggedIn, isAdmin, expiry, clientName: storedClientName, pinCode, sessionId } = authData;
+          
+          if (new Date(expiry) > new Date()) {
+            // For PIN users, validate session to ensure single device login
+            if (!isAdmin && pinCode && sessionId) {
+              const sessionValid = await validateSession(pinCode, sessionId);
+              if (sessionValid) {
+                setIsLoggedIn(isLoggedIn);
+                setIsAdmin(isAdmin);
+                setClientName(sanitizeInput(storedClientName || ""));
+                
+                // Calculate days remaining
+                const expiryDate = new Date(expiry);
+                const currentDate = new Date();
+                const diffTime = expiryDate.getTime() - currentDate.getTime();
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                setDaysRemaining(Math.max(0, diffDays));
+              } else {
+                // Session invalid, logout
+                localStorage.removeItem("authState");
+                toast({
+                  title: "Sessão expirada",
+                  description: "Este PIN está sendo usado em outro dispositivo.",
+                  variant: "destructive",
+                });
+              }
+            } else {
+              // Admin login
               setIsLoggedIn(isLoggedIn);
               setIsAdmin(isAdmin);
-              setClientName(storedClientName || "");
-              
-              // Calculate days remaining
-              const expiryDate = new Date(expiry);
-              const currentDate = new Date();
-              const diffTime = expiryDate.getTime() - currentDate.getTime();
-              const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-              setDaysRemaining(Math.max(0, diffDays));
-            } else {
-              // Session invalid, logout
-              localStorage.removeItem("authState");
-              toast({
-                title: "Sessão expirada",
-                description: "Este PIN está sendo usado em outro dispositivo.",
-                variant: "destructive",
-              });
+              setClientName(sanitizeInput(storedClientName || ""));
             }
           } else {
-            // Admin login
-            setIsLoggedIn(isLoggedIn);
-            setIsAdmin(isAdmin);
-            setClientName(storedClientName || "");
+            // Auth expired
+            localStorage.removeItem("authState");
           }
-        } else {
-          // Auth expired
+        } catch (error) {
+          console.error("Error parsing auth state:", error);
           localStorage.removeItem("authState");
         }
       }
@@ -84,21 +95,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const interval = setInterval(async () => {
       const storedAuthState = localStorage.getItem("authState");
       if (storedAuthState) {
-        const { isAdmin, pinCode, sessionId } = JSON.parse(storedAuthState);
-        if (!isAdmin && pinCode && sessionId) {
-          const sessionValid = await validateSession(pinCode, sessionId);
-          if (!sessionValid) {
-            localStorage.removeItem("authState");
-            setIsLoggedIn(false);
-            setIsAdmin(false);
-            setClientName("");
-            setDaysRemaining(0);
-            toast({
-              title: "Sessão expirada",
-              description: "Este PIN está sendo usado em outro dispositivo.",
-              variant: "destructive",
-            });
+        try {
+          const decryptedData = decryptData(storedAuthState);
+          const authData = JSON.parse(decryptedData || storedAuthState);
+          const { isAdmin, pinCode, sessionId } = authData;
+          
+          if (!isAdmin && pinCode && sessionId) {
+            const sessionValid = await validateSession(pinCode, sessionId);
+            if (!sessionValid) {
+              localStorage.removeItem("authState");
+              setIsLoggedIn(false);
+              setIsAdmin(false);
+              setClientName("");
+              setDaysRemaining(0);
+              toast({
+                title: "Sessão expirada",
+                description: "Este PIN está sendo usado em outro dispositivo.",
+                variant: "destructive",
+              });
+            }
           }
+        } catch (error) {
+          console.error("Error validating session:", error);
+          localStorage.removeItem("authState");
+          setIsLoggedIn(false);
+          setIsAdmin(false);
+          setClientName("");
+          setDaysRemaining(0);
         }
       }
     }, 30000);
@@ -106,10 +129,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => clearInterval(interval);
   }, []);
 
-  // Login with PIN
+  // Login with PIN with enhanced security
   const loginWithPin = async (pin: string): Promise<boolean> => {
     try {
-      const pinData = await validatePin(pin);
+      const sanitizedPin = sanitizeInput(pin);
+      const pinData = await validatePin(sanitizedPin);
+      
       if (pinData) {
         const expiryDate = new Date(pinData.expiryDate);
         
@@ -118,20 +143,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const diffTime = expiryDate.getTime() - currentDate.getTime();
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         
-        // Save auth state with session info
+        // Save encrypted auth state with session info
         const authState = {
           isLoggedIn: true,
           isAdmin: false,
           expiry: expiryDate.toISOString(),
           clientName: pinData.clientName,
-          pinCode: pin,
+          pinCode: sanitizedPin,
           sessionId: pinData.sessionId,
         };
-        localStorage.setItem("authState", JSON.stringify(authState));
+        
+        const encryptedAuthState = encryptData(JSON.stringify(authState));
+        localStorage.setItem("authState", encryptedAuthState);
         
         setIsLoggedIn(true);
         setIsAdmin(false);
-        setClientName(pinData.clientName);
+        setClientName(sanitizeInput(pinData.clientName));
         setDaysRemaining(Math.max(0, diffDays));
         
         toast({
@@ -150,11 +177,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       return false;
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Erro desconhecido";
       console.error("Erro ao fazer login:", error);
       
       toast({
         title: "Erro ao fazer login",
-        description: "Ocorreu um erro ao tentar fazer login. Tente novamente.",
+        description: errorMessage,
         variant: "destructive",
       });
       
@@ -162,21 +190,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Login as admin
+  // Login as admin with enhanced security
   const loginAsAdmin = (password: string): boolean => {
-    if (password === "admin4455") {
-      // Set expiry to 24 hours from now
+    const clientId = getClientIdentifier();
+    
+    // Check rate limiting for admin attempts
+    if (adminRateLimiter.isBlocked(clientId)) {
+      const remainingTime = Math.ceil(adminRateLimiter.getRemainingTime(clientId) / 60000);
+      toast({
+        title: "Bloqueado temporariamente",
+        description: `Muitas tentativas de login admin. Tente novamente em ${remainingTime} minutos.`,
+        variant: "destructive",
+      });
+      return false;
+    }
+    
+    const config = getConfig();
+    const sanitizedPassword = sanitizeInput(password);
+    
+    if (sanitizedPassword === config.admin.password) {
+      // Set expiry based on config
       const expiry = new Date();
-      expiry.setHours(expiry.getHours() + 24);
+      expiry.setHours(expiry.getHours() + config.security.sessionTimeout);
       
-      // Save auth state
+      // Save encrypted auth state
       const authState = {
         isLoggedIn: true,
         isAdmin: true,
         expiry: expiry.toISOString(),
         clientName: "Administrador",
       };
-      localStorage.setItem("authState", JSON.stringify(authState));
+      
+      const encryptedAuthState = encryptData(JSON.stringify(authState));
+      localStorage.setItem("authState", encryptedAuthState);
       
       setIsLoggedIn(true);
       setIsAdmin(true);
@@ -189,6 +235,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       return true;
     }
+    
+    // Record failed attempt
+    adminRateLimiter.recordAttempt(clientId);
     
     toast({
       title: "Senha incorreta",

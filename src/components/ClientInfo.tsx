@@ -1,11 +1,19 @@
 import React from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useFavorites } from "@/contexts/FavoritesContext";
+import { useHistory } from "@/contexts/HistoryContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { User, Calendar, Clock, LogOut } from "lucide-react";
+import { User, Calendar, Clock, LogOut, Heart, History, Settings } from "lucide-react";
+import { Link } from "react-router-dom";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const ClientInfo: React.FC = () => {
   const { clientName, daysRemaining, logout } = useAuth();
+  const { favoriteMovies, favoriteSeries, favoriteLiveTV } = useFavorites();
+  const { history } = useHistory();
+  
+  const totalFavorites = favoriteMovies.length + favoriteSeries.length + favoriteLiveTV.length;
 
   const formatDaysRemaining = (days: number) => {
     if (days === 0) {
@@ -101,6 +109,53 @@ const ClientInfo: React.FC = () => {
                 <LogOut className="w-4 h-4" />
                 Sair da Conta
               </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-card border-border">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Settings className="w-5 h-5" />
+              Preferências e Dados
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50">
+              <div className="flex items-center gap-3">
+                <Heart className="w-6 h-6 text-red-500" />
+                <div>
+                  <p className="font-semibold">Favoritos</p>
+                  <p className="text-sm text-muted-foreground">{totalFavorites} itens salvos</p>
+                </div>
+              </div>
+              <Button asChild variant="outline" size="sm">
+                <Link to="/favorites">Ver Favoritos</Link>
+              </Button>
+            </div>
+
+            <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50">
+              <div className="flex items-center gap-3">
+                <History className="w-6 h-6 text-blue-500" />
+                <div>
+                  <p className="font-semibold">Histórico</p>
+                  <p className="text-sm text-muted-foreground">{history.length} itens assistidos</p>
+                </div>
+              </div>
+              <Button asChild variant="outline" size="sm">
+                <Link to="/history">Ver Histórico</Link>
+              </Button>
+            </div>
+
+            <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50">
+              <div className="flex items-center gap-3">
+                <Settings className="w-6 h-6 text-green-500" />
+                <div>
+                  <p className="font-semibold">Tema</p>
+                  <p className="text-sm text-muted-foreground">Personalizar aparência</p>
+                </div>
+              </div>
+              <ThemeToggle />
             </div>
           </CardContent>
         </Card>

@@ -1,12 +1,11 @@
+import React, { useRef } from "react";
 
-import React, { useEffect, useRef } from "react";
-
-interface VideoPlayerProps {
+interface LiveTVPlayerProps {
   videoUrl: string;
   posterUrl?: string;
 }
 
-const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, posterUrl }) => {
+const LiveTVPlayer: React.FC<LiveTVPlayerProps> = ({ videoUrl, posterUrl }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   // Check if URL is a direct video file (mp4, m3u8, etc.)
@@ -14,13 +13,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, posterUrl }) => {
   
   // Check if it's an HLS stream
   const isHLS = videoUrl.includes('.m3u8');
-
-  useEffect(() => {
-    if (isHLS && videoRef.current) {
-      // For HLS streams, set source directly
-      videoRef.current.src = videoUrl;
-    }
-  }, [videoUrl, isHLS]);
 
   const handleVideoClick = () => {
     if (videoRef.current) {
@@ -32,8 +24,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, posterUrl }) => {
     }
   };
 
-  // If it's a direct video file, use HTML5 video element
-  if (isDirectVideo) {
+  // For direct video files or HLS streams, use HTML5 video element
+  if (isDirectVideo || isHLS) {
     return (
       <div className="relative w-full aspect-video">
         <video
@@ -42,15 +34,17 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, posterUrl }) => {
           controls
           poster={posterUrl}
           onClick={handleVideoClick}
+          autoPlay
+          muted
         >
           <source src={videoUrl} type={isHLS ? "application/x-mpegURL" : "video/mp4"} />
-          Seu navegador não suporta a reprodução deste vídeo.
+          Canal não suportado pelo seu navegador.
         </video>
       </div>
     );
   }
 
-  // For iframe-based videos (YouTube, Drive, etc.)
+  // For any other URL (streaming services, etc.), use iframe
   return (
     <div className="relative w-full aspect-video">
       <iframe
@@ -65,4 +59,4 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, posterUrl }) => {
   );
 };
 
-export default VideoPlayer;
+export default LiveTVPlayer;
