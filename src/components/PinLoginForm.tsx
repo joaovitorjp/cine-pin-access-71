@@ -8,8 +8,6 @@ import { Lock } from "lucide-react";
 import AdminModal from "@/components/AdminModal";
 import AnimatedBackground from "@/components/AnimatedBackground";
 import { useNavigate } from "react-router-dom";
-import { getAllMovies } from "@/services/movieService";
-import { getAllSeries } from "@/services/seriesService";
 
 const PinLoginForm: React.FC = () => {
   const [pin, setPin] = useState("");
@@ -18,9 +16,6 @@ const PinLoginForm: React.FC = () => {
   const [welcomeMessage, setWelcomeMessage] = useState("");
   const [loadingMessage, setLoadingMessage] = useState(true);
   const [showAdminModal, setShowAdminModal] = useState(false);
-  const [moviesCount, setMoviesCount] = useState(0);
-  const [seriesCount, setSeriesCount] = useState(0);
-  const [loadingCounts, setLoadingCounts] = useState(true);
   const { loginWithPin } = useAuth();
   const navigate = useNavigate();
 
@@ -39,24 +34,6 @@ const PinLoginForm: React.FC = () => {
       }
     };
     fetchWelcomeMessage();
-  }, []);
-
-  useEffect(() => {
-    const fetchCounts = async () => {
-      try {
-        const [moviesData, seriesData] = await Promise.all([
-          getAllMovies(),
-          getAllSeries()
-        ]);
-        setMoviesCount(moviesData.length);
-        setSeriesCount(seriesData.length);
-      } catch (error) {
-        console.error("Erro ao buscar quantidades:", error);
-      } finally {
-        setLoadingCounts(false);
-      }
-    };
-    fetchCounts();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -95,17 +72,6 @@ const PinLoginForm: React.FC = () => {
             <p className="text-netflix-gray text-center text-sm mb-4 animate-fade-in">
               {welcomeMessage}
             </p>
-          )}
-          
-          {/* Mensagem promocional */}
-          {!loadingCounts && (
-            <div className="mb-4 p-3 bg-netflix-red/20 border border-netflix-red/30 rounded-lg">
-              <p className="text-white text-center text-sm leading-relaxed">
-                🎬 <strong className="text-netflix-red">O Cine Flex</strong> é um site completo e conta com mais de{" "}
-                <span className="font-bold text-yellow-400">{moviesCount} filmes</span> e{" "}
-                <span className="font-bold text-yellow-400">{seriesCount} séries</span> para você assistir!
-              </p>
-            </div>
           )}
           <form onSubmit={handleSubmit} className="space-y-3">
             <div className="space-y-2">

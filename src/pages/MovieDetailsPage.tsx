@@ -6,21 +6,14 @@ import { getMovieById } from "@/services/movieService";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Play } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useHistory } from "@/contexts/HistoryContext";
-import { convertVideoLink } from "@/lib/utils";
-import FavoriteButton from "@/components/FavoriteButton";
-import VideoPlayer from "@/components/VideoPlayer";
 
 const MovieDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [movie, setMovie] = useState<Movie | null>(null);
-  const [videoUrl, setVideoUrl] = useState<string>("");
-  const [showPlayer, setShowPlayer] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const { isLoggedIn } = useAuth();
-  const { addToHistory } = useHistory();
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -35,8 +28,6 @@ const MovieDetailsPage: React.FC = () => {
         const data = await getMovieById(id);
         if (data) {
           setMovie(data);
-          const processedUrl = convertVideoLink(data.playerUrl);
-          setVideoUrl(processedUrl);
         } else {
           setError("Filme não encontrado");
         }
@@ -56,10 +47,7 @@ const MovieDetailsPage: React.FC = () => {
   };
 
   const handlePlayMovie = () => {
-    if (movie) {
-      addToHistory(movie, 'movie');
-      setShowPlayer(true);
-    }
+    navigate(`/player/${id}`);
   };
 
   if (loading) {
@@ -78,20 +66,6 @@ const MovieDetailsPage: React.FC = () => {
           Voltar
         </Button>
         <div className="text-red-500">{error || "Filme não encontrado"}</div>
-      </div>
-    );
-  }
-
-  if (showPlayer && videoUrl) {
-    return (
-      <div className="bg-black min-h-screen">
-        <div className="absolute top-4 left-4 z-50">
-          <Button variant="ghost" onClick={() => setShowPlayer(false)} className="text-white hover:bg-white/20">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Voltar
-          </Button>
-        </div>
-        <VideoPlayer videoUrl={videoUrl} posterUrl={movie?.imageUrl} />
       </div>
     );
   }
@@ -124,16 +98,13 @@ const MovieDetailsPage: React.FC = () => {
               {movie.genre && <span className="text-netflix-gray">{movie.genre}</span>}
             </div>
             
-            <div className="flex items-center gap-4 mb-4">
-              <Button 
-                onClick={handlePlayMovie} 
-                className="bg-netflix-red hover:bg-red-700"
-              >
-                <Play className="w-4 h-4 mr-2" />
-                Assistir
-              </Button>
-              <FavoriteButton item={movie} type="movie" />
-            </div>
+            <Button 
+              onClick={handlePlayMovie} 
+              className="bg-netflix-red hover:bg-red-700 mb-4 w-40"
+            >
+              <Play className="w-4 h-4 mr-2" />
+              Assistir
+            </Button>
           </div>
         </div>
       </div>

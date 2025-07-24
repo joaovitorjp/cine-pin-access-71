@@ -1,33 +1,33 @@
 
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Series, Season, Episode } from '@/types';
+import { Anime, Season, Episode } from '@/types';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Plus, Minus, FileVideo, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, Minus, ChevronDown } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
-import { addSeries, updateSeries } from '@/services/seriesService';
+import { addAnime, updateAnime } from '@/services/animeService';
 
-interface AddEditSeriesFormProps {
-  series?: Series;
+interface AddEditAnimeFormProps {
+  anime?: Anime;
   onSuccess: () => void;
 }
 
-const AddEditSeriesForm = ({ series, onSuccess }: AddEditSeriesFormProps) => {
-  const [seasons, setSeasons] = useState<Season[]>(series?.seasons || [{ id: '1', number: 1, episodes: [] }]);
+const AddEditAnimeForm = ({ anime, onSuccess }: AddEditAnimeFormProps) => {
+  const [seasons, setSeasons] = useState<Season[]>(anime?.seasons || [{ id: '1', number: 1, episodes: [] }]);
   const [loading, setLoading] = useState(false);
 
   const { register, handleSubmit, formState: { errors } } = useForm({
     defaultValues: {
-      title: series?.title || '',
-      description: series?.description || '',
-      imageUrl: series?.imageUrl || '',
-      year: series?.year || '',
-      genre: series?.genre || '',
-      rating: series?.rating || '',
+      title: anime?.title || '',
+      description: anime?.description || '',
+      imageUrl: anime?.imageUrl || '',
+      year: anime?.year || '',
+      genre: anime?.genre || '',
+      rating: anime?.rating || '',
     }
   });
 
@@ -75,7 +75,7 @@ const AddEditSeriesForm = ({ series, onSuccess }: AddEditSeriesFormProps) => {
   const onSubmit = async (formData: any) => {
     setLoading(true);
     try {
-      const seriesData = {
+      const animeData = {
         ...formData,
         seasons: seasons.map(season => ({
           ...season,
@@ -86,18 +86,18 @@ const AddEditSeriesForm = ({ series, onSuccess }: AddEditSeriesFormProps) => {
         }))
       };
 
-      if (series) {
-        await updateSeries(series.id, seriesData);
-        toast({ title: "Série atualizada com sucesso!" });
+      if (anime) {
+        await updateAnime(anime.id, animeData);
+        toast({ title: "Anime atualizado com sucesso!" });
       } else {
-        await addSeries(seriesData);
-        toast({ title: "Série adicionada com sucesso!" });
+        await addAnime(animeData);
+        toast({ title: "Anime adicionado com sucesso!" });
       }
       onSuccess();
     } catch (error) {
-      console.error('Erro ao salvar série:', error);
+      console.error('Erro ao salvar anime:', error);
       toast({ 
-        title: "Erro ao salvar série",
+        title: "Erro ao salvar anime",
         variant: "destructive"
       });
     } finally {
@@ -268,11 +268,11 @@ const AddEditSeriesForm = ({ series, onSuccess }: AddEditSeriesFormProps) => {
           disabled={loading}
           className="bg-netflix-red hover:bg-red-700"
         >
-          {loading ? 'Salvando...' : series ? 'Atualizar Série' : 'Adicionar Série'}
+          {loading ? 'Salvando...' : anime ? 'Atualizar Anime' : 'Adicionar Anime'}
         </Button>
       </div>
     </form>
   );
 };
 
-export default AddEditSeriesForm;
+export default AddEditAnimeForm;

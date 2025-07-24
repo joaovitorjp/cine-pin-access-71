@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { Movie, Series, LiveTV, PinAccess } from "@/types";
+import { Movie, Series, Anime, PinAccess } from "@/types";
 import { getAllMovies, deleteMovie } from "@/services/movieService";
 import { getAllSeries, deleteSeries } from "@/services/seriesService";
-import { getAllLiveTVChannels, deleteLiveTVChannel } from "@/services/liveTvService";
+import { getAllAnimes, deleteAnime } from "@/services/animeService";
 import { getAllPins, deactivatePin, deletePin } from "@/services/pinService";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,7 +15,7 @@ import CreatePinForm from "@/components/CreatePinForm";
 import { formatDate, isPinValid } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
 import AddEditSeriesForm from "@/components/AddEditSeriesForm";
-import AddEditLiveTVForm from "@/components/AddEditLiveTVForm";
+import AddEditAnimeForm from "@/components/AddEditAnimeForm";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import AdminStats from "@/components/AdminStats";
 import BackgroundImageManager from "@/components/BackgroundImageManager";
@@ -27,22 +27,22 @@ const AdminPage: React.FC = () => {
   const navigate = useNavigate();
   const [movies, setMovies] = useState<Movie[]>([]);
   const [series, setSeries] = useState<Series[]>([]);
-  const [liveTVChannels, setLiveTVChannels] = useState<LiveTV[]>([]);
+  const [animes, setAnimes] = useState<Anime[]>([]);
   const [pins, setPins] = useState<PinAccess[]>([]);
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
   const [selectedSeries, setSelectedSeries] = useState<Series | null>(null);
-  const [selectedLiveTVChannel, setSelectedLiveTVChannel] = useState<LiveTV | null>(null);
+  const [selectedAnime, setSelectedAnime] = useState<Anime | null>(null);
   const [showAddEditModal, setShowAddEditModal] = useState(false);
   const [showAddEditSeriesModal, setShowAddEditSeriesModal] = useState(false);
-  const [showAddEditLiveTVModal, setShowAddEditLiveTVModal] = useState(false);
+  const [showAddEditAnimeModal, setShowAddEditAnimeModal] = useState(false);
   const [showCreatePinModal, setShowCreatePinModal] = useState(false);
   const [loadingMovies, setLoadingMovies] = useState(true);
   const [loadingSeries, setLoadingSeries] = useState(true);
-  const [loadingLiveTV, setLoadingLiveTV] = useState(true);
+  const [loadingAnimes, setLoadingAnimes] = useState(true);
   const [loadingPins, setLoadingPins] = useState(true);
   const [movieSearchTerm, setMovieSearchTerm] = useState("");
   const [seriesSearchTerm, setSeriesSearchTerm] = useState("");
-  const [liveTVSearchTerm, setLiveTVSearchTerm] = useState("");
+  const [animeSearchTerm, setAnimeSearchTerm] = useState("");
 
   useEffect(() => {
     if (!isLoggedIn || !isAdmin) {
@@ -52,16 +52,16 @@ const AdminPage: React.FC = () => {
 
     const fetchData = async () => {
       try {
-        const [moviesData, seriesData, liveTVData, pinsData] = await Promise.all([
+        const [moviesData, seriesData, animesData, pinsData] = await Promise.all([
           getAllMovies(),
           getAllSeries(),
-          getAllLiveTVChannels(),
+          getAllAnimes(),
           getAllPins()
         ]);
         
         setMovies(moviesData);
         setSeries(seriesData);
-        setLiveTVChannels(liveTVData);
+        setAnimes(animesData);
         setPins(pinsData);
       } catch (error) {
         console.error("Erro ao buscar dados:", error);
@@ -73,7 +73,7 @@ const AdminPage: React.FC = () => {
       } finally {
         setLoadingMovies(false);
         setLoadingSeries(false);
-        setLoadingLiveTV(false);
+        setLoadingAnimes(false);
         setLoadingPins(false);
       }
     };
@@ -84,26 +84,26 @@ const AdminPage: React.FC = () => {
   const handleRefreshData = async () => {
     setLoadingMovies(true);
     setLoadingSeries(true);
-    setLoadingLiveTV(true);
+    setLoadingAnimes(true);
     setLoadingPins(true);
     try {
-      const [moviesData, seriesData, liveTVData, pinsData] = await Promise.all([
+      const [moviesData, seriesData, animesData, pinsData] = await Promise.all([
         getAllMovies(),
         getAllSeries(),
-        getAllLiveTVChannels(),
+        getAllAnimes(),
         getAllPins()
       ]);
       
       setMovies(moviesData);
       setSeries(seriesData);
-      setLiveTVChannels(liveTVData);
+      setAnimes(animesData);
       setPins(pinsData);
     } catch (error) {
       console.error("Erro ao atualizar dados:", error);
     } finally {
       setLoadingMovies(false);
       setLoadingSeries(false);
-      setLoadingLiveTV(false);
+      setLoadingAnimes(false);
       setLoadingPins(false);
     }
   };
@@ -195,20 +195,20 @@ const AdminPage: React.FC = () => {
     }
   };
 
-  const handleDeleteLiveTVChannel = async (id: string) => {
-    if (window.confirm("Tem certeza que deseja excluir este canal?")) {
+  const handleDeleteAnime = async (id: string) => {
+    if (window.confirm("Tem certeza que deseja excluir este anime?")) {
       try {
-        await deleteLiveTVChannel(id);
-        setLiveTVChannels(liveTVChannels.filter(c => c.id !== id));
+        await deleteAnime(id);
+        setAnimes(animes.filter(a => a.id !== id));
         toast({
-          title: "Canal excluído",
-          description: "O canal foi excluído com sucesso",
+          title: "Anime excluído",
+          description: "O anime foi excluído com sucesso",
         });
       } catch (error) {
-        console.error("Erro ao excluir canal:", error);
+        console.error("Erro ao excluir anime:", error);
         toast({
           title: "Erro",
-          description: "Não foi possível excluir o canal",
+          description: "Não foi possível excluir o anime",
           variant: "destructive",
         });
       }
@@ -230,9 +230,9 @@ const AdminPage: React.FC = () => {
     s.description.toLowerCase().includes(seriesSearchTerm.toLowerCase())
   );
 
-  const filteredLiveTVChannels = liveTVChannels.filter(channel =>
-    channel.name.toLowerCase().includes(liveTVSearchTerm.toLowerCase()) ||
-    (channel.description && channel.description.toLowerCase().includes(liveTVSearchTerm.toLowerCase()))
+  const filteredAnimes = animes.filter(anime =>
+    anime.title.toLowerCase().includes(animeSearchTerm.toLowerCase()) ||
+    anime.description.toLowerCase().includes(animeSearchTerm.toLowerCase())
   );
 
   return (
@@ -255,7 +255,7 @@ const AdminPage: React.FC = () => {
         <AdminStats 
           moviesCount={movies.length} 
           seriesCount={series.length} 
-          animesCount={liveTVChannels.length}
+          animesCount={animes.length}
           pinsCount={pins.length} 
         />
         
@@ -279,11 +279,11 @@ const AdminPage: React.FC = () => {
                   <span className="truncate">Séries</span>
                 </TabsTrigger>
                 <TabsTrigger 
-                  value="livetv" 
+                  value="animes" 
                   className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-2 px-2 text-xs sm:text-sm"
                 >
-                  <Tv className="w-4 h-4 flex-shrink-0" />
-                  <span className="truncate">TV Ao Vivo</span>
+                  <Sparkles className="w-4 h-4 flex-shrink-0" />
+                  <span className="truncate">Animes</span>
                 </TabsTrigger>
               </TabsList>
             </div>
@@ -501,33 +501,33 @@ const AdminPage: React.FC = () => {
           )}
         </TabsContent>
         
-        <TabsContent value="livetv">
+        <TabsContent value="animes">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
-            <h2 className="text-xl md:text-2xl font-semibold">Gerenciar TV Ao Vivo</h2>
+            <h2 className="text-xl md:text-2xl font-semibold">Gerenciar Animes</h2>
             <Button 
               onClick={() => {
-                setSelectedLiveTVChannel(null);
-                setShowAddEditLiveTVModal(true);
+                setSelectedAnime(null);
+                setShowAddEditAnimeModal(true);
               }}
               className="bg-netflix-red hover:bg-red-700 w-full sm:w-auto"
             >
               <Plus className="w-4 h-4 mr-2" />
-              <span className="hidden sm:inline">Adicionar Canal</span>
+              <span className="hidden sm:inline">Adicionar Anime</span>
               <span className="sm:hidden">Adicionar</span>
             </Button>
           </div>
 
           <AdminSearchBar
-            value={liveTVSearchTerm}
-            onChange={setLiveTVSearchTerm}
-            placeholder="Pesquisar canais por nome ou descrição..."
+            value={animeSearchTerm}
+            onChange={setAnimeSearchTerm}
+            placeholder="Pesquisar animes por título ou descrição..."
           />
           
-          {loadingLiveTV ? (
-            <div className="animate-pulse text-netflix-gray">Carregando canais...</div>
-          ) : filteredLiveTVChannels.length === 0 ? (
+          {loadingAnimes ? (
+            <div className="animate-pulse text-netflix-gray">Carregando animes...</div>
+          ) : filteredAnimes.length === 0 ? (
             <div className="text-netflix-gray bg-netflix-dark p-6 rounded-md text-center">
-              {liveTVSearchTerm ? "Nenhum canal encontrado com essa pesquisa." : "Nenhum canal cadastrado. Clique em \"Adicionar Canal\" para começar."}
+              {animeSearchTerm ? "Nenhum anime encontrado com essa pesquisa." : "Nenhum anime cadastrado. Clique em \"Adicionar Anime\" para começar."}
             </div>
           ) : (
             <div className="bg-netflix-dark rounded-md overflow-hidden">
@@ -535,36 +535,34 @@ const AdminPage: React.FC = () => {
                 <table className="w-full min-w-[600px]">
                   <thead className="bg-gray-800">
                     <tr>
-                      <th className="px-2 sm:px-4 py-3 text-left text-sm font-medium">Canal</th>
-                      <th className="px-2 sm:px-4 py-3 text-left text-sm font-medium hidden md:table-cell">Categoria</th>
+                      <th className="px-2 sm:px-4 py-3 text-left text-sm font-medium">Anime</th>
+                      <th className="px-2 sm:px-4 py-3 text-left text-sm font-medium">Temporadas</th>
                       <th className="px-2 sm:px-4 py-3 text-center w-20 sm:w-32 text-sm font-medium">Ações</th>
                     </tr>
                   </thead>
                   <tbody>
-                   {filteredLiveTVChannels.map((channel) => (
-                     <tr key={channel.id} className="border-t border-gray-700">
+                   {filteredAnimes.map((anime) => (
+                     <tr key={anime.id} className="border-t border-gray-700">
                        <td className="px-2 sm:px-4 py-3">
                          <div className="flex items-center space-x-2 sm:space-x-3">
                            <img 
-                             src={channel.imageUrl} 
-                             alt={channel.name}
+                             src={anime.imageUrl} 
+                             alt={anime.title}
                              className="w-10 h-12 sm:w-12 sm:h-16 object-cover rounded flex-shrink-0"
                              onError={(e) => {
                                const target = e.target as HTMLImageElement;
-                               target.src = "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37";
+                               target.src = "https://via.placeholder.com/160x90";
                              }}
                            />
                            <div className="min-w-0 flex-1">
-                             <div className="font-medium text-sm sm:text-base truncate">{channel.name}</div>
-                             <div className="md:hidden text-xs text-netflix-gray mt-1 line-clamp-2">
-                               {channel.category}
-                             </div>
+                             <div className="font-medium text-sm sm:text-base truncate">{anime.title}</div>
+                             {anime.year && <div className="text-xs sm:text-sm text-netflix-gray">{anime.year}</div>}
                            </div>
                          </div>
                        </td>
-                       <td className="px-2 sm:px-4 py-3 hidden md:table-cell">
-                         <div className="text-xs sm:text-sm text-netflix-gray">
-                           {channel.category || "Sem categoria"}
+                       <td className="px-2 sm:px-4 py-3">
+                         <div className="text-xs sm:text-sm">
+                           {anime.seasons?.length || 0} temporada(s)
                          </div>
                        </td>
                        <td className="px-2 sm:px-4 py-3">
@@ -573,8 +571,8 @@ const AdminPage: React.FC = () => {
                              variant="ghost"
                              size="icon"
                              onClick={() => {
-                               setSelectedLiveTVChannel(channel);
-                               setShowAddEditLiveTVModal(true);
+                               setSelectedAnime(anime);
+                               setShowAddEditAnimeModal(true);
                              }}
                              className="text-netflix-gray hover:text-white h-8 w-8 sm:h-9 sm:w-9"
                            >
@@ -583,7 +581,7 @@ const AdminPage: React.FC = () => {
                            <Button
                              variant="ghost"
                              size="icon"
-                             onClick={() => handleDeleteLiveTVChannel(channel.id)}
+                             onClick={() => handleDeleteAnime(anime.id)}
                              className="text-netflix-gray hover:text-red-500 h-8 w-8 sm:h-9 sm:w-9"
                            >
                              <Trash className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -747,18 +745,18 @@ const AdminPage: React.FC = () => {
           </DialogContent>
         </Dialog>
         
-        <Dialog open={showAddEditLiveTVModal} onOpenChange={setShowAddEditLiveTVModal}>
-          <DialogContent className="w-[95vw] max-w-[650px] max-h-[90vh] bg-netflix-dark text-white">
+        <Dialog open={showAddEditAnimeModal} onOpenChange={setShowAddEditAnimeModal}>
+          <DialogContent className="w-[95vw] max-w-[800px] max-h-[90vh] bg-netflix-dark text-white">
             <DialogHeader>
               <DialogTitle className="text-lg">
-                {selectedLiveTVChannel ? "Editar Canal" : "Adicionar Canal"}
+                {selectedAnime ? "Editar Anime" : "Adicionar Anime"}
               </DialogTitle>
             </DialogHeader>
             <ScrollArea className="max-h-[75vh] pr-4">
-              <AddEditLiveTVForm
-                channel={selectedLiveTVChannel || undefined}
+              <AddEditAnimeForm
+                anime={selectedAnime || undefined}
                 onSuccess={() => {
-                  setShowAddEditLiveTVModal(false);
+                  setShowAddEditAnimeModal(false);
                   handleRefreshData();
                 }}
               />

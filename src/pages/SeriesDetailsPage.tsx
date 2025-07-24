@@ -1,28 +1,20 @@
 
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { Series, Episode } from "@/types";
 import { getSeriesById } from "@/services/seriesService";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Play } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useHistory } from "@/contexts/HistoryContext";
-import { convertVideoLink } from "@/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import FavoriteButton from "@/components/FavoriteButton";
-import VideoPlayer from "@/components/VideoPlayer";
 
 const SeriesDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [series, setSeries] = useState<Series | null>(null);
-  const [currentEpisode, setCurrentEpisode] = useState<Episode | null>(null);
-  const [videoUrl, setVideoUrl] = useState<string>("");
-  const [showPlayer, setShowPlayer] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const { isLoggedIn } = useAuth();
-  const { addToHistory } = useHistory();
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -51,31 +43,6 @@ const SeriesDetailsPage: React.FC = () => {
 
     fetchSeries();
   }, [id, navigate, isLoggedIn]);
-
-  const handlePlayEpisode = (episode: Episode) => {
-    if (series) {
-      const processedUrl = convertVideoLink(episode.playerUrl);
-      setVideoUrl(processedUrl);
-      setCurrentEpisode(episode);
-      setShowPlayer(true);
-      // Add to history
-      addToHistory(series, 'series');
-    }
-  };
-
-  if (showPlayer && videoUrl && currentEpisode) {
-    return (
-      <div className="bg-black min-h-screen">
-        <div className="absolute top-4 left-4 z-50">
-          <Button variant="ghost" onClick={() => setShowPlayer(false)} className="text-white hover:bg-white/20">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Voltar
-          </Button>
-        </div>
-        <VideoPlayer videoUrl={videoUrl} posterUrl={series?.imageUrl} />
-      </div>
-    );
-  }
 
   if (loading) {
     return (
@@ -134,11 +101,7 @@ const SeriesDetailsPage: React.FC = () => {
             )}
           </div>
           
-          <p className="text-netflix-gray mb-4">{series.description}</p>
-          
-          <div className="mb-8">
-            <FavoriteButton item={series} type="series" />
-          </div>
+          <p className="text-netflix-gray mb-8">{series.description}</p>
 
           <Tabs defaultValue={`season-1`} className="w-full">
             <TabsList className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 mb-4">
@@ -171,14 +134,12 @@ const SeriesDetailsPage: React.FC = () => {
                           </p>
                         )}
                       </div>
-                      <Button 
-                        size="sm" 
-                        className="bg-netflix-red hover:bg-red-700"
-                        onClick={() => handlePlayEpisode(episode)}
-                      >
-                        <Play className="w-4 h-4 mr-2" />
-                        Assistir
-                      </Button>
+                      <Link to={`/player/series/${series.id}/${season.number}/${episode.number}`}>
+                        <Button size="sm" className="bg-netflix-red hover:bg-red-700">
+                          <Play className="w-4 h-4 mr-2" />
+                          Assistir
+                        </Button>
+                      </Link>
                     </div>
                   ))}
                 </div>

@@ -1,10 +1,10 @@
+
 // Movie data type
 export interface Movie {
   id: string;
   title: string;
   imageUrl: string;
   videoUrl: string;
-  playerUrl: string;
   description: string;
   year?: string;
   rating?: string;
@@ -23,14 +23,16 @@ export interface Series {
   seasons: Season[];
 }
 
-// Live TV data type
-export interface LiveTV {
+// Anime data type
+export interface Anime {
   id: string;
-  name: string;
+  title: string;
   imageUrl: string;
-  playerUrl: string;
-  description?: string;
-  category?: string;
+  description: string;
+  year?: string;
+  rating?: string;
+  genre?: string;
+  seasons: Season[];
 }
 
 export interface Season {
@@ -44,7 +46,6 @@ export interface Episode {
   number: number;
   title: string;
   videoUrl: string;
-  playerUrl: string;
   description?: string;
   thumbnail?: string;
 }
