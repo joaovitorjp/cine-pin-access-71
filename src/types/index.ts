@@ -58,6 +58,4 @@ export interface PinAccess {
   createdAt: string;
   daysValid: number;
   isActive: boolean;
-  clientName: string;
-  sessionId?: string;
 }
