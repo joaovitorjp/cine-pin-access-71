@@ -14,6 +14,7 @@ import SeriesPage from "@/pages/SeriesPage";
 import SeriesDetailsPage from "@/pages/SeriesDetailsPage";
 import SeriesPlayerPage from "@/pages/SeriesPlayerPage";
 import LiveTVPage from "@/pages/LiveTVPage";
+import LiveTVPlayerPage from "@/pages/LiveTVPlayerPage";
 import ClientInfo from "@/components/ClientInfo";
 import NotFound from "./pages/NotFound";
 
@@ -35,6 +36,7 @@ const App = () => (
               <Route path="/series/:id" element={<SeriesDetailsPage />} />
               <Route path="/player/series/:seriesId/:seasonNumber/:episodeNumber" element={<SeriesPlayerPage />} />
             <Route path="/livetv" element={<LiveTVPage />} />
+            <Route path="/livetv/player/:id" element={<LiveTVPlayerPage />} />
               <Route path="/info" element={<ClientInfo />} />
               <Route path="/admin" element={<AdminPage />} />
               <Route path="*" element={<NotFound />} />

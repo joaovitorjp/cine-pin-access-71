@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { LiveTV } from "@/types";
 import { getAllLiveTVChannels } from "@/services/liveTvService";
 import LiveTVCard from "@/components/LiveTVCard";
@@ -6,7 +7,6 @@ import PinLoginForm from "@/components/PinLoginForm";
 import { useAuth } from "@/contexts/AuthContext";
 import SearchBar from "@/components/SearchBar";
 import GenreFilter from "@/components/GenreFilter";
-import { convertVideoLink } from "@/lib/utils";
 
 const LiveTVPage: React.FC = () => {
   const [channels, setChannels] = useState<LiveTV[]>([]);
@@ -16,6 +16,7 @@ const LiveTVPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const { isLoggedIn, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
 
   // Extract unique categories from channels
   const categories = [...new Set(channels.flatMap(c => c.category ? [c.category] : []))];
@@ -59,8 +60,7 @@ const LiveTVPage: React.FC = () => {
   }, [searchQuery, selectedCategory, channels]);
 
   const handleChannelClick = (channel: LiveTV) => {
-    const convertedUrl = convertVideoLink(channel.playerUrl);
-    window.open(convertedUrl, '_blank', 'noopener,noreferrer');
+    navigate(`/livetv/player/${channel.id}`);
   };
 
   if (authLoading) {
