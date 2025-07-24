@@ -35,9 +35,13 @@ const MovieDetailsPage: React.FC = () => {
         const data = await getMovieById(id);
         if (data) {
           console.log('Movie data loaded:', data);
+          console.log('Movie videoUrl:', data.videoUrl);
           console.log('Movie playerUrl:', data.playerUrl);
           setMovie(data);
-          const processedUrl = convertVideoLink(data.playerUrl);
+          // Use videoUrl if playerUrl doesn't exist
+          const urlToUse = data.playerUrl || data.videoUrl;
+          console.log('URL to use:', urlToUse);
+          const processedUrl = convertVideoLink(urlToUse);
           console.log('Processed video URL:', processedUrl);
           setVideoUrl(processedUrl);
         } else {
