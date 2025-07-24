@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Film, Tv, Key } from "lucide-react";
+import { Film, Tv, Key, Sparkles } from "lucide-react";
 
 interface AdminStatsProps {
   moviesCount: number;
@@ -41,9 +41,9 @@ const AdminStats: React.FC<AdminStatsProps> = ({ moviesCount, seriesCount, anime
       <Card className="bg-netflix-dark border-gray-800">
         <CardContent className="flex items-center justify-between p-4">
           <div className="flex items-center space-x-4">
-            <Tv className="w-8 h-8 text-netflix-red" />
+            <Sparkles className="w-8 h-8 text-netflix-red" />
             <div>
-              <p className="text-sm text-gray-400">Canais de TV</p>
+              <p className="text-sm text-gray-400">Animes</p>
               <p className="text-2xl font-bold">{animesCount}</p>
             </div>
           </div>

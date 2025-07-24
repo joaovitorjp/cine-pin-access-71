@@ -45,19 +45,40 @@ export const formatDate = (dateString: string): string => {
   return new Date(dateString).toLocaleDateString(undefined, options);
 };
 
-// Convert video links - simplified version
-export const convertVideoLink = (url: string): string => {
-  console.log('convertVideoLink input:', url);
+// Convert Google Drive link to direct playable URL
+export const convertGoogleDriveLink = (url: string): string => {
+  if (!url) return '';
   
-  if (!url) {
-    console.log('convertVideoLink: URL is empty');
-    return '';
+  // Already in the correct format
+  if (url.includes('drive.google.com/file/d/') && url.includes('/preview')) {
+    return url;
   }
-
-  // Return URL as-is for HTML5 video player
-  console.log('convertVideoLink output:', url);
+  
+  // Extract file ID from Google Drive URL
+  let fileId = '';
+  
+  // Handle format: https://drive.google.com/file/d/{ID}/view
+  if (url.includes('/file/d/')) {
+    const match = url.match(/\/file\/d\/([^\/\?]+)/);
+    if (match && match[1]) {
+      fileId = match[1];
+    }
+  }
+  // Handle format: https://drive.google.com/open?id={ID}
+  else if (url.includes('drive.google.com/open?id=')) {
+    const match = url.match(/id=([^&]+)/);
+    if (match && match[1]) {
+      fileId = match[1];
+    }
+  }
+  // If the URL is just the ID
+  else if (/^[a-zA-Z0-9_-]{25,}$/.test(url)) {
+    fileId = url;
+  }
+  
+  if (fileId) {
+    return `https://drive.google.com/file/d/${fileId}/preview`;
+  }
+  
   return url;
 };
-
-// Backward compatibility - keep the old function name but use the new one
-export const convertGoogleDriveLink = convertVideoLink;
