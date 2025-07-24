@@ -242,3 +242,47 @@
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
   z-index: 1;
 }
+
+@keyframes scrollLeftRight {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes scrollRightLeft {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-scroll-left-right {
+  animation: scrollLeftRight 40s linear infinite;
+}
+
+.animate-scroll-right-left {
+  animation: scrollRightLeft 40s linear infinite;
+}
+
+.animate-scroll-left-right-slow {
+  animation: scrollLeftRight 50s linear infinite;
+}
+
+.animate-scroll-right-left-slow {
+  animation: scrollRightLeft 50s linear infinite;
+}
+
+.animate-shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}

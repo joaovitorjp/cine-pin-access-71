@@ -23,21 +23,21 @@ const AdminModal: React.FC<AdminModalProps> = ({ open, onOpenChange, onSuccessfu
   const [error, setError] = useState("");
   const { loginAsAdmin } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!password) {
       setError("Por favor, insira a senha");
       return;
     }
 
-    const success = loginAsAdmin(password);
+    const success = await loginAsAdmin(password);
     if (success) {
       onOpenChange(false);
       onSuccessfulLogin();
       setPassword("");
       setError("");
     } else {
-      setError("Senha incorreta");
+      setError("Falha na autenticação");
     }
   };
 

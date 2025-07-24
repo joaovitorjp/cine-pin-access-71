@@ -1,22 +1,23 @@
-
 import React, { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Movie } from "@/types";
-import { getMovieById } from "@/services/movieService";
-import VideoPlayer from "@/components/VideoPlayer";
+import { LiveTV } from "@/types";
+import { getLiveTVChannelById } from "@/services/liveTvService";
+import LiveTVPlayer from "@/components/LiveTVPlayer";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { convertGoogleDriveLink } from "@/lib/utils";
+import { useHistory } from "@/contexts/HistoryContext";
+import { convertVideoLink } from "@/lib/utils";
 
-const PlayerPage: React.FC = () => {
+const LiveTVPlayerPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [movie, setMovie] = React.useState<Movie | null>(null);
+  const [channel, setChannel] = React.useState<LiveTV | null>(null);
   const [videoUrl, setVideoUrl] = React.useState<string>("");
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState("");
   const navigate = useNavigate();
   const { isLoggedIn } = useAuth();
+  const { addToHistory } = useHistory();
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -24,33 +25,35 @@ const PlayerPage: React.FC = () => {
       return;
     }
 
-    const fetchMovie = async () => {
+    const fetchChannel = async () => {
       if (!id) return;
 
       try {
         setLoading(true);
-        const data = await getMovieById(id);
+        const data = await getLiveTVChannelById(id);
         
         if (data) {
-          setMovie(data);
-          const processedUrl = convertGoogleDriveLink(data.videoUrl);
+          setChannel(data);
+          const processedUrl = convertVideoLink(data.playerUrl);
           setVideoUrl(processedUrl);
+          // Add to history when channel starts playing
+          addToHistory(data, 'livetv');
         } else {
-          setError("Filme não encontrado");
+          setError("Canal não encontrado");
         }
       } catch (error) {
-        console.error("Erro ao buscar detalhes do filme:", error);
-        setError("Não foi possível carregar o filme. Tente novamente mais tarde.");
+        console.error("Erro ao buscar detalhes do canal:", error);
+        setError("Não foi possível carregar o canal. Tente novamente mais tarde.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchMovie();
+    fetchChannel();
   }, [id, navigate, isLoggedIn]);
 
   const handleGoBack = () => {
-    navigate(`/movie/${id}`);
+    navigate("/livetv");
   };
 
   if (loading) {
@@ -67,7 +70,7 @@ const PlayerPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-black">
         <div className="container mx-auto py-8 px-4">
-          <Button variant="ghost" onClick={() => navigate(-1)} className="mb-4 text-white">
+          <Button variant="ghost" onClick={handleGoBack} className="mb-4 text-white">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Voltar
           </Button>
@@ -79,9 +82,15 @@ const PlayerPage: React.FC = () => {
 
   return (
     <div className="bg-black min-h-screen">
-      {movie && <VideoPlayer videoUrl={videoUrl} posterUrl={movie.imageUrl} />}
+      <div className="absolute top-4 left-4 z-50">
+        <Button variant="ghost" onClick={handleGoBack} className="text-white hover:bg-white/20">
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Voltar
+        </Button>
+      </div>
+      {channel && <LiveTVPlayer videoUrl={videoUrl} posterUrl={channel.imageUrl} />}
     </div>
   );
 };
 
-export default PlayerPage;
+export default LiveTVPlayerPage;
