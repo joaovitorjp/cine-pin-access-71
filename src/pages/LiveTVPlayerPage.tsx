@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { LiveTV } from "@/types";
 import { getLiveTVChannelById } from "@/services/liveTvService";
-import VideoPlayer from "@/components/VideoPlayer";
+import LiveTVPlayer from "@/components/LiveTVPlayer";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -88,7 +88,7 @@ const LiveTVPlayerPage: React.FC = () => {
           Voltar
         </Button>
       </div>
-      {channel && <VideoPlayer videoUrl={videoUrl} posterUrl={channel.imageUrl} />}
+      {channel && <LiveTVPlayer videoUrl={videoUrl} posterUrl={channel.imageUrl} />}
     </div>
   );
 };
