@@ -19,6 +19,26 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, posterUrl }) => {
     );
   }
 
+  // Check if URL is a direct video file
+  const isDirectVideo = videoUrl.match(/\.(mp4|webm|ogg|avi|mov|wmv|flv|m3u8)(\?.*)?$/i);
+  
+  // Use iframe for Google Drive and other embed URLs
+  if (videoUrl.includes('drive.google.com') || videoUrl.includes('preview') || !isDirectVideo) {
+    return (
+      <div className="relative w-full aspect-video">
+        <iframe
+          src={videoUrl}
+          className="w-full h-full absolute inset-0"
+          allowFullScreen
+          allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+          style={{ border: 'none' }}
+          loading="lazy"
+        />
+      </div>
+    );
+  }
+
+  // Use HTML5 video for direct video files
   return (
     <div className="relative w-full aspect-video">
       <video

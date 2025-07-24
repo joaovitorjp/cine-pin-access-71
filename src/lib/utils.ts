@@ -45,7 +45,7 @@ export const formatDate = (dateString: string): string => {
   return new Date(dateString).toLocaleDateString(undefined, options);
 };
 
-// Convert video links - simplified version
+// Convert video links
 export const convertVideoLink = (url: string): string => {
   console.log('convertVideoLink input:', url);
   
@@ -54,7 +54,18 @@ export const convertVideoLink = (url: string): string => {
     return '';
   }
 
-  // Return URL as-is for HTML5 video player
+  // Convert Google Drive links to direct video URLs
+  if (url.includes('drive.google.com')) {
+    const fileIdMatch = url.match(/\/d\/([a-zA-Z0-9-_]+)/);
+    if (fileIdMatch) {
+      const fileId = fileIdMatch[1];
+      const directUrl = `https://drive.google.com/file/d/${fileId}/preview`;
+      console.log('convertVideoLink Google Drive output:', directUrl);
+      return directUrl;
+    }
+  }
+
+  // Return URL as-is for other types
   console.log('convertVideoLink output:', url);
   return url;
 };
