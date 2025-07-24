@@ -115,6 +115,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_pin_secure: {
+        Args: {
+          p_pin_code: string
+          p_client_name: string
+          p_days_valid: number
+          p_created_by: string
+        }
+        Returns: Json
+      }
       get_user_role: {
         Args: { user_uuid: string }
         Returns: Database["public"]["Enums"]["user_role"]
@@ -122,6 +131,10 @@ export type Database = {
       validate_pin_secure: {
         Args: { p_pin_code: string; p_client_identifier: string }
         Returns: Json
+      }
+      validate_session_secure: {
+        Args: { p_pin_code: string; p_session_id: string }
+        Returns: boolean
       }
     }
     Enums: {
