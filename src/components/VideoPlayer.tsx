@@ -7,6 +7,18 @@ interface VideoPlayerProps {
 }
 
 const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, posterUrl }) => {
+  console.log('VideoPlayer rendering with URL:', videoUrl);
+  console.log('VideoPlayer poster:', posterUrl);
+  
+  if (!videoUrl) {
+    console.log('VideoPlayer: No video URL provided');
+    return (
+      <div className="relative w-full aspect-video bg-black flex items-center justify-center">
+        <p className="text-white">Nenhum vídeo disponível</p>
+      </div>
+    );
+  }
+
   return (
     <div className="relative w-full aspect-video">
       <video

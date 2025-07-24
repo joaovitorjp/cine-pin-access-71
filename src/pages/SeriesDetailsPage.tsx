@@ -53,13 +53,20 @@ const SeriesDetailsPage: React.FC = () => {
   }, [id, navigate, isLoggedIn]);
 
   const handlePlayEpisode = (episode: Episode) => {
-    if (series) {
+    console.log('handlePlayEpisode called');
+    console.log('Episode:', episode);
+    console.log('Episode playerUrl:', episode.playerUrl);
+    
+    if (series && episode.playerUrl) {
       const processedUrl = convertVideoLink(episode.playerUrl);
+      console.log('Processed episode URL:', processedUrl);
       setVideoUrl(processedUrl);
       setCurrentEpisode(episode);
       setShowPlayer(true);
       // Add to history
       addToHistory(series, 'series');
+    } else {
+      console.log('Missing series or episode playerUrl');
     }
   };
 

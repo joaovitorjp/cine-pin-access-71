@@ -34,8 +34,11 @@ const MovieDetailsPage: React.FC = () => {
       try {
         const data = await getMovieById(id);
         if (data) {
+          console.log('Movie data loaded:', data);
+          console.log('Movie playerUrl:', data.playerUrl);
           setMovie(data);
           const processedUrl = convertVideoLink(data.playerUrl);
+          console.log('Processed video URL:', processedUrl);
           setVideoUrl(processedUrl);
         } else {
           setError("Filme não encontrado");
@@ -56,9 +59,15 @@ const MovieDetailsPage: React.FC = () => {
   };
 
   const handlePlayMovie = () => {
-    if (movie) {
+    console.log('handlePlayMovie called');
+    console.log('Movie:', movie);
+    console.log('Video URL:', videoUrl);
+    
+    if (movie && videoUrl) {
       addToHistory(movie, 'movie');
       setShowPlayer(true);
+    } else {
+      console.log('Missing movie or videoUrl');
     }
   };
 
