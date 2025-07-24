@@ -10,11 +10,20 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, posterUrl }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Check if URL is a direct video file (mp4, m3u8, etc.)
+  // Check if URL is a direct video file (mp4, m3u8, etc.) or can be played natively
   const isDirectVideo = videoUrl.match(/\.(mp4|webm|ogg|avi|mov|wmv|flv|m3u8)(\?.*)?$/i);
   
   // Check if it's an HLS stream
   const isHLS = videoUrl.includes('.m3u8');
+  
+  // Check if it's a Google Drive link (should use iframe)
+  const isGoogleDrive = videoUrl.includes('drive.google.com');
+  
+  // Check if it's YouTube (should use iframe)
+  const isYouTube = videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be');
+  
+  // Use video element for direct video files, iframe for everything else
+  const shouldUseVideoElement = isDirectVideo && !isGoogleDrive && !isYouTube;
 
   useEffect(() => {
     if (isHLS && videoRef.current) {
@@ -34,8 +43,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, posterUrl }) => {
     }
   };
 
-  // If it's a direct video file, use HTML5 video element
-  if (isDirectVideo) {
+  // If should use video element for direct video files
+  if (shouldUseVideoElement) {
     return (
       <div className="relative w-full aspect-video" ref={containerRef}>
         <video
