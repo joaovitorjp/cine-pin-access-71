@@ -4,6 +4,7 @@ export interface Movie {
   title: string;
   imageUrl: string;
   videoUrl: string;
+  playerUrl: string;
   description: string;
   year?: string;
   rating?: string;
@@ -43,6 +44,7 @@ export interface Episode {
   number: number;
   title: string;
   videoUrl: string;
+  playerUrl: string;
   description?: string;
   thumbnail?: string;
 }
