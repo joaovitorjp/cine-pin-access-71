@@ -56,9 +56,13 @@ const SeriesDetailsPage: React.FC = () => {
     console.log('handlePlayEpisode called');
     console.log('Episode:', episode);
     console.log('Episode playerUrl:', episode.playerUrl);
+    console.log('Episode videoUrl:', episode.videoUrl);
     
-    if (series && episode.playerUrl) {
-      const processedUrl = convertVideoLink(episode.playerUrl);
+    if (series && (episode.playerUrl || episode.videoUrl)) {
+      // Use playerUrl if available, otherwise use videoUrl
+      const urlToUse = episode.playerUrl || episode.videoUrl;
+      console.log('URL to use for episode:', urlToUse);
+      const processedUrl = convertVideoLink(urlToUse);
       console.log('Processed episode URL:', processedUrl);
       setVideoUrl(processedUrl);
       setCurrentEpisode(episode);
@@ -66,7 +70,7 @@ const SeriesDetailsPage: React.FC = () => {
       // Add to history
       addToHistory(series, 'series');
     } else {
-      console.log('Missing series or episode playerUrl');
+      console.log('Missing series or episode video URL');
     }
   };
 
