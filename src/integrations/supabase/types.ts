@@ -14,16 +14,118 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      auth_attempts: {
+        Row: {
+          attempt_count: number | null
+          attempt_type: string
+          blocked_until: string | null
+          client_identifier: string
+          first_attempt: string | null
+          id: string
+          last_attempt: string | null
+        }
+        Insert: {
+          attempt_count?: number | null
+          attempt_type: string
+          blocked_until?: string | null
+          client_identifier: string
+          first_attempt?: string | null
+          id?: string
+          last_attempt?: string | null
+        }
+        Update: {
+          attempt_count?: number | null
+          attempt_type?: string
+          blocked_until?: string | null
+          client_identifier?: string
+          first_attempt?: string | null
+          id?: string
+          last_attempt?: string | null
+        }
+        Relationships: []
+      }
+      pin_access: {
+        Row: {
+          client_name: string
+          created_at: string | null
+          created_by: string | null
+          days_valid: number
+          expiry_date: string
+          id: string
+          is_active: boolean | null
+          last_login: string | null
+          pin_code: string
+          session_id: string | null
+        }
+        Insert: {
+          client_name: string
+          created_at?: string | null
+          created_by?: string | null
+          days_valid: number
+          expiry_date: string
+          id?: string
+          is_active?: boolean | null
+          last_login?: string | null
+          pin_code: string
+          session_id?: string | null
+        }
+        Update: {
+          client_name?: string
+          created_at?: string | null
+          created_by?: string | null
+          days_valid?: number
+          expiry_date?: string
+          id?: string
+          is_active?: boolean | null
+          last_login?: string | null
+          pin_code?: string
+          session_id?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          display_name: string
+          id: string
+          role: Database["public"]["Enums"]["user_role"] | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          display_name: string
+          id?: string
+          role?: Database["public"]["Enums"]["user_role"] | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          display_name?: string
+          id?: string
+          role?: Database["public"]["Enums"]["user_role"] | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_role: {
+        Args: { user_uuid: string }
+        Returns: Database["public"]["Enums"]["user_role"]
+      }
+      validate_pin_secure: {
+        Args: { p_pin_code: string; p_client_identifier: string }
+        Returns: Json
+      }
     }
     Enums: {
-      [_ in never]: never
+      user_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +252,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      user_role: ["admin", "user"],
+    },
   },
 } as const
