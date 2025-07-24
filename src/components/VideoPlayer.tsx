@@ -66,7 +66,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, posterUrl }) => {
         className="w-full h-full absolute inset-0"
         allowFullScreen
         allow="autoplay; encrypted-media; picture-in-picture; fullscreen; accelerometer; gyroscope"
-        sandbox="allow-scripts allow-same-origin allow-presentation allow-forms allow-top-navigation allow-top-navigation-by-user-activation allow-popups"
         style={{ border: 'none' }}
         loading="lazy"
       />
