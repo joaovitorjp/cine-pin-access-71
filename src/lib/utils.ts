@@ -45,28 +45,74 @@ export const formatDate = (dateString: string): string => {
   return new Date(dateString).toLocaleDateString(undefined, options);
 };
 
-// Convert video links
+// Convert various video links to playable formats
 export const convertVideoLink = (url: string): string => {
-  console.log('convertVideoLink input:', url);
-  
-  if (!url) {
-    console.log('convertVideoLink: URL is empty');
-    return '';
-  }
+  if (!url) return '';
 
-  // Convert Google Drive links to direct video URLs
-  if (url.includes('drive.google.com')) {
-    const fileIdMatch = url.match(/\/d\/([a-zA-Z0-9-_]+)/);
-    if (fileIdMatch) {
-      const fileId = fileIdMatch[1];
-      const directUrl = `https://drive.google.com/file/d/${fileId}/preview`;
-      console.log('convertVideoLink Google Drive output:', directUrl);
-      return directUrl;
+  // YouTube links - Convert to embed format
+  if (url.includes('youtube.com') || url.includes('youtu.be')) {
+    let videoId = '';
+    
+    // Handle youtube.com/watch?v=ID
+    if (url.includes('watch?v=')) {
+      const match = url.match(/[?&]v=([^&]+)/);
+      if (match && match[1]) {
+        videoId = match[1];
+      }
+    }
+    // Handle youtu.be/ID
+    else if (url.includes('youtu.be/')) {
+      const match = url.match(/youtu\.be\/([^?]+)/);
+      if (match && match[1]) {
+        videoId = match[1];
+      }
+    }
+    
+    if (videoId) {
+      return `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1&rel=0`;
     }
   }
 
-  // Return URL as-is for other types
-  console.log('convertVideoLink output:', url);
+  // Google Drive links
+  if (url.includes('drive.google.com')) {
+    // Already in the correct format
+    if (url.includes('/preview')) {
+      return url;
+    }
+    
+    let fileId = '';
+    
+    // Handle format: https://drive.google.com/file/d/{ID}/view
+    if (url.includes('/file/d/')) {
+      const match = url.match(/\/file\/d\/([^\/\?]+)/);
+      if (match && match[1]) {
+        fileId = match[1];
+      }
+    }
+    // Handle format: https://drive.google.com/open?id={ID}
+    else if (url.includes('open?id=')) {
+      const match = url.match(/id=([^&]+)/);
+      if (match && match[1]) {
+        fileId = match[1];
+      }
+    }
+    
+    if (fileId) {
+      return `https://drive.google.com/file/d/${fileId}/preview`;
+    }
+  }
+
+  // Direct video files (.mp4, .webm, .ogg, etc.) or HLS streams (.m3u8)
+  if (url.match(/\.(mp4|webm|ogg|avi|mov|wmv|flv|m3u8)(\?.*)?$/i)) {
+    return url;
+  }
+
+  // Already embedded or iframe-ready URLs
+  if (url.includes('/embed/') || url.includes('iframe')) {
+    return url;
+  }
+
+  // For any other URL, return as-is (could be from various video hosting services)
   return url;
 };
 

@@ -11,9 +11,11 @@ import { HistoryProvider } from "@/contexts/HistoryContext";
 import Layout from "@/components/Layout";
 import HomePage from "@/pages/HomePage";
 import MovieDetailsPage from "@/pages/MovieDetailsPage";
+import PlayerPage from "@/pages/PlayerPage";
 import AdminPage from "@/pages/AdminPage";
 import SeriesPage from "@/pages/SeriesPage";
 import SeriesDetailsPage from "@/pages/SeriesDetailsPage";
+import SeriesPlayerPage from "@/pages/SeriesPlayerPage";
 import LiveTVPage from "@/pages/LiveTVPage";
 import LiveTVPlayerPage from "@/pages/LiveTVPlayerPage";
 import FavoritesPage from "@/pages/FavoritesPage";
@@ -37,8 +39,10 @@ const App = () => (
                   <Routes>
                     <Route path="/" element={<HomePage />} />
                     <Route path="/movie/:id" element={<MovieDetailsPage />} />
+                    <Route path="/player/:id" element={<PlayerPage />} />
                     <Route path="/series" element={<SeriesPage />} />
                     <Route path="/series/:id" element={<SeriesDetailsPage />} />
+                    <Route path="/player/series/:seriesId/:seasonNumber/:episodeNumber" element={<SeriesPlayerPage />} />
                     <Route path="/livetv" element={<LiveTVPage />} />
                     <Route path="/livetv/player/:id" element={<LiveTVPlayerPage />} />
                     <Route path="/favorites" element={<FavoritesPage />} />

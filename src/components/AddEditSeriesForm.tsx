@@ -51,7 +51,6 @@ const AddEditSeriesForm = ({ series, onSuccess }: AddEditSeriesFormProps) => {
       number: episodeNumber,
       title: '',
       videoUrl: '',
-      playerUrl: '', // Add playerUrl field
       description: '',
       thumbnail: ''
     });
@@ -229,14 +228,6 @@ const AddEditSeriesForm = ({ series, onSuccess }: AddEditSeriesFormProps) => {
                             value={episode.videoUrl}
                             onChange={(e) => handleEpisodeChange(seasonIndex, episodeIndex, 'videoUrl', e.target.value)}
                             placeholder="URL do vídeo"
-                          />
-                        </div>
-                        <div>
-                          <Label>URL do Player</Label>
-                          <Input
-                            value={episode.playerUrl}
-                            onChange={(e) => handleEpisodeChange(seasonIndex, episodeIndex, 'playerUrl', e.target.value)}
-                            placeholder="URL do player"
                           />
                         </div>
                         <div>

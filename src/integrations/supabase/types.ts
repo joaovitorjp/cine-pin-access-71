@@ -14,131 +14,16 @@ export type Database = {
   }
   public: {
     Tables: {
-      auth_attempts: {
-        Row: {
-          attempt_count: number | null
-          attempt_type: string
-          blocked_until: string | null
-          client_identifier: string
-          first_attempt: string | null
-          id: string
-          last_attempt: string | null
-        }
-        Insert: {
-          attempt_count?: number | null
-          attempt_type: string
-          blocked_until?: string | null
-          client_identifier: string
-          first_attempt?: string | null
-          id?: string
-          last_attempt?: string | null
-        }
-        Update: {
-          attempt_count?: number | null
-          attempt_type?: string
-          blocked_until?: string | null
-          client_identifier?: string
-          first_attempt?: string | null
-          id?: string
-          last_attempt?: string | null
-        }
-        Relationships: []
-      }
-      pin_access: {
-        Row: {
-          client_name: string
-          created_at: string | null
-          created_by: string | null
-          days_valid: number
-          expiry_date: string
-          id: string
-          is_active: boolean | null
-          last_login: string | null
-          pin_code: string
-          session_id: string | null
-        }
-        Insert: {
-          client_name: string
-          created_at?: string | null
-          created_by?: string | null
-          days_valid: number
-          expiry_date: string
-          id?: string
-          is_active?: boolean | null
-          last_login?: string | null
-          pin_code: string
-          session_id?: string | null
-        }
-        Update: {
-          client_name?: string
-          created_at?: string | null
-          created_by?: string | null
-          days_valid?: number
-          expiry_date?: string
-          id?: string
-          is_active?: boolean | null
-          last_login?: string | null
-          pin_code?: string
-          session_id?: string | null
-        }
-        Relationships: []
-      }
-      profiles: {
-        Row: {
-          created_at: string | null
-          display_name: string
-          id: string
-          role: Database["public"]["Enums"]["user_role"] | null
-          updated_at: string | null
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          display_name: string
-          id?: string
-          role?: Database["public"]["Enums"]["user_role"] | null
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          display_name?: string
-          id?: string
-          role?: Database["public"]["Enums"]["user_role"] | null
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      create_pin_secure: {
-        Args: {
-          p_pin_code: string
-          p_client_name: string
-          p_days_valid: number
-          p_created_by: string
-        }
-        Returns: Json
-      }
-      get_user_role: {
-        Args: { user_uuid: string }
-        Returns: Database["public"]["Enums"]["user_role"]
-      }
-      validate_pin_secure: {
-        Args: { p_pin_code: string; p_client_identifier: string }
-        Returns: Json
-      }
-      validate_session_secure: {
-        Args: { p_pin_code: string; p_session_id: string }
-        Returns: boolean
-      }
+      [_ in never]: never
     }
     Enums: {
-      user_role: "admin" | "user"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
@@ -265,8 +150,6 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {
-      user_role: ["admin", "user"],
-    },
+    Enums: {},
   },
 } as const

@@ -41,7 +41,6 @@ const AddEditMovieForm: React.FC<AddEditMovieFormProps> = ({ movie, onSuccess })
         title,
         imageUrl,
         videoUrl,
-        playerUrl: videoUrl, // Use videoUrl as playerUrl for compatibility
         description,
         year,
         genre,
