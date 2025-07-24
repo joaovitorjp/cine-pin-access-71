@@ -6,6 +6,7 @@ import { getAnimeById } from "@/services/animeService";
 import VideoPlayer from "@/components/VideoPlayer";
 import { ArrowLeft, SkipBack, SkipForward } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { convertVideoLink } from "@/lib/utils";
 
 const AnimePlayerPage: React.FC = () => {
   const { animeId, seasonNumber, episodeNumber } = useParams<{
@@ -170,7 +171,7 @@ const AnimePlayerPage: React.FC = () => {
 
       {/* Video player */}
       <div className="relative">
-        <VideoPlayer videoUrl={episode.videoUrl} />
+        <VideoPlayer videoUrl={convertVideoLink(episode.videoUrl)} />
       </div>
 
       {/* Episode info */}

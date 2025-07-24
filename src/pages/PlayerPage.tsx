@@ -7,7 +7,7 @@ import VideoPlayer from "@/components/VideoPlayer";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { convertGoogleDriveLink } from "@/lib/utils";
+import { convertVideoLink } from "@/lib/utils";
 
 const PlayerPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -33,7 +33,7 @@ const PlayerPage: React.FC = () => {
         
         if (data) {
           setMovie(data);
-          const processedUrl = convertGoogleDriveLink(data.videoUrl);
+          const processedUrl = convertVideoLink(data.videoUrl);
           setVideoUrl(processedUrl);
         } else {
           setError("Filme não encontrado");

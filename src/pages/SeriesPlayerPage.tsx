@@ -7,7 +7,7 @@ import VideoPlayer from "@/components/VideoPlayer";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { convertGoogleDriveLink } from "@/lib/utils";
+import { convertVideoLink } from "@/lib/utils";
 
 const SeriesPlayerPage: React.FC = () => {
   const { seriesId, seasonNumber, episodeNumber } = useParams<{
@@ -51,7 +51,7 @@ const SeriesPlayerPage: React.FC = () => {
             
             if (ep) {
               setEpisode(ep);
-              const processedUrl = convertGoogleDriveLink(ep.videoUrl);
+              const processedUrl = convertVideoLink(ep.videoUrl);
               setVideoUrl(processedUrl);
             } else {
               setError("Episódio não encontrado");
