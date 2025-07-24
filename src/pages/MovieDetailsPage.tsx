@@ -6,6 +6,7 @@ import { getMovieById } from "@/services/movieService";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Play } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import FavoriteButton from "@/components/FavoriteButton";
 
 const MovieDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -98,13 +99,16 @@ const MovieDetailsPage: React.FC = () => {
               {movie.genre && <span className="text-netflix-gray">{movie.genre}</span>}
             </div>
             
-            <Button 
-              onClick={handlePlayMovie} 
-              className="bg-netflix-red hover:bg-red-700 mb-4 w-40"
-            >
-              <Play className="w-4 h-4 mr-2" />
-              Assistir
-            </Button>
+            <div className="flex items-center gap-4 mb-4">
+              <Button 
+                onClick={handlePlayMovie} 
+                className="bg-netflix-red hover:bg-red-700"
+              >
+                <Play className="w-4 h-4 mr-2" />
+                Assistir
+              </Button>
+              <FavoriteButton item={movie} type="movie" />
+            </div>
           </div>
         </div>
       </div>

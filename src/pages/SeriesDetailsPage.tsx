@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Play } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import FavoriteButton from "@/components/FavoriteButton";
 
 const SeriesDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -101,7 +102,11 @@ const SeriesDetailsPage: React.FC = () => {
             )}
           </div>
           
-          <p className="text-netflix-gray mb-8">{series.description}</p>
+          <p className="text-netflix-gray mb-4">{series.description}</p>
+          
+          <div className="mb-8">
+            <FavoriteButton item={series} type="series" />
+          </div>
 
           <Tabs defaultValue={`season-1`} className="w-full">
             <TabsList className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 mb-4">

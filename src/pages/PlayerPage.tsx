@@ -7,6 +7,7 @@ import VideoPlayer from "@/components/VideoPlayer";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useHistory } from "@/contexts/HistoryContext";
 import { convertVideoLink } from "@/lib/utils";
 
 const PlayerPage: React.FC = () => {
@@ -17,6 +18,7 @@ const PlayerPage: React.FC = () => {
   const [error, setError] = React.useState("");
   const navigate = useNavigate();
   const { isLoggedIn } = useAuth();
+  const { addToHistory } = useHistory();
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -35,6 +37,8 @@ const PlayerPage: React.FC = () => {
           setMovie(data);
           const processedUrl = convertVideoLink(data.videoUrl);
           setVideoUrl(processedUrl);
+          // Add to history when movie starts playing
+          addToHistory(data, 'movie');
         } else {
           setError("Filme não encontrado");
         }

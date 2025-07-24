@@ -6,6 +6,7 @@ import VideoPlayer from "@/components/VideoPlayer";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useHistory } from "@/contexts/HistoryContext";
 import { convertVideoLink } from "@/lib/utils";
 
 const LiveTVPlayerPage: React.FC = () => {
@@ -16,6 +17,7 @@ const LiveTVPlayerPage: React.FC = () => {
   const [error, setError] = React.useState("");
   const navigate = useNavigate();
   const { isLoggedIn } = useAuth();
+  const { addToHistory } = useHistory();
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -34,6 +36,8 @@ const LiveTVPlayerPage: React.FC = () => {
           setChannel(data);
           const processedUrl = convertVideoLink(data.playerUrl);
           setVideoUrl(processedUrl);
+          // Add to history when channel starts playing
+          addToHistory(data, 'livetv');
         } else {
           setError("Canal não encontrado");
         }

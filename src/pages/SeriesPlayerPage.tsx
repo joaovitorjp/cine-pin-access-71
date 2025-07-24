@@ -7,6 +7,7 @@ import VideoPlayer from "@/components/VideoPlayer";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useHistory } from "@/contexts/HistoryContext";
 import { convertVideoLink } from "@/lib/utils";
 
 const SeriesPlayerPage: React.FC = () => {
@@ -23,6 +24,7 @@ const SeriesPlayerPage: React.FC = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const { isLoggedIn } = useAuth();
+  const { addToHistory } = useHistory();
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -53,6 +55,8 @@ const SeriesPlayerPage: React.FC = () => {
               setEpisode(ep);
               const processedUrl = convertVideoLink(ep.videoUrl);
               setVideoUrl(processedUrl);
+              // Add to history when episode starts playing
+              addToHistory(seriesData, 'series', ep, parseInt(seasonNumber));
             } else {
               setError("Episódio não encontrado");
             }

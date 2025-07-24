@@ -5,6 +5,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
+import { FavoritesProvider } from "@/contexts/FavoritesContext";
+import { HistoryProvider } from "@/contexts/HistoryContext";
 import Layout from "@/components/Layout";
 import HomePage from "@/pages/HomePage";
 import MovieDetailsPage from "@/pages/MovieDetailsPage";
@@ -15,6 +18,8 @@ import SeriesDetailsPage from "@/pages/SeriesDetailsPage";
 import SeriesPlayerPage from "@/pages/SeriesPlayerPage";
 import LiveTVPage from "@/pages/LiveTVPage";
 import LiveTVPlayerPage from "@/pages/LiveTVPlayerPage";
+import FavoritesPage from "@/pages/FavoritesPage";
+import HistoryPage from "@/pages/HistoryPage";
 import ClientInfo from "@/components/ClientInfo";
 import NotFound from "./pages/NotFound";
 
@@ -25,25 +30,33 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <AuthProvider>
-        <BrowserRouter>
-          <Layout>
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/movie/:id" element={<MovieDetailsPage />} />
-              <Route path="/player/:id" element={<PlayerPage />} />
-              <Route path="/series" element={<SeriesPage />} />
-              <Route path="/series/:id" element={<SeriesDetailsPage />} />
-              <Route path="/player/series/:seriesId/:seasonNumber/:episodeNumber" element={<SeriesPlayerPage />} />
-            <Route path="/livetv" element={<LiveTVPage />} />
-            <Route path="/livetv/player/:id" element={<LiveTVPlayerPage />} />
-              <Route path="/info" element={<ClientInfo />} />
-              <Route path="/admin" element={<AdminPage />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Layout>
-        </BrowserRouter>
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <FavoritesProvider>
+            <HistoryProvider>
+              <BrowserRouter>
+                <Layout>
+                  <Routes>
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/movie/:id" element={<MovieDetailsPage />} />
+                    <Route path="/player/:id" element={<PlayerPage />} />
+                    <Route path="/series" element={<SeriesPage />} />
+                    <Route path="/series/:id" element={<SeriesDetailsPage />} />
+                    <Route path="/player/series/:seriesId/:seasonNumber/:episodeNumber" element={<SeriesPlayerPage />} />
+                    <Route path="/livetv" element={<LiveTVPage />} />
+                    <Route path="/livetv/player/:id" element={<LiveTVPlayerPage />} />
+                    <Route path="/favorites" element={<FavoritesPage />} />
+                    <Route path="/history" element={<HistoryPage />} />
+                    <Route path="/info" element={<ClientInfo />} />
+                    <Route path="/admin" element={<AdminPage />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </Layout>
+              </BrowserRouter>
+            </HistoryProvider>
+          </FavoritesProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
