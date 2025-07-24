@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Film, Tv, User } from "lucide-react";
+import { Film, Tv, Radio, User } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 const BottomNavigation: React.FC = () => {
@@ -67,7 +67,7 @@ const BottomNavigation: React.FC = () => {
                   : "text-gray-400 hover:text-gray-200"
               }`}
             >
-              <Tv className={`w-6 h-6 transition-transform duration-300 ${
+              <Radio className={`w-6 h-6 transition-transform duration-300 ${
                 isLiveTVActive ? 'scale-110' : ''
               }`} />
               <span className={`text-xs mt-1 transition-all duration-300 ${
