@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { validatePin, validateSession } from "@/services/pinService";
 import { toast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AuthContextType {
   isLoggedIn: boolean;
@@ -10,7 +11,7 @@ interface AuthContextType {
   clientName: string;
   daysRemaining: number;
   loginWithPin: (pin: string) => Promise<boolean>;
-  loginAsAdmin: (password: string) => boolean;
+  loginAsAdmin: (password: string) => Promise<boolean>;
   logout: () => void;
 }
 
@@ -21,7 +22,7 @@ const AuthContext = createContext<AuthContextType>({
   clientName: "",
   daysRemaining: 0,
   loginWithPin: async () => false,
-  loginAsAdmin: () => false,
+  loginAsAdmin: async () => false,
   logout: () => {},
 });
 
@@ -162,41 +163,57 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Login as admin
-  const loginAsAdmin = (password: string): boolean => {
-    if (password === "admin4455") {
-      // Set expiry to 24 hours from now
-      const expiry = new Date();
-      expiry.setHours(expiry.getHours() + 24);
-      
-      // Save auth state
-      const authState = {
-        isLoggedIn: true,
-        isAdmin: true,
-        expiry: expiry.toISOString(),
-        clientName: "Administrador",
-      };
-      localStorage.setItem("authState", JSON.stringify(authState));
-      
-      setIsLoggedIn(true);
-      setIsAdmin(true);
-      setClientName("Administrador");
-      
-      toast({
-        title: "Login admin efetuado com sucesso",
-        description: "Você está logado como administrador.",
+  // Login as admin (validates token via Lovable Cloud)
+  const loginAsAdmin = async (password: string): Promise<boolean> => {
+    try {
+      const { data, error } = await supabase.rpc("validate_admin_token", {
+        _token: password,
       });
-      
-      return true;
+
+      if (error) {
+        console.error("Erro ao validar token admin:", error);
+        toast({
+          title: "Erro ao validar token",
+          description: "Não foi possível validar o token de admin. Tente novamente.",
+          variant: "destructive",
+        });
+        return false;
+      }
+
+      if (data === true) {
+        const expiry = new Date();
+        expiry.setHours(expiry.getHours() + 24);
+
+        const authState = {
+          isLoggedIn: true,
+          isAdmin: true,
+          expiry: expiry.toISOString(),
+          clientName: "Administrador",
+        };
+        localStorage.setItem("authState", JSON.stringify(authState));
+
+        setIsLoggedIn(true);
+        setIsAdmin(true);
+        setClientName("Administrador");
+
+        toast({
+          title: "Login admin efetuado com sucesso",
+          description: "Você está logado como administrador.",
+        });
+
+        return true;
+      }
+
+      toast({
+        title: "Token inválido",
+        description: "O token de administrador informado é inválido.",
+        variant: "destructive",
+      });
+      return false;
+    } catch (err) {
+      console.error("Erro inesperado no login admin:", err);
+      return false;
     }
-    
-    toast({
-      title: "Senha incorreta",
-      description: "A senha fornecida está incorreta.",
-      variant: "destructive",
-    });
-    
-    return false;
   };
 
   // Logout

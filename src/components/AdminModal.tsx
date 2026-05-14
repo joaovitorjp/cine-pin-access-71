@@ -23,21 +23,21 @@ const AdminModal: React.FC<AdminModalProps> = ({ open, onOpenChange, onSuccessfu
   const [error, setError] = useState("");
   const { loginAsAdmin } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!password) {
-      setError("Por favor, insira a senha");
+      setError("Por favor, insira o token de admin");
       return;
     }
 
-    const success = loginAsAdmin(password);
+    const success = await loginAsAdmin(password);
     if (success) {
       onOpenChange(false);
       onSuccessfulLogin();
       setPassword("");
       setError("");
     } else {
-      setError("Senha incorreta");
+      setError("Token inválido");
     }
   };
 
@@ -47,17 +47,17 @@ const AdminModal: React.FC<AdminModalProps> = ({ open, onOpenChange, onSuccessfu
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold">Acesso Administrativo</DialogTitle>
           <DialogDescription className="text-netflix-gray">
-            Digite a senha para acessar o painel administrativo.
+            Digite o token para acessar o painel administrativo.
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="password">Senha</Label>
+            <Label htmlFor="password">Token de admin</Label>
             <Input
               id="password"
               type="password"
-              placeholder="Digite a senha admin"
+              placeholder="Digite o token admin"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="bg-gray-700 border-gray-600"
