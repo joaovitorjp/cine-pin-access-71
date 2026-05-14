@@ -21,7 +21,7 @@ const AuthContext = createContext<AuthContextType>({
   clientName: "",
   daysRemaining: 0,
   loginWithPin: async () => false,
-  loginAsAdmin: () => false,
+  loginAsAdmin: async () => false,
   logout: () => {},
 });
 
