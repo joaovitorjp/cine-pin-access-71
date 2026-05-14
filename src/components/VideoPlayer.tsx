@@ -73,15 +73,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, posterUrl }) => {
           loading="lazy"
         />
       </div>
-      <div className="flex justify-center px-4 py-4 bg-black">
-        <button
-          type="button"
-          onClick={() => window.open(videoUrl, '_blank', 'noopener,noreferrer')}
-          className="px-5 py-2 rounded-md bg-netflix-red text-white font-semibold hover:bg-red-700 transition-colors"
-        >
-          Assistir no Player Externo
-        </button>
-      </div>
     </div>
   );
 };
