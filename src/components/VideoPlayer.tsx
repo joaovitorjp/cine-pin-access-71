@@ -60,16 +60,28 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, posterUrl }) => {
 
   // For iframe-based videos (YouTube, Drive, etc.)
   return (
-    <div className="relative w-full aspect-video">
-      <iframe
-        src={videoUrl}
-        className="w-full h-full absolute inset-0"
-        allowFullScreen
-        allow="autoplay; encrypted-media; picture-in-picture; fullscreen; accelerometer; gyroscope"
-        sandbox="allow-scripts allow-same-origin allow-presentation allow-forms"
-        style={{ border: 'none' }}
-        loading="lazy"
-      />
+    <div className="w-full">
+      <div className="relative w-full aspect-video">
+        <iframe
+          src={videoUrl}
+          className="w-full h-full absolute inset-0"
+          allowFullScreen
+          referrerPolicy="no-referrer"
+          allow="autoplay; encrypted-media; picture-in-picture; fullscreen; accelerometer; gyroscope"
+          sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation"
+          style={{ border: 'none' }}
+          loading="lazy"
+        />
+      </div>
+      <div className="flex justify-center px-4 py-4 bg-black">
+        <button
+          type="button"
+          onClick={() => window.open(videoUrl, '_blank', 'noopener,noreferrer')}
+          className="px-5 py-2 rounded-md bg-netflix-red text-white font-semibold hover:bg-red-700 transition-colors"
+        >
+          Assistir no Player Externo
+        </button>
+      </div>
     </div>
   );
 };
