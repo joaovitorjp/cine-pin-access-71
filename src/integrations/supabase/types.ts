@@ -14,13 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      admin_tokens: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          label: string | null
+          token: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          label?: string | null
+          token: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          label?: string | null
+          token?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      validate_admin_token: { Args: { _token: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
