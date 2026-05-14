@@ -10,7 +10,7 @@ interface AuthContextType {
   clientName: string;
   daysRemaining: number;
   loginWithPin: (pin: string) => Promise<boolean>;
-  loginAsAdmin: (password: string) => boolean;
+  loginAsAdmin: (password: string) => Promise<boolean>;
   logout: () => void;
 }
 
