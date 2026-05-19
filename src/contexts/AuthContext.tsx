@@ -167,24 +167,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Login as admin (validates token via Lovable Cloud)
-  const loginAsAdmin = async (password: string): Promise<boolean> => {
+  // Login as admin (validates username + password via Lovable Cloud)
+  const loginAsAdmin = async (username: string, password: string): Promise<boolean> => {
     try {
-      const { data, error } = await supabase.rpc("validate_admin_token", {
-        _token: password,
+      const { data, error } = await supabase.rpc("validate_admin_credentials", {
+        _username: username,
+        _password: password,
       });
 
       if (error) {
-        console.error("Erro ao validar token admin:", error);
+        console.error("Erro ao validar credenciais admin:", error);
         toast({
-          title: "Erro ao validar token",
-          description: "Não foi possível validar o token de admin. Tente novamente.",
+          title: "Erro ao validar credenciais",
+          description: "Não foi possível validar as credenciais. Tente novamente.",
           variant: "destructive",
         });
         return false;
       }
 
-      if (data === true) {
+      if (data) {
+        const validatedUsername = data as string;
         const expiry = new Date();
         expiry.setHours(expiry.getHours() + 24);
 
@@ -192,25 +194,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           isLoggedIn: true,
           isAdmin: true,
           expiry: expiry.toISOString(),
-          clientName: "Administrador",
+          clientName: validatedUsername,
+          adminUsername: validatedUsername,
         };
         localStorage.setItem("authState", JSON.stringify(authState));
 
         setIsLoggedIn(true);
         setIsAdmin(true);
-        setClientName("Administrador");
+        setClientName(validatedUsername);
+        setAdminUsername(validatedUsername);
 
         toast({
           title: "Login admin efetuado com sucesso",
-          description: "Você está logado como administrador.",
+          description: `Bem-vindo, ${validatedUsername}.`,
         });
 
         return true;
       }
 
       toast({
-        title: "Token inválido",
-        description: "O token de administrador informado é inválido.",
+        title: "Credenciais inválidas",
+        description: "Usuário ou senha incorretos.",
         variant: "destructive",
       });
       return false;
