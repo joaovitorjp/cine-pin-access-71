@@ -131,9 +131,12 @@ const FeaturedLoginCarousel: React.FC = () => {
                 <button
                   key={`${rowIdx}-${m.id}-${i}`}
                   type="button"
-                  onClick={() => setSelected(m)}
-                  className="group relative flex-shrink-0 aspect-[2/3] rounded-md overflow-hidden shadow-2xl ring-1 ring-white/10 bg-netflix-dark hover:ring-netflix-red transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-netflix-red"
-                  style={{ width: "clamp(76px, 8vmax, 190px)" }}
+                  onPointerDown={(e) => {
+                    e.preventDefault();
+                    setSelected(m);
+                  }}
+                  className="group relative flex-shrink-0 aspect-[2/3] rounded-md overflow-hidden shadow-2xl ring-1 ring-white/10 bg-netflix-dark md:hover:ring-netflix-red md:transition-all md:duration-300 md:hover:scale-105 focus:outline-none focus:ring-2 focus:ring-netflix-red touch-manipulation select-none"
+                  style={{ width: "clamp(76px, 8vmax, 190px)", WebkitTapHighlightColor: "transparent" }}
                   aria-label={`Ver detalhes de ${m.title}`}
                 >
                   <img
