@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 const FeaturedLoginCarousel: React.FC = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [selected, setSelected] = useState<Movie | null>(null);
-  const [paused, setPaused] = useState(false);
+
 
   useEffect(() => {
     const load = async () => {
@@ -65,13 +65,9 @@ const FeaturedLoginCarousel: React.FC = () => {
               key={rowIdx}
               className={`flex gap-2 ${rowIdx % 2 === 0 ? "animate-marquee-x" : "animate-marquee-x-reverse"}`}
               style={{
-                animationPlayState: paused ? "paused" : "running",
                 width: "max-content",
               }}
-              onMouseEnter={() => setPaused(true)}
-              onMouseLeave={() => setPaused(false)}
-              onTouchStart={() => setPaused(true)}
-              onTouchEnd={() => setPaused(false)}
+
             >
               {rowMovies.map((m, i) => (
                 <button
