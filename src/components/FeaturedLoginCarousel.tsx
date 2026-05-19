@@ -94,7 +94,17 @@ const FeaturedLoginCarousel: React.FC = () => {
 
   return (
     <>
-      <div className="fixed inset-0 z-0 overflow-hidden w-screen h-screen h-[100dvh]" aria-hidden="false">
+      <div
+        className="overflow-hidden"
+        style={{
+          position: "fixed",
+          inset: 0,
+          width: "100vw",
+          height: "100dvh",
+          zIndex: 0,
+        }}
+        aria-hidden="false"
+      >
         <div
           className="absolute left-1/2 top-1/2 flex flex-col gap-[5px]"
           style={{
