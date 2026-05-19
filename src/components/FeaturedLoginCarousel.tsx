@@ -96,7 +96,7 @@ const FeaturedLoginCarousel: React.FC = () => {
     <>
       <div className="absolute inset-0 z-0 overflow-hidden" aria-hidden="false">
         <div
-          className="absolute -inset-x-[10%] -inset-y-[5%] flex flex-col gap-[5px]"
+          className="absolute -inset-x-[15%] -inset-y-[20%] flex flex-col gap-[5px]"
           style={{ transform: "rotate(-6deg)", transformOrigin: "center" }}
         >
           {rows.map((rowMovies, rowIdx) => (

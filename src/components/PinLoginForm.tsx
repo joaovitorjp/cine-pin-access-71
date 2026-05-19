@@ -82,7 +82,7 @@ const PinLoginForm: React.FC = () => {
 
 
   return (
-    <div className="h-screen w-screen overflow-hidden flex items-center justify-center p-4 relative">
+    <div className="min-h-screen min-h-[100dvh] h-[100dvh] w-screen overflow-hidden flex items-center justify-center p-4 relative">
       <AnimatedBackground />
       <FeaturedLoginCarousel />
       <div className="w-full max-w-sm mx-auto relative z-20">
