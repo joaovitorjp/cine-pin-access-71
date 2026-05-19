@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import AnimatedBackground from "@/components/AnimatedBackground";
+import FeaturedLoginCarousel from "@/components/FeaturedLoginCarousel";
 import { getAllMovies } from "@/services/movieService";
 import { getAllSeries } from "@/services/seriesService";
 
@@ -83,6 +84,7 @@ const PinLoginForm: React.FC = () => {
   return (
     <div className="h-screen w-screen overflow-hidden flex items-center justify-center p-4 relative">
       <AnimatedBackground />
+      <FeaturedLoginCarousel />
       <div className="w-full max-w-sm mx-auto relative z-20">
         <div className="p-6 rounded-lg bg-netflix-dark/70">
           <h2 className="text-xl font-bold mb-3 text-center">CINE FLEX</h2>
