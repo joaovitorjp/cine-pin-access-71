@@ -74,14 +74,15 @@ const FeaturedLoginCarousel: React.FC = () => {
                   key={`${rowIdx}-${m.id}-${i}`}
                   type="button"
                   onClick={() => setSelected(m)}
-                  className="group relative flex-shrink-0 w-24 sm:w-28 md:w-32 aspect-[2/3] rounded-md overflow-hidden shadow-2xl ring-1 ring-white/10 hover:ring-netflix-red transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-netflix-red"
+                  className="group relative flex-shrink-0 w-20 sm:w-24 md:w-28 lg:w-32 xl:w-36 2xl:w-40 aspect-[2/3] rounded-md overflow-hidden shadow-2xl ring-1 ring-white/10 bg-netflix-dark hover:ring-netflix-red transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-netflix-red"
                   aria-label={`Ver detalhes de ${m.title}`}
                 >
                   <img
                     src={m.imageUrl}
                     alt={m.title}
                     className="w-full h-full object-cover"
-                    loading="lazy"
+                    loading="eager"
+                    decoding="async"
                     onError={(e) => {
                       (e.target as HTMLImageElement).src =
                         "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b";
