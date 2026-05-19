@@ -81,35 +81,39 @@ const FeaturedLoginCarousel: React.FC = () => {
   // Garante filmes únicos antes de distribuir (evita repetição na mesma linha)
   const uniqueMovies = Array.from(new Map(movies.map(m => [m.id, m])).values());
 
-  // Distribui filmes em 6 linhas
-  const ROW_COUNT = 6;
+  // Distribui filmes em linhas suficientes para cobrir qualquer viewport.
+  const ROW_COUNT = 14;
+  const MIN_ITEMS_PER_HALF_ROW = 48;
   const rows = Array.from({ length: ROW_COUNT }, (_, rowIdx) => {
     const offset = Math.floor((uniqueMovies.length / ROW_COUNT) * rowIdx);
     const rotated = [...uniqueMovies.slice(offset), ...uniqueMovies.slice(0, offset)];
-    // duplicamos a lista (2x) para loop seamless com translateX(-50%).
-    // Como cada filme só reaparece após um ciclo completo (~100s),
-    // o mesmo filme nunca se repete na mesma linha em menos de 10s.
-    return [...rotated, ...rotated];
+    const halfRow = Array.from(
+      { length: Math.max(MIN_ITEMS_PER_HALF_ROW, rotated.length) },
+      (_, index) => rotated[index % rotated.length]
+    );
+    // duplicamos a metade final (2x) para loop seamless com translateX(-50%).
+    return [...halfRow, ...halfRow];
   });
 
   return (
     <>
       <div
-        className="overflow-hidden"
+        className="fixed inset-0 h-screen w-screen overflow-hidden"
         style={{
           position: "fixed",
           inset: 0,
           width: "100vw",
           height: "100dvh",
+          minHeight: "100vh",
           zIndex: 0,
         }}
         aria-hidden="false"
       >
         <div
-          className="absolute left-1/2 top-1/2 flex flex-col gap-[5px]"
+          className="absolute left-1/2 top-1/2 flex flex-col justify-center gap-[5px]"
           style={{
             width: "200vmax",
-            height: "200vmax",
+            minHeight: "200vmax",
             transform: "translate(-50%, -50%) rotate(-6deg)",
             transformOrigin: "center",
           }}
@@ -129,7 +133,7 @@ const FeaturedLoginCarousel: React.FC = () => {
                   type="button"
                   onClick={() => setSelected(m)}
                   className="group relative flex-shrink-0 aspect-[2/3] rounded-md overflow-hidden shadow-2xl ring-1 ring-white/10 bg-netflix-dark hover:ring-netflix-red transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-netflix-red"
-                  style={{ width: "clamp(72px, 9vw, 180px)" }}
+                  style={{ width: "clamp(76px, 8vmax, 190px)" }}
                   aria-label={`Ver detalhes de ${m.title}`}
                 >
                   <img
