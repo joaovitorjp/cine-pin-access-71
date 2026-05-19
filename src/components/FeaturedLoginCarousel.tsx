@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
  * Carrossel diagonal de destaques na tela de login.
  * Suporta filmes, séries e canais.
  */
-const CACHE_KEY = "featuredLoginCarousel:v1";
+const CACHE_KEY = "featuredLoginCarousel:v2";
 const LEGACY_CACHE_KEY = "featuredLoginCarousel:v1";
 
 const createPoster = (index: number, title: string) => {
@@ -39,7 +39,10 @@ const FeaturedLoginCarousel: React.FC = () => {
   const [movies, setMovies] = useState<Movie[]>(() => {
     try {
       const cached = sessionStorage.getItem(CACHE_KEY) || localStorage.getItem(LEGACY_CACHE_KEY);
-      if (cached) return JSON.parse(cached) as Movie[];
+      if (cached) {
+        const parsed = JSON.parse(cached) as Movie[];
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
     } catch {}
     return INSTANT_POSTERS;
   });
