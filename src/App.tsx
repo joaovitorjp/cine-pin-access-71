@@ -31,8 +31,8 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <ThemeProvider>
-        <AuthProvider>
+      <AuthProvider>
+        <ThemeProvider>
           <FavoritesProvider>
             <HistoryProvider>
               <BrowserRouter>
@@ -57,8 +57,8 @@ const App = () => (
               </BrowserRouter>
             </HistoryProvider>
           </FavoritesProvider>
-        </AuthProvider>
-      </ThemeProvider>
+        </ThemeProvider>
+      </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
