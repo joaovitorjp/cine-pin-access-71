@@ -76,7 +76,7 @@ const PinLoginForm: React.FC = () => {
     }
   };
 
-  };
+
 
 
 
