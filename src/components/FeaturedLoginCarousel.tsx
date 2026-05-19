@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 const FeaturedLoginCarousel: React.FC = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [selected, setSelected] = useState<Movie | null>(null);
-  const [paused, setPaused] = useState(false);
+
 
   useEffect(() => {
     const load = async () => {
