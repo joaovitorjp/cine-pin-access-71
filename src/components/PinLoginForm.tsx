@@ -4,10 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { Lock } from "lucide-react";
-import AdminModal from "@/components/AdminModal";
 import AnimatedBackground from "@/components/AnimatedBackground";
-import { useNavigate } from "react-router-dom";
 import { getAllMovies } from "@/services/movieService";
 import { getAllSeries } from "@/services/seriesService";
 
@@ -17,12 +14,10 @@ const PinLoginForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [welcomeMessage, setWelcomeMessage] = useState("");
   const [loadingMessage, setLoadingMessage] = useState(true);
-  const [showAdminModal, setShowAdminModal] = useState(false);
   const [moviesCount, setMoviesCount] = useState(0);
   const [seriesCount, setSeriesCount] = useState(0);
   const [loadingCounts, setLoadingCounts] = useState(true);
   const { loginWithPin } = useAuth();
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchWelcomeMessage = async () => {
@@ -81,9 +76,9 @@ const PinLoginForm: React.FC = () => {
     }
   };
 
-  const handleSuccessfulAdminLogin = () => {
-    navigate("/admin");
-  };
+
+
+
 
   return (
     <div className="h-screen w-screen overflow-hidden flex items-center justify-center p-4 relative">
@@ -157,30 +152,11 @@ const PinLoginForm: React.FC = () => {
             </Button>
           </div>
 
-          {/* Cadeado de admin abaixo do botão */}
-          <div className="flex justify-center mt-4">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="text-netflix-gray hover:text-white h-8 w-8"
-              onClick={() => setShowAdminModal(true)}
-            >
-              <Lock className="w-4 h-4" />
-            </Button>
-          </div>
-          
           <p className="text-xs text-netflix-gray mt-3 text-center">
             Entre em contato com o administrador para obter um PIN de acesso.
           </p>
         </div>
       </div>
-      
-      {/* Admin login modal */}
-      <AdminModal 
-        open={showAdminModal} 
-        onOpenChange={setShowAdminModal} 
-        onSuccessfulLogin={handleSuccessfulAdminLogin}
-      />
     </div>
   );
 };

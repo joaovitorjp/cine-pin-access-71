@@ -13,6 +13,7 @@ import HomePage from "@/pages/HomePage";
 import MovieDetailsPage from "@/pages/MovieDetailsPage";
 import PlayerPage from "@/pages/PlayerPage";
 import AdminPage from "@/pages/AdminPage";
+import AdminAccess from "@/pages/AdminAccess";
 import SeriesPage from "@/pages/SeriesPage";
 import SeriesDetailsPage from "@/pages/SeriesDetailsPage";
 import SeriesPlayerPage from "@/pages/SeriesPlayerPage";
@@ -49,6 +50,7 @@ const App = () => (
                     <Route path="/history" element={<HistoryPage />} />
                     <Route path="/info" element={<ClientInfo />} />
                     <Route path="/admin" element={<AdminPage />} />
+                    <Route path="/admin-access" element={<AdminAccess />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </Layout>

@@ -10,6 +10,16 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, posterUrl }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Security: only allow http(s) URLs to prevent javascript:/data: XSS via iframe src
+  const isSafeUrl = /^https?:\/\//i.test(videoUrl ?? "");
+  if (!isSafeUrl) {
+    return (
+      <div className="w-full aspect-video flex items-center justify-center bg-black text-netflix-gray text-sm">
+        URL de vídeo inválida.
+      </div>
+    );
+  }
+
   // Check if URL is a direct video file (mp4, m3u8, etc.)
   const isDirectVideo = videoUrl.match(/\.(mp4|webm|ogg|avi|mov|wmv|flv|m3u8)(\?.*)?$/i);
   
