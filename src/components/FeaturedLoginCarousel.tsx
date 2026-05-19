@@ -12,8 +12,16 @@ import { Button } from "@/components/ui/button";
  * Carrossel diagonal de destaques na tela de login.
  * Suporta filmes, séries e canais.
  */
+const CACHE_KEY = "featuredLoginCarousel:v1";
+
 const FeaturedLoginCarousel: React.FC = () => {
-  const [movies, setMovies] = useState<Movie[]>([]);
+  const [movies, setMovies] = useState<Movie[]>(() => {
+    try {
+      const cached = sessionStorage.getItem(CACHE_KEY);
+      if (cached) return JSON.parse(cached) as Movie[];
+    } catch {}
+    return [];
+  });
   const [selected, setSelected] = useState<Movie | null>(null);
 
 
@@ -68,6 +76,9 @@ const FeaturedLoginCarousel: React.FC = () => {
         // fallback: mostra os primeiros filmes se nada estiver configurado
         if (list.length === 0) list = allMovies.slice(0, 12);
         setMovies(list);
+        try {
+          sessionStorage.setItem(CACHE_KEY, JSON.stringify(list));
+        } catch {}
       } catch (e) {
         console.error("Erro ao carregar destaques:", e);
       }
