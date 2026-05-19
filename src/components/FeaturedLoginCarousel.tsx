@@ -12,15 +12,39 @@ import { Button } from "@/components/ui/button";
  * Carrossel diagonal de destaques na tela de login.
  * Suporta filmes, séries e canais.
  */
-const CACHE_KEY = "featuredLoginCarousel:v1";
+const CACHE_KEY = "featuredLoginCarousel:v2";
+const LEGACY_CACHE_KEY = "featuredLoginCarousel:v1";
+
+const createPoster = (index: number, title: string) => {
+  const palettes = [
+    ["141414", "E50914", "7F1D1D"],
+    ["0A0A0A", "991B1B", "27272A"],
+    ["111827", "B91C1C", "020617"],
+    ["18181B", "DC2626", "3F3F46"],
+  ];
+  const [bg, accent, deep] = palettes[index % palettes.length];
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 360"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#${bg}"/><stop offset="0.52" stop-color="#${deep}"/><stop offset="1" stop-color="#${accent}"/></linearGradient></defs><rect width="240" height="360" rx="12" fill="url(#g)"/><rect x="18" y="22" width="204" height="316" rx="8" fill="none" stroke="#ffffff" stroke-opacity=".12" stroke-width="2"/><circle cx="120" cy="142" r="42" fill="#ffffff" fill-opacity=".08"/><path d="M105 118v48l42-24-42-24Z" fill="#ffffff" fill-opacity=".72"/><text x="120" y="252" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="22" font-weight="700">CINE FLEX</text><text x="120" y="282" text-anchor="middle" fill="#ffffff" fill-opacity=".72" font-family="Arial, sans-serif" font-size="13">${title}</text></svg>`;
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+};
+
+const INSTANT_POSTERS: Movie[] = Array.from({ length: 24 }, (_, index) => ({
+  id: `instant-poster-${index}`,
+  title: `Destaque ${index + 1}`,
+  imageUrl: createPoster(index, `DESTAQUE ${index + 1}`),
+  videoUrl: "",
+  description: "Carregando destaques...",
+}));
 
 const FeaturedLoginCarousel: React.FC = () => {
   const [movies, setMovies] = useState<Movie[]>(() => {
     try {
-      const cached = sessionStorage.getItem(CACHE_KEY);
-      if (cached) return JSON.parse(cached) as Movie[];
+      const cached = sessionStorage.getItem(CACHE_KEY) || localStorage.getItem(LEGACY_CACHE_KEY);
+      if (cached) {
+        const parsed = JSON.parse(cached) as Movie[];
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
     } catch {}
-    return [];
+    return INSTANT_POSTERS;
   });
   const [selected, setSelected] = useState<Movie | null>(null);
 
@@ -28,12 +52,16 @@ const FeaturedLoginCarousel: React.FC = () => {
   useEffect(() => {
     const load = async () => {
       try {
-        const [items, allMovies, allSeries, allChannels] = await Promise.all([
+        const [itemsResult, moviesResult, seriesResult, channelsResult] = await Promise.allSettled([
           getFeaturedLoginItems(),
           getAllMovies(),
           getAllSeries(),
           getAllLiveTVChannels(),
         ]);
+        const items = itemsResult.status === "fulfilled" ? itemsResult.value : [];
+        const allMovies = moviesResult.status === "fulfilled" ? moviesResult.value : [];
+        const allSeries = seriesResult.status === "fulfilled" ? seriesResult.value : [];
+        const allChannels = channelsResult.status === "fulfilled" ? channelsResult.value : [];
         const movieMap = new Map(allMovies.map(m => [m.id, m]));
         const seriesMap = new Map(allSeries.map(s => [s.id, s]));
         const channelMap = new Map(allChannels.map(c => [c.id, c]));
@@ -75,10 +103,14 @@ const FeaturedLoginCarousel: React.FC = () => {
         }
         // fallback: mostra os primeiros filmes se nada estiver configurado
         if (list.length === 0) list = allMovies.slice(0, 12);
-        setMovies(list);
-        try {
-          sessionStorage.setItem(CACHE_KEY, JSON.stringify(list));
-        } catch {}
+        if (list.length > 0) {
+          setMovies(list);
+          try {
+            const serialized = JSON.stringify(list);
+            sessionStorage.setItem(CACHE_KEY, serialized);
+            localStorage.setItem(LEGACY_CACHE_KEY, serialized);
+          } catch {}
+        }
       } catch (e) {
         console.error("Erro ao carregar destaques:", e);
       }
@@ -89,12 +121,12 @@ const FeaturedLoginCarousel: React.FC = () => {
   if (movies.length === 0) return null;
 
 
-  // Garante filmes únicos antes de distribuir (evita repetição na mesma linha)
-  const uniqueMovies = Array.from(new Map(movies.map(m => [m.id, m])).values());
+  // Garante uma malha leve e instantânea: poucas capas únicas repetidas cobrem a tela sem travar o primeiro render.
+  const uniqueMovies = Array.from(new Map(movies.map(m => [m.id, m])).values()).slice(0, 32);
 
   // Distribui filmes em linhas suficientes para cobrir qualquer viewport.
-  const ROW_COUNT = 14;
-  const MIN_ITEMS_PER_HALF_ROW = 48;
+  const ROW_COUNT = 10;
+  const MIN_ITEMS_PER_HALF_ROW = 32;
   const rows = Array.from({ length: ROW_COUNT }, (_, rowIdx) => {
     const offset = Math.floor((uniqueMovies.length / ROW_COUNT) * rowIdx);
     const rotated = [...uniqueMovies.slice(offset), ...uniqueMovies.slice(0, offset)];
@@ -154,7 +186,7 @@ const FeaturedLoginCarousel: React.FC = () => {
                     src={m.imageUrl}
                     alt={m.title}
                     className="w-full h-full object-cover"
-                    loading="eager"
+                    loading={rowIdx < 3 ? "eager" : "lazy"}
                     decoding="async"
                     onError={(e) => {
                       (e.target as HTMLImageElement).src =
