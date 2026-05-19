@@ -262,6 +262,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loading,
         clientName,
         daysRemaining,
+        adminUsername,
         loginWithPin,
         loginAsAdmin,
         logout,
