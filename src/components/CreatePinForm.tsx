@@ -13,6 +13,7 @@ interface CreatePinFormProps {
 }
 
 const CreatePinForm: React.FC<CreatePinFormProps> = ({ onSuccess }) => {
+  const { adminUsername } = useAuth();
   const [daysValid, setDaysValid] = useState(7);
   const [clientName, setClientName] = useState("");
   const [customPin, setCustomPin] = useState("");
