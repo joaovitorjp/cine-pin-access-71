@@ -121,12 +121,12 @@ const FeaturedLoginCarousel: React.FC = () => {
   if (movies.length === 0) return null;
 
 
-  // Garante filmes únicos antes de distribuir (evita repetição na mesma linha)
-  const uniqueMovies = Array.from(new Map(movies.map(m => [m.id, m])).values());
+  // Garante uma malha leve e instantânea: poucas capas únicas repetidas cobrem a tela sem travar o primeiro render.
+  const uniqueMovies = Array.from(new Map(movies.map(m => [m.id, m])).values()).slice(0, 32);
 
   // Distribui filmes em linhas suficientes para cobrir qualquer viewport.
-  const ROW_COUNT = 14;
-  const MIN_ITEMS_PER_HALF_ROW = 48;
+  const ROW_COUNT = 10;
+  const MIN_ITEMS_PER_HALF_ROW = 32;
   const rows = Array.from({ length: ROW_COUNT }, (_, rowIdx) => {
     const offset = Math.floor((uniqueMovies.length / ROW_COUNT) * rowIdx);
     const rotated = [...uniqueMovies.slice(offset), ...uniqueMovies.slice(0, offset)];
@@ -186,7 +186,7 @@ const FeaturedLoginCarousel: React.FC = () => {
                     src={m.imageUrl}
                     alt={m.title}
                     className="w-full h-full object-cover"
-                    loading="eager"
+                    loading={rowIdx < 3 ? "eager" : "lazy"}
                     decoding="async"
                     onError={(e) => {
                       (e.target as HTMLImageElement).src =
