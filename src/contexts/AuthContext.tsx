@@ -10,8 +10,9 @@ interface AuthContextType {
   loading: boolean;
   clientName: string;
   daysRemaining: number;
+  adminUsername: string;
   loginWithPin: (pin: string) => Promise<boolean>;
-  loginAsAdmin: (password: string) => Promise<boolean>;
+  loginAsAdmin: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
 }
 
@@ -21,6 +22,7 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
   clientName: "",
   daysRemaining: 0,
+  adminUsername: "",
   loginWithPin: async () => false,
   loginAsAdmin: async () => false,
   logout: () => {},
