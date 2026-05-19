@@ -38,11 +38,39 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_users: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          password: string
+          username: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          password: string
+          username: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          password?: string
+          username?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      validate_admin_credentials: {
+        Args: { _password: string; _username: string }
+        Returns: string
+      }
       validate_admin_token: { Args: { _token: string }; Returns: boolean }
     }
     Enums: {

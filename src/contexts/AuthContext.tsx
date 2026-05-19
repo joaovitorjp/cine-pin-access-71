@@ -10,8 +10,9 @@ interface AuthContextType {
   loading: boolean;
   clientName: string;
   daysRemaining: number;
+  adminUsername: string;
   loginWithPin: (pin: string) => Promise<boolean>;
-  loginAsAdmin: (password: string) => Promise<boolean>;
+  loginAsAdmin: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
 }
 
@@ -21,6 +22,7 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
   clientName: "",
   daysRemaining: 0,
+  adminUsername: "",
   loginWithPin: async () => false,
   loginAsAdmin: async () => false,
   logout: () => {},
@@ -34,13 +36,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState<boolean>(true);
   const [clientName, setClientName] = useState<string>("");
   const [daysRemaining, setDaysRemaining] = useState<number>(0);
+  const [adminUsername, setAdminUsername] = useState<string>("");
 
   // Check local storage for auth state on mount and validate session
   useEffect(() => {
     const checkAuthState = async () => {
       const storedAuthState = localStorage.getItem("authState");
       if (storedAuthState) {
-        const { isLoggedIn, isAdmin, expiry, clientName: storedClientName, pinCode, sessionId } = JSON.parse(storedAuthState);
+        const { isLoggedIn, isAdmin, expiry, clientName: storedClientName, pinCode, sessionId, adminUsername: storedAdminUsername } = JSON.parse(storedAuthState);
         if (new Date(expiry) > new Date()) {
           // For PIN users, validate session to ensure single device login
           if (!isAdmin && pinCode && sessionId) {
@@ -70,6 +73,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setIsLoggedIn(isLoggedIn);
             setIsAdmin(isAdmin);
             setClientName(storedClientName || "");
+            setAdminUsername(storedAdminUsername || "");
           }
         } else {
           // Auth expired
@@ -163,24 +167,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Login as admin (validates token via Lovable Cloud)
-  const loginAsAdmin = async (password: string): Promise<boolean> => {
+  // Login as admin (validates username + password via Lovable Cloud)
+  const loginAsAdmin = async (username: string, password: string): Promise<boolean> => {
     try {
-      const { data, error } = await supabase.rpc("validate_admin_token", {
-        _token: password,
+      const { data, error } = await supabase.rpc("validate_admin_credentials", {
+        _username: username,
+        _password: password,
       });
 
       if (error) {
-        console.error("Erro ao validar token admin:", error);
+        console.error("Erro ao validar credenciais admin:", error);
         toast({
-          title: "Erro ao validar token",
-          description: "Não foi possível validar o token de admin. Tente novamente.",
+          title: "Erro ao validar credenciais",
+          description: "Não foi possível validar as credenciais. Tente novamente.",
           variant: "destructive",
         });
         return false;
       }
 
-      if (data === true) {
+      if (data) {
+        const validatedUsername = data as string;
         const expiry = new Date();
         expiry.setHours(expiry.getHours() + 24);
 
@@ -188,25 +194,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           isLoggedIn: true,
           isAdmin: true,
           expiry: expiry.toISOString(),
-          clientName: "Administrador",
+          clientName: validatedUsername,
+          adminUsername: validatedUsername,
         };
         localStorage.setItem("authState", JSON.stringify(authState));
 
         setIsLoggedIn(true);
         setIsAdmin(true);
-        setClientName("Administrador");
+        setClientName(validatedUsername);
+        setAdminUsername(validatedUsername);
 
         toast({
           title: "Login admin efetuado com sucesso",
-          description: "Você está logado como administrador.",
+          description: `Bem-vindo, ${validatedUsername}.`,
         });
 
         return true;
       }
 
       toast({
-        title: "Token inválido",
-        description: "O token de administrador informado é inválido.",
+        title: "Credenciais inválidas",
+        description: "Usuário ou senha incorretos.",
         variant: "destructive",
       });
       return false;
@@ -254,6 +262,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loading,
         clientName,
         daysRemaining,
+        adminUsername,
         loginWithPin,
         loginAsAdmin,
         logout,

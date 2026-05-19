@@ -6,12 +6,14 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { createPin, createCustomPin } from "@/services/pinService";
 import { toast } from "@/components/ui/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface CreatePinFormProps {
   onSuccess: () => void;
 }
 
 const CreatePinForm: React.FC<CreatePinFormProps> = ({ onSuccess }) => {
+  const { adminUsername } = useAuth();
   const [daysValid, setDaysValid] = useState(7);
   const [clientName, setClientName] = useState("");
   const [customPin, setCustomPin] = useState("");
@@ -37,7 +39,7 @@ const CreatePinForm: React.FC<CreatePinFormProps> = ({ onSuccess }) => {
     setError("");
     
     try {
-      const newPin = await createPin(daysValid, clientName.trim());
+      const newPin = await createPin(daysValid, clientName.trim(), adminUsername);
       
       toast({
         title: "PIN criado com sucesso",
@@ -80,7 +82,7 @@ const CreatePinForm: React.FC<CreatePinFormProps> = ({ onSuccess }) => {
     setError("");
     
     try {
-      const newPin = await createCustomPin(customPin.trim(), customDaysValid, customClientName.trim());
+      const newPin = await createCustomPin(customPin.trim(), customDaysValid, customClientName.trim(), adminUsername);
       
       toast({
         title: "PIN personalizado criado com sucesso",

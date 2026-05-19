@@ -642,6 +642,9 @@ const AdminPage: React.FC = () => {
                         </td>
                         <td className="px-2 sm:px-4 py-3">
                           <div className="text-xs sm:text-sm font-medium truncate">{pin.clientName}</div>
+                          <div className="text-[10px] sm:text-xs text-netflix-gray mt-0.5">
+                            Criado por: <span className="font-medium">{pin.createdBy || "desconhecido"}</span>
+                          </div>
                           <div className="md:hidden text-xs text-netflix-gray mt-1">
                             {formatDate(pin.expiryDate)} • {pin.daysValid} dias
                           </div>
