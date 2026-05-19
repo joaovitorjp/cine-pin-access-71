@@ -39,63 +39,56 @@ const FeaturedLoginCarousel: React.FC = () => {
 
   if (movies.length === 0) return null;
 
-  // Distribui filmes em 4 linhas, com rotações para parecerem distintas
-  const rows = [0, 1, 2, 3].map((rowIdx) => {
-    const offset = Math.floor((movies.length / 4) * rowIdx);
+  // Distribui filmes em 6 linhas, com pequenas rotações alternadas para um efeito diagonal sutil
+  const ROW_COUNT = 6;
+  const rows = Array.from({ length: ROW_COUNT }, (_, rowIdx) => {
+    const offset = Math.floor((movies.length / ROW_COUNT) * rowIdx);
     const rotated = [...movies.slice(offset), ...movies.slice(0, offset)];
-    return [...rotated, ...rotated];
+    // triplicamos a lista para garantir loop contínuo mesmo com poucos filmes
+    return [...rotated, ...rotated, ...rotated];
   });
-
-  // Cada linha diagonal: rotação positiva = "descendo" (esquerda alta → direita baixa)
-  // rotação negativa = "subindo". Alternamos: desce, sobe, desce, sobe.
-  const rowRotations = [12, -12, 12, -12];
 
   return (
     <>
       <div className="absolute inset-0 z-0 overflow-hidden" aria-hidden="false">
-        <div className="absolute inset-0 flex flex-col justify-center gap-4 py-6">
+        {/* Container ligeiramente maior que a tela e levemente rotacionado para um leve efeito diagonal sem sobreposição entre linhas */}
+        <div
+          className="absolute -inset-x-[10%] -inset-y-[5%] flex flex-col justify-between"
+          style={{ transform: "rotate(-6deg)", transformOrigin: "center" }}
+        >
           {rows.map((rowMovies, rowIdx) => (
             <div
               key={rowIdx}
-              className="relative"
+              className={`flex gap-2 ${rowIdx % 2 === 0 ? "animate-marquee-x" : "animate-marquee-x-reverse"}`}
               style={{
-                transform: `rotate(${rowRotations[rowIdx]}deg)`,
-                transformOrigin: "center",
+                animationPlayState: paused ? "paused" : "running",
+                width: "max-content",
               }}
+              onMouseEnter={() => setPaused(true)}
+              onMouseLeave={() => setPaused(false)}
+              onTouchStart={() => setPaused(true)}
+              onTouchEnd={() => setPaused(false)}
             >
-              <div
-                className={`flex gap-3 ${rowIdx % 2 === 0 ? "animate-marquee-x" : "animate-marquee-x-reverse"}`}
-                style={{
-                  animationPlayState: paused ? "paused" : "running",
-                  width: "max-content",
-                  marginLeft: "-20vw",
-                }}
-                onMouseEnter={() => setPaused(true)}
-                onMouseLeave={() => setPaused(false)}
-                onTouchStart={() => setPaused(true)}
-                onTouchEnd={() => setPaused(false)}
-              >
-                {rowMovies.map((m, i) => (
-                  <button
-                    key={`${rowIdx}-${m.id}-${i}`}
-                    type="button"
-                    onClick={() => setSelected(m)}
-                    className="group relative flex-shrink-0 w-16 sm:w-20 md:w-24 aspect-[2/3] rounded-md overflow-hidden shadow-2xl ring-1 ring-white/10 hover:ring-netflix-red transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-netflix-red"
-                    aria-label={`Ver detalhes de ${m.title}`}
-                  >
-                    <img
-                      src={m.imageUrl}
-                      alt={m.title}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src =
-                          "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b";
-                      }}
-                    />
-                  </button>
-                ))}
-              </div>
+              {rowMovies.map((m, i) => (
+                <button
+                  key={`${rowIdx}-${m.id}-${i}`}
+                  type="button"
+                  onClick={() => setSelected(m)}
+                  className="group relative flex-shrink-0 w-16 sm:w-20 md:w-24 aspect-[2/3] rounded-md overflow-hidden shadow-2xl ring-1 ring-white/10 hover:ring-netflix-red transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-netflix-red"
+                  aria-label={`Ver detalhes de ${m.title}`}
+                >
+                  <img
+                    src={m.imageUrl}
+                    alt={m.title}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src =
+                        "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b";
+                    }}
+                  />
+                </button>
+              ))}
             </div>
           ))}
         </div>
@@ -103,6 +96,7 @@ const FeaturedLoginCarousel: React.FC = () => {
         {/* Overlay para legibilidade do formulário */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/80 pointer-events-none" />
       </div>
+
 
 
 
