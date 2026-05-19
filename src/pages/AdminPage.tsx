@@ -9,7 +9,7 @@ import { getAllPins, deactivatePin, deletePin } from "@/services/pinService";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Trash, Edit, Plus, Film, Key, Tv, Sparkles, Image as ImageIcon } from "lucide-react";
+import { Trash, Edit, Plus, Film, Key, Tv, Sparkles, Image as ImageIcon, Star } from "lucide-react";
 import AddEditMovieForm from "@/components/AddEditMovieForm";
 import CreatePinForm from "@/components/CreatePinForm";
 import { formatDate, isPinValid } from "@/lib/utils";
@@ -19,6 +19,7 @@ import AddEditLiveTVForm from "@/components/AddEditLiveTVForm";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import AdminStats from "@/components/AdminStats";
 import BackgroundImageManager from "@/components/BackgroundImageManager";
+import FeaturedLoginManager from "@/components/FeaturedLoginManager";
 import AdminSearchBar from "@/components/AdminSearchBar";
 import { ChevronLeft } from "lucide-react";
 
@@ -288,22 +289,29 @@ const AdminPage: React.FC = () => {
               </TabsList>
             </div>
             
-            {/* Grupo separado: PINs de Acesso e Imagens */}
+            {/* Grupo separado: PINs de Acesso, Imagens e Destaques de login */}
             <div className="flex justify-center">
-              <TabsList className="w-full max-w-md">
+              <TabsList className="w-full max-w-2xl">
                 <TabsTrigger 
                   value="pins" 
                   className="flex items-center justify-center gap-2 flex-1 py-2 px-2 text-xs sm:text-sm"
                 >
                   <Key className="w-4 h-4 flex-shrink-0" />
-                  <span className="truncate">PINs de Acesso</span>
+                  <span className="truncate">PINs</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="background" 
                   className="flex items-center justify-center gap-2 flex-1 py-2 px-2 text-xs sm:text-sm"
                 >
                   <ImageIcon className="w-4 h-4 flex-shrink-0" />
-                  <span className="truncate">Imagens de Fundo</span>
+                  <span className="truncate">Fundo</span>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="featured-login" 
+                  className="flex items-center justify-center gap-2 flex-1 py-2 px-2 text-xs sm:text-sm"
+                >
+                  <Star className="w-4 h-4 flex-shrink-0" />
+                  <span className="truncate">Destaques Login</span>
                 </TabsTrigger>
               </TabsList>
             </div>
@@ -708,6 +716,10 @@ const AdminPage: React.FC = () => {
 
         <TabsContent value="background">
           <BackgroundImageManager />
+        </TabsContent>
+
+        <TabsContent value="featured-login">
+          <FeaturedLoginManager />
         </TabsContent>
         </Tabs>
         
