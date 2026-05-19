@@ -82,7 +82,7 @@ const CreatePinForm: React.FC<CreatePinFormProps> = ({ onSuccess }) => {
     setError("");
     
     try {
-      const newPin = await createCustomPin(customPin.trim(), customDaysValid, customClientName.trim());
+      const newPin = await createCustomPin(customPin.trim(), customDaysValid, customClientName.trim(), adminUsername);
       
       toast({
         title: "PIN personalizado criado com sucesso",
