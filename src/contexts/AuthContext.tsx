@@ -43,7 +43,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const checkAuthState = async () => {
       const storedAuthState = localStorage.getItem("authState");
       if (storedAuthState) {
-        const { isLoggedIn, isAdmin, expiry, clientName: storedClientName, pinCode, sessionId } = JSON.parse(storedAuthState);
+        const { isLoggedIn, isAdmin, expiry, clientName: storedClientName, pinCode, sessionId, adminUsername: storedAdminUsername } = JSON.parse(storedAuthState);
         if (new Date(expiry) > new Date()) {
           // For PIN users, validate session to ensure single device login
           if (!isAdmin && pinCode && sessionId) {
@@ -73,6 +73,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setIsLoggedIn(isLoggedIn);
             setIsAdmin(isAdmin);
             setClientName(storedClientName || "");
+            setAdminUsername(storedAdminUsername || "");
           }
         } else {
           // Auth expired
