@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { Movie } from "@/types";
 import { getAllMovies } from "@/services/movieService";
-import { getFeaturedLoginMovieIds } from "@/services/featuredLoginService";
+import { getAllSeries } from "@/services/seriesService";
+import { getAllLiveTVChannels } from "@/services/liveTvService";
+import { getFeaturedLoginItems } from "@/services/featuredLoginService";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Star, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 /**
- * Carrossel diagonal de filmes em destaque na tela de login.
- * Fica como fundo interativo - clique abre detalhes (capa, sinopse, avaliação).
+ * Carrossel diagonal de destaques na tela de login.
+ * Suporta filmes, séries e canais.
  */
 const FeaturedLoginCarousel: React.FC = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -18,26 +20,63 @@ const FeaturedLoginCarousel: React.FC = () => {
   useEffect(() => {
     const load = async () => {
       try {
-        const [ids, all] = await Promise.all([
-          getFeaturedLoginMovieIds(),
+        const [items, allMovies, allSeries, allChannels] = await Promise.all([
+          getFeaturedLoginItems(),
           getAllMovies(),
+          getAllSeries(),
+          getAllLiveTVChannels(),
         ]);
+        const movieMap = new Map(allMovies.map(m => [m.id, m]));
+        const seriesMap = new Map(allSeries.map(s => [s.id, s]));
+        const channelMap = new Map(allChannels.map(c => [c.id, c]));
+
         let list: Movie[] = [];
-        if (ids.length > 0) {
-          const map = new Map(all.map(m => [m.id, m]));
-          list = ids.map(id => map.get(id)).filter((m): m is Movie => !!m);
+        if (items.length > 0) {
+          list = items
+            .map(it => {
+              if (it.type === "movie") return movieMap.get(it.id);
+              if (it.type === "series") {
+                const s = seriesMap.get(it.id);
+                if (!s) return undefined;
+                return {
+                  id: `series-${s.id}`,
+                  title: s.title,
+                  imageUrl: s.imageUrl,
+                  videoUrl: "",
+                  description: s.description,
+                  year: s.year,
+                  rating: s.rating,
+                  genre: s.genre,
+                } as Movie;
+              }
+              if (it.type === "channel") {
+                const c = channelMap.get(it.id);
+                if (!c) return undefined;
+                return {
+                  id: `channel-${c.id}`,
+                  title: c.name,
+                  imageUrl: c.imageUrl,
+                  videoUrl: "",
+                  description: c.description || "",
+                  genre: c.category,
+                } as Movie;
+              }
+              return undefined;
+            })
+            .filter((m): m is Movie => !!m);
         }
         // fallback: mostra os primeiros filmes se nada estiver configurado
-        if (list.length === 0) list = all.slice(0, 12);
+        if (list.length === 0) list = allMovies.slice(0, 12);
         setMovies(list);
       } catch (e) {
-        console.error("Erro ao carregar filmes em destaque:", e);
+        console.error("Erro ao carregar destaques:", e);
       }
     };
     load();
   }, []);
 
   if (movies.length === 0) return null;
+
 
   // Garante filmes únicos antes de distribuir (evita repetição na mesma linha)
   const uniqueMovies = Array.from(new Map(movies.map(m => [m.id, m])).values());
