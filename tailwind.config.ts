@@ -87,8 +87,8 @@ export default {
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
-				'marquee-x': 'marquee-x 200s linear infinite',
-				'marquee-x-reverse': 'marquee-x-reverse 200s linear infinite'
+				'marquee-x': 'marquee-x 320s linear infinite',
+				'marquee-x-reverse': 'marquee-x-reverse 320s linear infinite'
 			}
 		}
 	},
