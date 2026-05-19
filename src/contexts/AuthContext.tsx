@@ -226,31 +226,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Logout
   const logout = () => {
+    const wasAdmin = isAdmin;
+    const redirectTo = wasAdmin ? "/admin-access" : "/";
     try {
       localStorage.removeItem("authState");
       setIsLoggedIn(false);
       setIsAdmin(false);
       setClientName("");
       setDaysRemaining(0);
-      
+      setAdminUsername("");
+
       toast({
         title: "Logout efetuado com sucesso",
         description: "Você foi desconectado.",
       });
-      
-      // Força redirect para página inicial após logout
+
       setTimeout(() => {
-        window.location.href = "/";
+        window.location.href = redirectTo;
       }, 500);
     } catch (error) {
       console.error("Erro no logout:", error);
-      // Mesmo com erro, força logout
       localStorage.removeItem("authState");
       setIsLoggedIn(false);
       setIsAdmin(false);
       setClientName("");
       setDaysRemaining(0);
-      window.location.href = "/";
+      setAdminUsername("");
+      window.location.href = redirectTo;
     }
   };
 

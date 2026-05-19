@@ -84,7 +84,7 @@
   }
 
   body {
-    @apply bg-netflix-black text-foreground dark;
+    @apply bg-background text-foreground;
     touch-action: manipulation;
     -webkit-user-select: none;
     -webkit-touch-callout: none;
