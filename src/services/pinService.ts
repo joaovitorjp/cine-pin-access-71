@@ -21,7 +21,7 @@ export const getAllPins = async (): Promise<PinAccess[]> => {
 };
 
 // Create a new PIN
-export const createPin = async (daysValid: number, clientName: string): Promise<PinAccess> => {
+export const createPin = async (daysValid: number, clientName: string, createdBy?: string): Promise<PinAccess> => {
   const pin = generatePin();
   const expiryDate = calculateExpiryDate(daysValid);
   const createdAt = new Date().toISOString();
@@ -32,7 +32,8 @@ export const createPin = async (daysValid: number, clientName: string): Promise<
     createdAt,
     daysValid,
     isActive: true,
-    clientName
+    clientName,
+    createdBy: createdBy || "desconhecido",
   };
   
   const pinsRef = ref(database, 'pins');
@@ -47,7 +48,7 @@ export const createPin = async (daysValid: number, clientName: string): Promise<
 };
 
 // Create a custom PIN
-export const createCustomPin = async (customPin: string, daysValid: number, clientName: string): Promise<PinAccess> => {
+export const createCustomPin = async (customPin: string, daysValid: number, clientName: string, createdBy?: string): Promise<PinAccess> => {
   const expiryDate = calculateExpiryDate(daysValid);
   const createdAt = new Date().toISOString();
   
@@ -57,7 +58,8 @@ export const createCustomPin = async (customPin: string, daysValid: number, clie
     createdAt,
     daysValid,
     isActive: true,
-    clientName
+    clientName,
+    createdBy: createdBy || "desconhecido",
   };
   
   const pinsRef = ref(database, 'pins');
