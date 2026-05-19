@@ -39,21 +39,25 @@ const FeaturedLoginCarousel: React.FC = () => {
 
   if (movies.length === 0) return null;
 
-  // Distribui filmes em 6 linhas, com pequenas rotações alternadas para um efeito diagonal sutil
+  // Garante filmes únicos antes de distribuir (evita repetição na mesma linha)
+  const uniqueMovies = Array.from(new Map(movies.map(m => [m.id, m])).values());
+
+  // Distribui filmes em 6 linhas
   const ROW_COUNT = 6;
   const rows = Array.from({ length: ROW_COUNT }, (_, rowIdx) => {
-    const offset = Math.floor((movies.length / ROW_COUNT) * rowIdx);
-    const rotated = [...movies.slice(offset), ...movies.slice(0, offset)];
-    // triplicamos a lista para garantir loop contínuo mesmo com poucos filmes
-    return [...rotated, ...rotated, ...rotated];
+    const offset = Math.floor((uniqueMovies.length / ROW_COUNT) * rowIdx);
+    const rotated = [...uniqueMovies.slice(offset), ...uniqueMovies.slice(0, offset)];
+    // duplicamos a lista (2x) para loop seamless com translateX(-50%).
+    // Como cada filme só reaparece após um ciclo completo (~100s),
+    // o mesmo filme nunca se repete na mesma linha em menos de 10s.
+    return [...rotated, ...rotated];
   });
 
   return (
     <>
       <div className="absolute inset-0 z-0 overflow-hidden" aria-hidden="false">
-        {/* Container ligeiramente maior que a tela e levemente rotacionado para um leve efeito diagonal sem sobreposição entre linhas */}
         <div
-          className="absolute -inset-x-[10%] -inset-y-[5%] flex flex-col justify-between"
+          className="absolute -inset-x-[10%] -inset-y-[5%] flex flex-col gap-[5px]"
           style={{ transform: "rotate(-6deg)", transformOrigin: "center" }}
         >
           {rows.map((rowMovies, rowIdx) => (
@@ -74,7 +78,7 @@ const FeaturedLoginCarousel: React.FC = () => {
                   key={`${rowIdx}-${m.id}-${i}`}
                   type="button"
                   onClick={() => setSelected(m)}
-                  className="group relative flex-shrink-0 w-16 sm:w-20 md:w-24 aspect-[2/3] rounded-md overflow-hidden shadow-2xl ring-1 ring-white/10 hover:ring-netflix-red transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-netflix-red"
+                  className="group relative flex-shrink-0 w-24 sm:w-28 md:w-32 aspect-[2/3] rounded-md overflow-hidden shadow-2xl ring-1 ring-white/10 hover:ring-netflix-red transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-netflix-red"
                   aria-label={`Ver detalhes de ${m.title}`}
                 >
                   <img
