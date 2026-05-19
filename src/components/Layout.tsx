@@ -1,23 +1,16 @@
 
 import React from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Lock, LogOut, Home, Settings } from "lucide-react";
-import AdminModal from "@/components/AdminModal";
+import { LogOut, Home, Settings } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import BottomNavigation from "@/components/BottomNavigation";
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isLoggedIn, isAdmin, logout } = useAuth();
   const location = useLocation();
-  const navigate = useNavigate();
-  const [showAdminModal, setShowAdminModal] = React.useState(false);
   const isMobile = useIsMobile();
-
-  const handleSuccessfulAdminLogin = () => {
-    navigate("/admin");
-  };
 
   const isPlayerPage = location.pathname.includes('/player/');
 
@@ -43,12 +36,12 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               <Link to="/" className="flex-shrink-0">
                 <h1 className="text-netflix-red text-xl sm:text-2xl font-bold">CINE FLEX</h1>
               </Link>
-              
+
               {isLoggedIn && (
                 <nav className="flex items-center gap-2">
                   <Link to="/">
-                    <Button 
-                      variant="ghost" 
+                    <Button
+                      variant="ghost"
                       size={isMobile ? "icon" : "default"}
                       className={`${location.pathname === "/" ? "text-white" : "text-gray-400 hover:text-white"}`}
                     >
@@ -56,11 +49,11 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                       {!isMobile && <span className="ml-2">Início</span>}
                     </Button>
                   </Link>
-                  
+
                   {isAdmin && (
                     <Link to="/admin">
-                      <Button 
-                        variant="ghost" 
+                      <Button
+                        variant="ghost"
                         size={isMobile ? "icon" : "default"}
                         className={`${location.pathname === "/admin" ? "text-white" : "text-gray-400 hover:text-white"}`}
                       >
@@ -69,10 +62,10 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                       </Button>
                     </Link>
                   )}
-                  
-                  <Button 
-                    variant="ghost" 
-                    onClick={logout} 
+
+                  <Button
+                    variant="ghost"
+                    onClick={logout}
                     size={isMobile ? "icon" : "default"}
                     className="text-gray-400 hover:text-white"
                   >
@@ -85,39 +78,23 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           </div>
         </header>
       )}
-      
+
       {/* Main content */}
       <main className="flex-grow pb-16">
         {children}
       </main>
-      
+
       {/* Bottom Navigation */}
       {isLoggedIn && <BottomNavigation />}
-      
+
       {/* Footer */}
       <footer className={`bg-netflix-black py-4 px-6 border-t border-gray-800 relative ${isPlayerPage ? 'hidden' : ''}`}>
-        <div className="container mx-auto flex justify-between items-center">
+        <div className="container mx-auto flex justify-center items-center">
           <p className="text-netflix-gray text-sm">
             &copy; {new Date().getFullYear()} CINE FLEX. Todos os direitos reservados.
           </p>
-          
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="text-netflix-gray hover:text-white"
-            onClick={() => setShowAdminModal(true)}
-          >
-            <Lock className="w-5 h-5" />
-          </Button>
         </div>
       </footer>
-      
-      {/* Admin login modal */}
-      <AdminModal 
-        open={showAdminModal} 
-        onOpenChange={setShowAdminModal} 
-        onSuccessfulLogin={handleSuccessfulAdminLogin}
-      />
     </div>
   );
 };
