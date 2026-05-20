@@ -79,12 +79,31 @@ const BottomNavigation: React.FC = () => {
             </div>
           </Link>
 
-          {!isAdmin && (
-            <Link to="/info" className="flex-1">
-              <div 
+          {isAdmin ? (
+            <Link to="/admin" className="flex-1">
+              <div
                 className={`flex flex-col items-center py-3 transition-all duration-300 ${
-                  isInfoActive 
-                    ? "text-white translate-y-[-4px]" 
+                  isAdminActive
+                    ? "text-white translate-y-[-4px]"
+                    : "text-gray-400 hover:text-gray-200"
+                }`}
+              >
+                <LayoutDashboard className={`w-6 h-6 transition-transform duration-300 ${
+                  isAdminActive ? 'scale-110' : ''
+                }`} />
+                <span className={`text-xs mt-1 transition-all duration-300 ${
+                  isAdminActive ? 'opacity-100' : 'opacity-70'
+                }`}>
+                  Painel
+                </span>
+              </div>
+            </Link>
+          ) : (
+            <Link to="/info" className="flex-1">
+              <div
+                className={`flex flex-col items-center py-3 transition-all duration-300 ${
+                  isInfoActive
+                    ? "text-white translate-y-[-4px]"
                     : "text-gray-400 hover:text-gray-200"
                 }`}
               >
