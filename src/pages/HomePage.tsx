@@ -79,11 +79,7 @@ const HomePage: React.FC = () => {
   }
 
   if (!isLoggedIn) {
-    return (
-      <div className="min-h-screen flex items-center justify-center px-4">
-        <PinLoginForm />
-      </div>
-    );
+    return <PinLoginForm />;
   }
 
   if (loading) {
