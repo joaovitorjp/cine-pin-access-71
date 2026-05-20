@@ -241,17 +241,28 @@ const AdminPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto py-4 px-4 max-w-7xl">
-        {/* Back button and title */}
-        <div className="flex items-center gap-2 mb-6">
-          <Button 
-            variant="ghost" 
-            size="icon"
-            onClick={handleBack}
-            className="text-netflix-gray hover:text-white flex-shrink-0"
+        {/* Header with back button, title and logout */}
+        <div className="flex items-center justify-between gap-2 mb-6">
+          <div className="flex items-center gap-2 min-w-0">
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={handleBack}
+              className="text-netflix-gray hover:text-white flex-shrink-0"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </Button>
+            <h1 className="text-xl md:text-2xl lg:text-3xl font-bold truncate">Painel Administrativo</h1>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={logout}
+            className="text-netflix-gray hover:text-red-400 hover:bg-red-500/10 flex-shrink-0 gap-2"
           >
-            <ChevronLeft className="w-5 h-5" />
+            <LogOut className="w-4 h-4" />
+            <span className="hidden sm:inline">Sair</span>
           </Button>
-          <h1 className="text-xl md:text-2xl lg:text-3xl font-bold truncate">Painel Administrativo</h1>
         </div>
 
         {/* Stats */}
