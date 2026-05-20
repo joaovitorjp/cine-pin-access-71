@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Trash, Edit, Plus, Film, Key, Tv, Sparkles, Image as ImageIcon, Star } from "lucide-react";
 import AddEditMovieForm from "@/components/AddEditMovieForm";
+import BulkUploadMoviesForm from "@/components/BulkUploadMoviesForm";
 import CreatePinForm from "@/components/CreatePinForm";
 import { formatDate, isPinValid } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
@@ -732,13 +733,38 @@ const AdminPage: React.FC = () => {
               </DialogTitle>
             </DialogHeader>
             <ScrollArea className="max-h-[75vh] pr-4">
-              <AddEditMovieForm
-                movie={selectedMovie || undefined}
-                onSuccess={() => {
-                  setShowAddEditModal(false);
-                  handleRefreshData();
-                }}
-              />
+              {selectedMovie ? (
+                <AddEditMovieForm
+                  movie={selectedMovie}
+                  onSuccess={() => {
+                    setShowAddEditModal(false);
+                    handleRefreshData();
+                  }}
+                />
+              ) : (
+                <Tabs defaultValue="manual" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2 bg-gray-800">
+                    <TabsTrigger value="manual">Manual</TabsTrigger>
+                    <TabsTrigger value="bulk">Importar Excel</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="manual" className="mt-4">
+                    <AddEditMovieForm
+                      onSuccess={() => {
+                        setShowAddEditModal(false);
+                        handleRefreshData();
+                      }}
+                    />
+                  </TabsContent>
+                  <TabsContent value="bulk" className="mt-4">
+                    <BulkUploadMoviesForm
+                      onSuccess={() => {
+                        setShowAddEditModal(false);
+                        handleRefreshData();
+                      }}
+                    />
+                  </TabsContent>
+                </Tabs>
+              )}
             </ScrollArea>
           </DialogContent>
         </Dialog>
