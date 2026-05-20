@@ -1,100 +1,55 @@
-
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { Button } from "@/components/ui/button";
-import { LogOut, Home, Settings } from "lucide-react";
-import { useIsMobile } from "@/hooks/use-mobile";
 import BottomNavigation from "@/components/BottomNavigation";
+import SearchBar from "@/components/SearchBar";
+import HomeBannerCarousel from "@/components/HomeBannerCarousel";
+import { useSearch } from "@/contexts/SearchContext";
+
+const LISTING_ROUTES = ["/", "/series", "/livetv"];
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isLoggedIn, isAdmin, logout } = useAuth();
+  const { isLoggedIn } = useAuth();
   const location = useLocation();
-  const isMobile = useIsMobile();
+  const { setQuery } = useSearch();
 
-  const isPlayerPage = location.pathname.includes('/player/');
+  const isPlayerPage = location.pathname.includes("/player/");
+  const isListing = LISTING_ROUTES.includes(location.pathname);
 
-  // Se não estiver logado, usar layout especial para tela de login (com scroll)
+  // Login screen
   if (!isLoggedIn) {
     return (
       <div className="min-h-screen w-full flex flex-col">
-        <main className="flex-1">
-          {children}
-        </main>
+        <main className="flex-1">{children}</main>
       </div>
     );
   }
 
-  // Após o login, usar layout normal com scroll
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Header */}
-      {!isPlayerPage && (
-        <header className="bg-netflix-black py-4 px-6 border-b border-gray-800 sticky top-0 z-10">
-          <div className="container mx-auto">
-            <div className="flex justify-between items-center">
-              <Link to="/" className="flex-shrink-0">
-                <h1 className="text-netflix-red text-xl sm:text-2xl font-bold">CINE FLEX</h1>
-              </Link>
-
-              {isLoggedIn && (
-                <nav className="flex items-center gap-2">
-                  <Link to="/">
-                    <Button
-                      variant="ghost"
-                      size={isMobile ? "icon" : "default"}
-                      className={`${location.pathname === "/" ? "text-white" : "text-gray-400 hover:text-white"}`}
-                    >
-                      <Home className="w-5 h-5" />
-                      {!isMobile && <span className="ml-2">Início</span>}
-                    </Button>
-                  </Link>
-
-                  {isAdmin && (
-                    <Link to="/admin">
-                      <Button
-                        variant="ghost"
-                        size={isMobile ? "icon" : "default"}
-                        className={`${location.pathname === "/admin" ? "text-white" : "text-gray-400 hover:text-white"}`}
-                      >
-                        <Settings className="w-5 h-5" />
-                        {!isMobile && <span className="ml-2">Admin</span>}
-                      </Button>
-                    </Link>
-                  )}
-
-                  <Button
-                    variant="ghost"
-                    onClick={logout}
-                    size={isMobile ? "icon" : "default"}
-                    className="text-gray-400 hover:text-white"
-                  >
-                    <LogOut className="w-5 h-5" />
-                    {!isMobile && <span className="ml-2">Sair</span>}
-                  </Button>
-                </nav>
-              )}
-            </div>
+      {/* Sticky top: search + banners (only on listing pages) */}
+      {!isPlayerPage && isListing && (
+        <div className="sticky top-0 z-30 bg-background/95 backdrop-blur border-b border-border">
+          <div className="container mx-auto px-3 sm:px-4 py-3 space-y-3">
+            <SearchBar onSearch={setQuery} />
+            <HomeBannerCarousel />
           </div>
-        </header>
+        </div>
       )}
 
-      {/* Main content */}
-      <main className="flex-grow pb-16">
-        {children}
-      </main>
+      <main className="flex-grow pb-20">{children}</main>
 
-      {/* Bottom Navigation */}
       {isLoggedIn && <BottomNavigation />}
 
-      {/* Footer */}
-      <footer className={`bg-netflix-black py-4 px-6 border-t border-gray-800 relative ${isPlayerPage ? 'hidden' : ''}`}>
-        <div className="container mx-auto flex justify-center items-center">
-          <p className="text-netflix-gray text-sm">
-            &copy; {new Date().getFullYear()} CINE FLEX. Todos os direitos reservados.
-          </p>
-        </div>
-      </footer>
+      {!isPlayerPage && (
+        <footer className="bg-netflix-black py-3 px-6 border-t border-gray-800">
+          <div className="container mx-auto flex justify-center">
+            <p className="text-netflix-gray text-xs">
+              &copy; {new Date().getFullYear()} CINE FLEX. Todos os direitos reservados.
+            </p>
+          </div>
+        </footer>
+      )}
     </div>
   );
 };

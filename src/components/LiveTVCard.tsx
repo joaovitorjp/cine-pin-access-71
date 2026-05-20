@@ -1,5 +1,4 @@
 import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
 import { LiveTV } from "@/types";
 
 interface LiveTVCardProps {
@@ -9,39 +8,29 @@ interface LiveTVCardProps {
 
 const LiveTVCard: React.FC<LiveTVCardProps> = ({ channel, onClick }) => {
   return (
-    <Card 
-      className="bg-netflix-dark border-gray-700 hover:border-netflix-red transition-all duration-300 cursor-pointer transform hover:scale-105"
+    <button
+      type="button"
       onClick={onClick}
+      className="block group text-left w-full"
     >
-      <CardContent className="p-0">
-        <div className="relative aspect-[9/16] overflow-hidden rounded-t-lg">
-          <img
-            src={channel.imageUrl}
-            alt={channel.name}
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.src = "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37";
-            }}
-          />
-          <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-            <div className="bg-netflix-red text-white px-2 py-0.5 rounded-full text-xs font-medium">
-              AO VIVO
-            </div>
-          </div>
+      <div className="relative overflow-hidden rounded-md transition-transform duration-300 transform group-hover:scale-105 bg-netflix-dark">
+        <img
+          src={channel.imageUrl}
+          alt={channel.name}
+          className="w-full aspect-[9/16] object-cover object-center"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.src = "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37";
+          }}
+        />
+        <div className="absolute top-1 left-1 bg-netflix-red text-white px-1.5 py-0.5 rounded text-[10px] font-bold">
+          AO VIVO
         </div>
-        <div className="p-1.5 sm:p-2">
-          <h3 className="font-semibold text-white text-xs sm:text-sm mb-0.5 line-clamp-2">
-            {channel.name}
-          </h3>
-          {channel.category && (
-            <p className="text-netflix-gray text-[10px] sm:text-xs">
-              {channel.category}
-            </p>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+      </div>
+      <h3 className="mt-1.5 text-xs sm:text-sm font-medium text-foreground line-clamp-2 leading-tight">
+        {channel.name}
+      </h3>
+    </button>
   );
 };
 

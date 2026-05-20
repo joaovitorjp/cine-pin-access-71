@@ -7,13 +7,14 @@ import PinLoginForm from "@/components/PinLoginForm";
 import { useAuth } from "@/contexts/AuthContext";
 import SearchBar from "@/components/SearchBar";
 import GenreFilter from "@/components/GenreFilter";
+import { useSearch } from "@/contexts/SearchContext";
 
 const LiveTVPage: React.FC = () => {
   const [channels, setChannels] = useState<LiveTV[]>([]);
   const [filteredChannels, setFilteredChannels] = useState<LiveTV[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
+  const { query: searchQuery } = useSearch();
   const [selectedCategory, setSelectedCategory] = useState("all");
   const { isLoggedIn, loading: authLoading } = useAuth();
   const navigate = useNavigate();
@@ -98,29 +99,26 @@ const LiveTVPage: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="flex flex-col gap-6">
-        <h1 className="text-3xl font-bold">TV Ao Vivo</h1>
-        
-        <div className="flex flex-col gap-4">
-          <SearchBar onSearch={setSearchQuery} />
-          <GenreFilter
-            genres={categories}
-            selectedGenre={selectedCategory}
-            onGenreSelect={setSelectedCategory}
-          />
-        </div>
+    <div className="container mx-auto py-4 px-3 sm:px-4">
+      <div className="flex flex-col gap-4">
+        <h1 className="text-2xl sm:text-3xl font-bold">TV Ao Vivo</h1>
+
+        <GenreFilter
+          genres={categories}
+          selectedGenre={selectedCategory}
+          onGenreSelect={setSelectedCategory}
+        />
 
         {filteredChannels.length === 0 ? (
           <div className="text-netflix-gray text-center py-8">
             Nenhum canal encontrado.
           </div>
         ) : (
-          <div className="grid grid-cols-5 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 gap-2">
+          <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 gap-2 sm:gap-3">
             {filteredChannels.map((channel) => (
-              <LiveTVCard 
-                key={channel.id} 
-                channel={channel} 
+              <LiveTVCard
+                key={channel.id}
+                channel={channel}
                 onClick={() => handleChannelClick(channel)}
               />
             ))}

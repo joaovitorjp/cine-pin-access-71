@@ -6,13 +6,14 @@ import PinLoginForm from "@/components/PinLoginForm";
 import { useAuth } from "@/contexts/AuthContext";
 import SearchBar from "@/components/SearchBar";
 import GenreFilter from "@/components/GenreFilter";
+import { useSearch } from "@/contexts/SearchContext";
 
 const HomePage: React.FC = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [filteredMovies, setFilteredMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
+  const { query: searchQuery } = useSearch();
   const [selectedGenre, setSelectedGenre] = useState("all");
   const { isLoggedIn, loading: authLoading } = useAuth();
 
@@ -101,25 +102,24 @@ const HomePage: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="flex flex-col gap-6">
-        <h1 className="text-3xl font-bold">Filmes</h1>
-        
-        <div className="flex flex-col gap-4">
-          <SearchBar onSearch={setSearchQuery} />
-          <GenreFilter
-            genres={genres}
-            selectedGenre={selectedGenre}
-            onGenreSelect={setSelectedGenre}
-          />
+    <div className="container mx-auto py-4 px-3 sm:px-4">
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center justify-between gap-3">
+          <h1 className="text-2xl sm:text-3xl font-bold">Filmes</h1>
         </div>
+
+        <GenreFilter
+          genres={genres}
+          selectedGenre={selectedGenre}
+          onGenreSelect={setSelectedGenre}
+        />
 
         {filteredMovies.length === 0 ? (
           <div className="text-netflix-gray text-center py-8">
             Nenhum filme encontrado.
           </div>
         ) : (
-          <div className="grid grid-cols-5 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 xl:grid-cols-8 gap-2">
+          <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 xl:grid-cols-8 gap-2 sm:gap-3">
             {filteredMovies.map((movie) => (
               <MovieCard key={movie.id} movie={movie} />
             ))}

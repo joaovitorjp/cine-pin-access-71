@@ -11,6 +11,7 @@ import { FavoritesProvider } from "@/contexts/FavoritesContext";
 import { HistoryProvider } from "@/contexts/HistoryContext";
 import Layout from "@/components/Layout";
 import HomePage from "@/pages/HomePage";
+import { SearchProvider } from "@/contexts/SearchContext";
 
 const MovieDetailsPage = lazy(() => import("@/pages/MovieDetailsPage"));
 const PlayerPage = lazy(() => import("@/pages/PlayerPage"));
@@ -38,6 +39,7 @@ const App = () => (
           <FavoritesProvider>
             <HistoryProvider>
               <BrowserRouter>
+                <SearchProvider>
                 <Layout>
                   <Suspense fallback={null}>
                     <Routes>
@@ -58,6 +60,7 @@ const App = () => (
                     </Routes>
                   </Suspense>
                 </Layout>
+                </SearchProvider>
               </BrowserRouter>
             </HistoryProvider>
           </FavoritesProvider>
