@@ -51,11 +51,29 @@ const PinLoginForm: React.FC = () => {
     })();
   }, []);
 
+  const [paymentId, setPaymentId] = useState<string | null>(null);
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const paymentId = params.get("payment_id");
-    if (!paymentId) return;
+    const pid = params.get("payment_id");
+    const status = params.get("collection_status");
+
+    if (!pid) return;
+
+    // Se o usuário voltou sem pagar (status === null ou 'null' do MP), não inicia polling
+    if (status === "null" || status === null) {
+      window.history.replaceState({}, "", window.location.pathname);
+      return;
+    }
+
+    // Limpa URL imediatamente para evitar re-trigger em remount
+    window.history.replaceState({}, "", window.location.pathname);
+    setPaymentId(pid);
     setPollingPayment(true);
+  }, []);
+
+  useEffect(() => {
+    if (!paymentId) return;
 
     let attempts = 0;
     const interval = setInterval(async () => {
@@ -70,7 +88,6 @@ const PinLoginForm: React.FC = () => {
         setGeneratedPin(data.generated_pin);
         setPollingPayment(false);
         clearInterval(interval);
-        window.history.replaceState({}, "", window.location.pathname);
       } else if (attempts > 30) {
         setPollingPayment(false);
         clearInterval(interval);
@@ -78,12 +95,11 @@ const PinLoginForm: React.FC = () => {
           title: "Pagamento em processamento",
           description: "Assim que aprovado, seu PIN será liberado.",
         });
-        window.history.replaceState({}, "", window.location.pathname);
       }
     }, 3000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [paymentId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
