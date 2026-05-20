@@ -9,6 +9,9 @@ import { ArrowLeft } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useHistory } from "@/contexts/HistoryContext";
 import { convertVideoLink } from "@/lib/utils";
+import PlayerActions from "@/components/PlayerActions";
+import Suggestions from "@/components/Suggestions";
+
 
 const SeriesPlayerPage: React.FC = () => {
   const { seriesId, seasonNumber, episodeNumber } = useParams<{
@@ -106,15 +109,38 @@ const SeriesPlayerPage: React.FC = () => {
   }
 
   return (
-    <div className="bg-black min-h-screen">
+    <div className="bg-black min-h-screen pb-12">
       {series && episode && (
-        <VideoPlayer 
-          videoUrl={videoUrl} 
-          posterUrl={episode.thumbnail || series.imageUrl} 
-        />
+        <>
+          <VideoPlayer
+            videoUrl={videoUrl}
+            posterUrl={episode.thumbnail || series.imageUrl}
+          />
+          <div className="container mx-auto px-4 py-6 space-y-8">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <Button variant="ghost" onClick={handleGoBack} className="mb-2 text-white -ml-3">
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Voltar
+                </Button>
+                <h1 className="text-xl sm:text-2xl font-bold text-white">{series.title}</h1>
+                <p className="text-sm text-netflix-gray">
+                  T{seasonNumber} • E{episodeNumber} — {episode.title}
+                </p>
+              </div>
+              <PlayerActions
+                item={series}
+                type="series"
+                shareTitle={`${series.title} - ${episode.title}`}
+              />
+            </div>
+            <Suggestions type="series" currentId={series.id} genre={series.genre} />
+          </div>
+        </>
       )}
     </div>
   );
 };
+
 
 export default SeriesPlayerPage;
