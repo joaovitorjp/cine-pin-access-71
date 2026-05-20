@@ -9,6 +9,9 @@ import { ArrowLeft } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useHistory } from "@/contexts/HistoryContext";
 import { convertVideoLink } from "@/lib/utils";
+import PlayerActions from "@/components/PlayerActions";
+import Suggestions from "@/components/Suggestions";
+
 
 const PlayerPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -82,10 +85,26 @@ const PlayerPage: React.FC = () => {
   }
 
   return (
-    <div className="bg-black min-h-screen">
+    <div className="bg-black min-h-screen pb-12">
       {movie && <VideoPlayer videoUrl={videoUrl} posterUrl={movie.imageUrl} />}
+      {movie && (
+        <div className="container mx-auto px-4 py-6 space-y-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <Button variant="ghost" onClick={handleGoBack} className="mb-2 text-white -ml-3">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Voltar
+              </Button>
+              <h1 className="text-xl sm:text-2xl font-bold text-white">{movie.title}</h1>
+            </div>
+            <PlayerActions item={movie} type="movie" shareTitle={movie.title} />
+          </div>
+          <Suggestions type="movie" currentId={movie.id} genre={movie.genre} />
+        </div>
+      )}
     </div>
   );
 };
+
 
 export default PlayerPage;
