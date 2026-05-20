@@ -14,11 +14,11 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   const isPlayerPage = location.pathname.includes('/player/');
 
-  // Se não estiver logado, usar layout especial para tela de login (sem scroll)
+  // Se não estiver logado, usar layout especial para tela de login (com scroll)
   if (!isLoggedIn) {
     return (
-      <div className="h-screen w-screen overflow-hidden flex flex-col fixed inset-0">
-        <main className="flex-1 overflow-hidden">
+      <div className="min-h-screen w-full flex flex-col">
+        <main className="flex-1">
           {children}
         </main>
       </div>
