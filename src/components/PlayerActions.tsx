@@ -28,7 +28,7 @@ const PlayerActions: React.FC<PlayerActionsProps> = ({ item, type, shareTitle })
 
   return (
     <div className="flex items-center gap-2 flex-wrap">
-      <FavoriteButton item={item} type={type} variant="outline" size="sm" />
+      <FavoriteButton item={item} type={type} variant="default" size="sm" />
       <Button variant="outline" size="sm" onClick={handleShare} className="flex items-center gap-2">
         <Share2 className="w-4 h-4" />
         Compartilhar
