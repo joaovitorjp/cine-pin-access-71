@@ -26,7 +26,7 @@ import AdminSearchBar from "@/components/AdminSearchBar";
 import { ChevronLeft } from "lucide-react";
 
 const AdminPage: React.FC = () => {
-  const { isAdmin, isLoggedIn } = useAuth();
+  const { isAdmin, isLoggedIn, logout } = useAuth();
   const navigate = useNavigate();
   const [movies, setMovies] = useState<Movie[]>([]);
   const [series, setSeries] = useState<Series[]>([]);
