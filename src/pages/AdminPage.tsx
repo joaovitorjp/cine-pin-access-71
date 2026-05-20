@@ -9,7 +9,7 @@ import { getAllPins, deactivatePin, deletePin } from "@/services/pinService";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Trash, Edit, Plus, Film, Key, Tv, Sparkles, Image as ImageIcon, Star } from "lucide-react";
+import { Trash, Edit, Plus, Film, Key, Tv, Sparkles, Image as ImageIcon, Star, Layout as LayoutIcon } from "lucide-react";
 import AddEditMovieForm from "@/components/AddEditMovieForm";
 import BulkUploadMoviesForm from "@/components/BulkUploadMoviesForm";
 import CreatePinForm from "@/components/CreatePinForm";
@@ -21,6 +21,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import AdminStats from "@/components/AdminStats";
 import BackgroundImageManager from "@/components/BackgroundImageManager";
 import FeaturedLoginManager from "@/components/FeaturedLoginManager";
+import BannerManager from "@/components/BannerManager";
 import AdminSearchBar from "@/components/AdminSearchBar";
 import { ChevronLeft } from "lucide-react";
 
@@ -290,9 +291,9 @@ const AdminPage: React.FC = () => {
               </TabsList>
             </div>
             
-            {/* Grupo separado: PINs de Acesso, Imagens e Destaques de login */}
+            {/* Grupo separado: PINs de Acesso, Imagens, Destaques de login e Banners */}
             <div className="flex justify-center">
-              <TabsList className="w-full max-w-2xl">
+              <TabsList className="w-full max-w-3xl flex-wrap h-auto">
                 <TabsTrigger 
                   value="pins" 
                   className="flex items-center justify-center gap-2 flex-1 py-2 px-2 text-xs sm:text-sm"
@@ -313,6 +314,13 @@ const AdminPage: React.FC = () => {
                 >
                   <Star className="w-4 h-4 flex-shrink-0" />
                   <span className="truncate">Destaques Login</span>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="banners" 
+                  className="flex items-center justify-center gap-2 flex-1 py-2 px-2 text-xs sm:text-sm"
+                >
+                  <LayoutIcon className="w-4 h-4 flex-shrink-0" />
+                  <span className="truncate">Banners</span>
                 </TabsTrigger>
               </TabsList>
             </div>
