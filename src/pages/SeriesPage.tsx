@@ -123,7 +123,7 @@ const SeriesPage: React.FC = () => {
             Nenhuma série encontrada.
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-5 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 gap-2">
             {filteredSeries.map((s) => (
               <SeriesCard key={s.id} series={s} />
             ))}

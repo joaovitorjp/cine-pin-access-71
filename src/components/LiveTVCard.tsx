@@ -14,7 +14,7 @@ const LiveTVCard: React.FC<LiveTVCardProps> = ({ channel, onClick }) => {
       onClick={onClick}
     >
       <CardContent className="p-0">
-        <div className="relative aspect-video overflow-hidden rounded-t-lg">
+        <div className="relative aspect-[9/16] overflow-hidden rounded-t-lg">
           <img
             src={channel.imageUrl}
             alt={channel.name}
@@ -25,17 +25,17 @@ const LiveTVCard: React.FC<LiveTVCardProps> = ({ channel, onClick }) => {
             }}
           />
           <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-            <div className="bg-netflix-red text-white px-3 py-1 rounded-full text-sm font-medium">
+            <div className="bg-netflix-red text-white px-2 py-0.5 rounded-full text-xs font-medium">
               AO VIVO
             </div>
           </div>
         </div>
-        <div className="p-4">
-          <h3 className="font-semibold text-white text-sm mb-2 line-clamp-2">
+        <div className="p-1.5 sm:p-2">
+          <h3 className="font-semibold text-white text-xs sm:text-sm mb-0.5 line-clamp-2">
             {channel.name}
           </h3>
           {channel.category && (
-            <p className="text-netflix-gray text-xs">
+            <p className="text-netflix-gray text-[10px] sm:text-xs">
               {channel.category}
             </p>
           )}
