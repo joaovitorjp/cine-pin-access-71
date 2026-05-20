@@ -15,7 +15,7 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie }) => {
         <img
           src={movie.imageUrl}
           alt={movie.title}
-          className="w-full aspect-video object-cover object-center"
+          className="w-full aspect-[9/16] object-cover object-center"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
             target.src = "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b";
