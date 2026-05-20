@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Film, Tv, Radio, User } from "lucide-react";
+import { Film, Tv, Radio, User, LayoutDashboard } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 const BottomNavigation: React.FC = () => {
@@ -11,6 +11,7 @@ const BottomNavigation: React.FC = () => {
   const isSeriesActive = location.pathname === "/series" || location.pathname.startsWith("/series");
   const isLiveTVActive = location.pathname === "/livetv" || location.pathname.startsWith("/livetv");
   const isInfoActive = location.pathname === "/info";
+  const isAdminActive = location.pathname === "/admin" || location.pathname.startsWith("/admin");
   const isPlayerPage = location.pathname.includes('/player/');
   
   if (isPlayerPage) {
