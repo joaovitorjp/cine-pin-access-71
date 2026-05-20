@@ -730,6 +730,10 @@ const AdminPage: React.FC = () => {
         <TabsContent value="featured-login">
           <FeaturedLoginManager />
         </TabsContent>
+
+        <TabsContent value="banners">
+          <BannerManager />
+        </TabsContent>
         </Tabs>
         
         {/* Wrap dialog content in ScrollArea for better scrolling */}
