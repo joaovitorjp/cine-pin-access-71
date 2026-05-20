@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Trash, Edit, Plus, Film, Key, Tv, Sparkles, Image as ImageIcon, Star } from "lucide-react";
 import AddEditMovieForm from "@/components/AddEditMovieForm";
+import BulkUploadMoviesForm from "@/components/BulkUploadMoviesForm";
 import CreatePinForm from "@/components/CreatePinForm";
 import { formatDate, isPinValid } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
