@@ -19,15 +19,15 @@ const BottomNavigation: React.FC = () => {
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-black/90 backdrop-blur-lg border-t border-gray-800 z-50">
+    <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-lg border-t border-border z-50">
       <div className="container mx-auto flex justify-center">
         <div className={`flex w-full ${isAdmin ? 'max-w-md' : 'max-w-lg'}`}>
           <Link to="/" className="flex-1">
             <div 
               className={`flex flex-col items-center py-3 transition-all duration-300 ${
                 isMoviesActive 
-                  ? "text-white translate-y-[-4px]" 
-                  : "text-gray-400 hover:text-gray-200"
+                  ? "text-foreground translate-y-[-4px]" 
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               <Film className={`w-6 h-6 transition-transform duration-300 ${
@@ -45,8 +45,8 @@ const BottomNavigation: React.FC = () => {
             <div 
               className={`flex flex-col items-center py-3 transition-all duration-300 ${
                 isSeriesActive 
-                  ? "text-white translate-y-[-4px]" 
-                  : "text-gray-400 hover:text-gray-200"
+                  ? "text-foreground translate-y-[-4px]" 
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               <Tv className={`w-6 h-6 transition-transform duration-300 ${
@@ -64,8 +64,8 @@ const BottomNavigation: React.FC = () => {
             <div 
               className={`flex flex-col items-center py-3 transition-all duration-300 ${
                 isLiveTVActive 
-                  ? "text-white translate-y-[-4px]" 
-                  : "text-gray-400 hover:text-gray-200"
+                  ? "text-foreground translate-y-[-4px]" 
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               <Radio className={`w-6 h-6 transition-transform duration-300 ${
@@ -84,8 +84,8 @@ const BottomNavigation: React.FC = () => {
               <div
                 className={`flex flex-col items-center py-3 transition-all duration-300 ${
                   isAdminActive
-                    ? "text-white translate-y-[-4px]"
-                    : "text-gray-400 hover:text-gray-200"
+                    ? "text-foreground translate-y-[-4px]"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 <LayoutDashboard className={`w-6 h-6 transition-transform duration-300 ${
@@ -103,8 +103,8 @@ const BottomNavigation: React.FC = () => {
               <div
                 className={`flex flex-col items-center py-3 transition-all duration-300 ${
                   isInfoActive
-                    ? "text-white translate-y-[-4px]"
-                    : "text-gray-400 hover:text-gray-200"
+                    ? "text-foreground translate-y-[-4px]"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 <User className={`w-6 h-6 transition-transform duration-300 ${
