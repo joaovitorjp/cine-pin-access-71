@@ -109,6 +109,68 @@ const RequestsManager: React.FC = () => {
     }
   };
 
+  const openAddDialog = (r: ContentRequest) => {
+    setAddRequest(r);
+    setAddKind(r.type === "series" ? "series" : "movie");
+    setAddForm({
+      title: r.title || "",
+      imageUrl: "",
+      videoUrl: "",
+      description: r.notes || "",
+      year: "",
+      genre: r.category || "",
+      rating: "",
+    });
+    setAddOpen(true);
+  };
+
+  const onCreateAndLink = async () => {
+    if (!addRequest) return;
+    const { title, imageUrl, videoUrl, description, year, genre, rating } = addForm;
+    if (!title || !imageUrl || !videoUrl || !description) {
+      toast({ title: "Preencha título, imagem, vídeo e descrição", variant: "destructive" });
+      return;
+    }
+    setAddLoading(true);
+    try {
+      let newId = "";
+      let newTitle = title;
+      if (addKind === "series") {
+        const created = await addSeries({ title, imageUrl, description, year, genre, rating, seasons: [] } as any);
+        newId = created.id;
+        newTitle = created.title;
+        setSeries((prev) => [...prev, created]);
+      } else {
+        const created = await addMovie({ title, imageUrl, videoUrl, description, year, genre, rating } as any);
+        newId = created.id;
+        newTitle = created.title;
+        setMovies((prev) => [...prev, created]);
+      }
+      await linkRequestContent(addRequest.id, {
+        linkedContentId: newId,
+        linkedContentType: addKind,
+        linkedContentTitle: newTitle,
+      });
+      toast({ title: "Conteúdo adicionado e usuário notificado" });
+      setAddOpen(false);
+      setAddRequest(null);
+    } catch {
+      toast({ title: "Erro ao adicionar", variant: "destructive" });
+    } finally {
+      setAddLoading(false);
+    }
+  };
+
+        ? movies.find((m) => m.id === linkedContentId)?.title || r.title
+        : series.find((s) => s.id === linkedContentId)?.title || r.title;
+    try {
+      await linkRequestContent(r.id, { linkedContentId, linkedContentType, linkedContentTitle });
+      toast({ title: "Conteúdo vinculado e usuário notificado" });
+    } catch {
+      toast({ title: "Erro ao vincular", variant: "destructive" });
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
