@@ -10,9 +10,14 @@ import { useSearch } from "@/contexts/SearchContext";
 import { getUniqueGenres, matchesGenre, normalizeGenreKey, formatGenreLabel } from "@/lib/genre";
 import ContinueWatchingRow from "@/components/ContinueWatchingRow";
 import { useWatchProgress } from "@/contexts/WatchProgressContext";
+import EditorsCollectionsSection from "@/components/EditorsCollectionsSection";
+import RequestContentDialog from "@/components/RequestContentDialog";
+import { getAllSeries } from "@/services/seriesService";
+import { Series } from "@/types";
 
 const HomePage: React.FC = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
+  const [seriesList, setSeriesList] = useState<Series[]>([]);
   const [filteredMovies, setFilteredMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -26,7 +31,8 @@ const HomePage: React.FC = () => {
   useEffect(() => {
     const fetchMovies = async () => {
       try {
-        const data = await getAllMovies();
+        const [data, seriesData] = await Promise.all([getAllMovies(), getAllSeries().catch(() => [])]);
+        setSeriesList(seriesData);
         // Sort movies by year (most recent first)
         const sortedMovies = data.sort((a, b) => {
           const yearA = a.year ? parseInt(a.year) : 0;
@@ -146,8 +152,11 @@ const HomePage: React.FC = () => {
           </section>
         )}
 
-        <div className="flex items-center justify-between gap-3">
+        <EditorsCollectionsSection movies={movies} series={seriesList} />
+
+        <div className="flex items-center justify-between gap-3 flex-wrap">
           <h1 className="text-2xl sm:text-3xl font-bold">Filmes</h1>
+          <RequestContentDialog />
         </div>
 
         <GenreFilter
