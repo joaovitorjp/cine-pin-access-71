@@ -1,5 +1,5 @@
 import { database } from "@/lib/firebase";
-import { ref, push, set, get, update, remove, onValue, off } from "firebase/database";
+import { ref, push, set, get, update, remove, onValue, off, query, orderByChild, equalTo } from "firebase/database";
 
 const PATH = "contentRequests";
 
@@ -13,6 +13,7 @@ export interface ContentRequest {
   notes?: string;
   status: RequestStatus;
   requesterName?: string;
+  requesterPin?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -55,6 +56,25 @@ export const subscribeRequests = (
     const list = Object.keys(val).map((k) => ({ id: k, ...val[k] })) as ContentRequest[];
     list.sort(
       (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+    cb(list);
+  });
+  return () => off(r, "value", handler);
+};
+
+export const subscribeRequestsByPin = (
+  pinCode: string,
+  cb: (items: ContentRequest[]) => void
+): (() => void) => {
+  const r = ref(database, PATH);
+  const handler = onValue(r, (snap) => {
+    if (!snap.exists()) return cb([]);
+    const val = snap.val();
+    const list = Object.keys(val)
+      .map((k) => ({ id: k, ...val[k] }))
+      .filter((i: ContentRequest) => i.requesterPin === pinCode) as ContentRequest[];
+    list.sort(
+      (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
     );
     cb(list);
   });
