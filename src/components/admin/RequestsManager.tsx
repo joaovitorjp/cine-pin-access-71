@@ -161,15 +161,7 @@ const RequestsManager: React.FC = () => {
     }
   };
 
-        ? movies.find((m) => m.id === linkedContentId)?.title || r.title
-        : series.find((s) => s.id === linkedContentId)?.title || r.title;
-    try {
-      await linkRequestContent(r.id, { linkedContentId, linkedContentType, linkedContentTitle });
-      toast({ title: "Conteúdo vinculado e usuário notificado" });
-    } catch {
-      toast({ title: "Erro ao vincular", variant: "destructive" });
-    }
-  };
+
 
   return (
     <div className="space-y-4">
