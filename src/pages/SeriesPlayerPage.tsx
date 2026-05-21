@@ -102,6 +102,66 @@ const SeriesPlayerPage: React.FC = () => {
     navigate(`/series/${seriesId}`);
   };
 
+  // Determine next episode (same season → next, or next season ep1)
+  const nextEpisode = useMemo(() => {
+    if (!series || !episode || !seasonNumber) return null;
+    const seasonNum = parseInt(seasonNumber);
+    const season = series.seasons.find(s => s.number === seasonNum);
+    if (!season) return null;
+    const sortedEps = [...season.episodes].sort((a, b) => a.number - b.number);
+    const idx = sortedEps.findIndex(e => e.number === episode.number);
+    if (idx >= 0 && idx < sortedEps.length - 1) {
+      return { seasonNumber: seasonNum, episodeNumber: sortedEps[idx + 1].number, title: sortedEps[idx + 1].title };
+    }
+    // try next season
+    const nextSeason = series.seasons
+      .filter(s => s.number > seasonNum)
+      .sort((a, b) => a.number - b.number)[0];
+    if (nextSeason && nextSeason.episodes.length > 0) {
+      const firstEp = [...nextSeason.episodes].sort((a, b) => a.number - b.number)[0];
+      return { seasonNumber: nextSeason.number, episodeNumber: firstEp.number, title: firstEp.title };
+    }
+    return null;
+  }, [series, episode, seasonNumber]);
+
+  const goToNextEpisode = () => {
+    if (!nextEpisode || !seriesId) return;
+    navigate(`/player/series/${seriesId}/${nextEpisode.seasonNumber}/${nextEpisode.episodeNumber}`);
+  };
+
+  // Track watch progress for the current episode
+  const progressItem = series && episode && seasonNumber
+    ? {
+        id: makeEpisodeProgressId(series.id, parseInt(seasonNumber), episode.number),
+        type: "series" as const,
+        title: `${series.title} - T${seasonNumber}E${episode.number}: ${episode.title}`,
+        imageUrl: episode.thumbnail || series.imageUrl,
+        totalSeconds: 45 * 60,
+        watchedSeconds: 0,
+        updatedAt: new Date().toISOString(),
+        seriesId: series.id,
+        seriesTitle: series.title,
+        seasonNumber: parseInt(seasonNumber),
+        episodeNumber: episode.number,
+        episodeTitle: episode.title,
+      }
+    : null;
+
+  useTrackWatchProgress({ enabled: !!progressItem, item: progressItem });
+
+  // Auto-advance: when current episode reaches ~end and toggle is on
+  useEffect(() => {
+    if (!autoNext || !progressItem || !nextEpisode) return;
+    const interval = window.setInterval(() => {
+      const p = getProgress(progressItem.id);
+      if (p && p.watchedSeconds / p.totalSeconds >= 0.97) {
+        window.clearInterval(interval);
+        goToNextEpisode();
+      }
+    }, 5000);
+    return () => window.clearInterval(interval);
+  }, [autoNext, progressItem?.id, nextEpisode?.episodeNumber, getProgress]);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
@@ -146,13 +206,40 @@ const SeriesPlayerPage: React.FC = () => {
                   T{seasonNumber} • E{episodeNumber} — {episode.title}
                 </p>
               </div>
-              <PlayerActions
-                item={series}
-                type="series"
-                shareTitle={`${series.title} - ${episode.title}`}
-              />
+              <div className="flex flex-col sm:items-end gap-3">
+                <PlayerActions
+                  item={series}
+                  type="series"
+                  shareTitle={`${series.title} - ${episode.title}`}
+                />
+                <div className="flex items-center gap-2">
+                  <Switch
+                    id="auto-next"
+                    checked={autoNext}
+                    onCheckedChange={setAutoNext}
+                  />
+                  <Label htmlFor="auto-next" className="text-xs text-white">
+                    Próximo episódio automático
+                  </Label>
+                </div>
+                {nextEpisode && (
+                  <Button
+                    onClick={goToNextEpisode}
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                    size="sm"
+                  >
+                    <SkipForward className="w-4 h-4 mr-2" />
+                    Próximo: T{nextEpisode.seasonNumber}E{nextEpisode.episodeNumber}
+                  </Button>
+                )}
+              </div>
             </div>
-            <Suggestions type="series" currentId={series.id} genre={series.genre} />
+            <Suggestions
+              type="series"
+              currentId={series.id}
+              genre={series.genre}
+              reason={`Porque você está assistindo "${series.title}"`}
+            />
           </div>
         </>
       )}
