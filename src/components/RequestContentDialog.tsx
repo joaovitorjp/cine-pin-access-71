@@ -61,6 +61,16 @@ const RequestContentDialog: React.FC<{ trigger?: React.ReactNode }> = ({ trigger
       });
       return;
     }
+    // Get user pin from auth state to track who requested it
+    let requesterPin: string | undefined;
+    try {
+      const stored = localStorage.getItem("authState");
+      if (stored) {
+        const parsedAuth = JSON.parse(stored);
+        requesterPin = parsedAuth.pinCode;
+      }
+    } catch { /* ignore */ }
+
     setSubmitting(true);
     try {
       await createRequest({
@@ -69,6 +79,7 @@ const RequestContentDialog: React.FC<{ trigger?: React.ReactNode }> = ({ trigger
         type: parsed.data.type,
         notes: parsed.data.notes,
         requesterName: clientName || "Anônimo",
+        requesterPin,
       });
       toast({
         title: "Solicitação enviada!",

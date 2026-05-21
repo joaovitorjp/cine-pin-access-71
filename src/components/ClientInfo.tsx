@@ -8,7 +8,6 @@ import { User, Calendar, Clock, LogOut, Heart, History, Settings } from "lucide-
 import { Link } from "react-router-dom";
 import ThemeToggle from "@/components/ThemeToggle";
 import ClientProfileEdit from "@/components/ClientProfileEdit";
-import KidsModeCard from "@/components/KidsModeCard";
 import SecuritySettings from "@/components/SecuritySettings";
 import PlaybackPreferences from "@/components/PlaybackPreferences";
 
@@ -104,8 +103,6 @@ const ClientInfo: React.FC = () => {
         </Card>
 
         {!isAdmin && <ClientProfileEdit />}
-
-        <KidsModeCard />
 
         <PlaybackPreferences />
 
