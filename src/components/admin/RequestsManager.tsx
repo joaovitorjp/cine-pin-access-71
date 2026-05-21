@@ -143,6 +143,50 @@ const RequestsManager: React.FC = () => {
                 <p className="text-xs text-muted-foreground mt-1">
                   Por {r.requesterName || "Anônimo"} • {new Date(r.createdAt).toLocaleString("pt-BR")}
                 </p>
+                {r.linkedContentId && r.linkedContentType && (
+                  <Link
+                    to={`/${r.linkedContentType}/${r.linkedContentId}`}
+                    className="inline-flex items-center gap-1 text-xs text-primary hover:underline mt-1"
+                  >
+                    <ExternalLink className="w-3 h-3" />
+                    Vinculado: {r.linkedContentTitle}
+                  </Link>
+                )}
+                <div className="mt-2 flex flex-col sm:flex-row gap-2 sm:items-center">
+                  <Select
+                    value={linkPick[r.id] || ""}
+                    onValueChange={(v) => setLinkPick((p) => ({ ...p, [r.id]: v }))}
+                  >
+                    <SelectTrigger className="w-full sm:w-[260px] h-8 text-xs">
+                      <SelectValue placeholder="Vincular ao conteúdo do catálogo..." />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-72">
+                      {movies.length > 0 && (
+                        <>
+                          <div className="px-2 py-1 text-[10px] uppercase text-muted-foreground">Filmes</div>
+                          {movies.map((m) => (
+                            <SelectItem key={`m-${m.id}`} value={`movie:${m.id}`}>
+                              🎬 {m.title}
+                            </SelectItem>
+                          ))}
+                        </>
+                      )}
+                      {series.length > 0 && (
+                        <>
+                          <div className="px-2 py-1 text-[10px] uppercase text-muted-foreground">Séries</div>
+                          {series.map((s) => (
+                            <SelectItem key={`s-${s.id}`} value={`series:${s.id}`}>
+                              📺 {s.title}
+                            </SelectItem>
+                          ))}
+                        </>
+                      )}
+                    </SelectContent>
+                  </Select>
+                  <Button size="sm" variant="secondary" onClick={() => onLink(r)} className="h-8">
+                    <Link2 className="w-3 h-3 mr-1" /> Vincular e notificar
+                  </Button>
+                </div>
               </div>
               <div className="flex gap-2 items-center">
                 <Select value={r.status} onValueChange={(v) => changeStatus(r.id, v as RequestStatus)}>
