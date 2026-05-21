@@ -276,8 +276,100 @@ const RequestsManager: React.FC = () => {
           ))}
         </div>
       )}
+
+      <Dialog open={addOpen} onOpenChange={setAddOpen}>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Adicionar ao catálogo</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                size="sm"
+                variant={addKind === "movie" ? "default" : "outline"}
+                onClick={() => setAddKind("movie")}
+              >
+                Filme
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant={addKind === "series" ? "default" : "outline"}
+                onClick={() => setAddKind("series")}
+              >
+                Série
+              </Button>
+            </div>
+            <div className="space-y-1">
+              <Label>Título *</Label>
+              <Input
+                value={addForm.title}
+                onChange={(e) => setAddForm((f) => ({ ...f, title: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-1">
+              <Label>URL da Imagem *</Label>
+              <Input
+                value={addForm.imageUrl}
+                onChange={(e) => setAddForm((f) => ({ ...f, imageUrl: e.target.value }))}
+                placeholder="https://..."
+              />
+            </div>
+            {addKind === "movie" && (
+              <div className="space-y-1">
+                <Label>URL do Vídeo *</Label>
+                <Input
+                  value={addForm.videoUrl}
+                  onChange={(e) => setAddForm((f) => ({ ...f, videoUrl: e.target.value }))}
+                  placeholder="https://drive.google.com/file/d/..."
+                />
+              </div>
+            )}
+            <div className="space-y-1">
+              <Label>Descrição *</Label>
+              <Textarea
+                value={addForm.description}
+                onChange={(e) => setAddForm((f) => ({ ...f, description: e.target.value }))}
+              />
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <div className="space-y-1">
+                <Label>Ano</Label>
+                <Input
+                  value={addForm.year}
+                  onChange={(e) => setAddForm((f) => ({ ...f, year: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label>Gênero</Label>
+                <Input
+                  value={addForm.genre}
+                  onChange={(e) => setAddForm((f) => ({ ...f, genre: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label>Avaliação</Label>
+                <Input
+                  value={addForm.rating}
+                  onChange={(e) => setAddForm((f) => ({ ...f, rating: e.target.value }))}
+                />
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAddOpen(false)} disabled={addLoading}>
+              Cancelar
+            </Button>
+            <Button onClick={onCreateAndLink} disabled={addLoading}>
+              {addLoading ? "Salvando..." : "Adicionar e notificar"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
+
 
 export default RequestsManager;
