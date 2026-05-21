@@ -1,5 +1,11 @@
-
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Gauge, PictureInPicture2 } from "lucide-react";
+import { PLAYBACK_SPEEDS, usePreferences } from "@/contexts/PreferencesContext";
+import { toast } from "@/components/ui/use-toast";
 
 interface VideoPlayerProps {
   videoUrl: string;
@@ -8,9 +14,11 @@ interface VideoPlayerProps {
 
 const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, posterUrl }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const { playbackSpeed, setPlaybackSpeed } = usePreferences();
+  const [currentSpeed, setCurrentSpeed] = useState<number>(playbackSpeed);
 
-  // Security: only allow http(s) URLs to prevent javascript:/data: XSS via iframe src
   const isSafeUrl = /^https?:\/\//i.test(videoUrl ?? "");
   if (!isSafeUrl) {
     return (
@@ -20,45 +28,97 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, posterUrl }) => {
     );
   }
 
-  // Check if URL is a direct video file (mp4, m3u8, etc.)
   const isDirectVideo = videoUrl.match(/\.(mp4|webm|ogg|avi|mov|wmv|flv|m3u8)(\?.*)?$/i);
-  
-  // Check if it's an HLS stream
-  const isHLS = videoUrl.includes('.m3u8');
+  const isHLS = videoUrl.includes(".m3u8");
 
   useEffect(() => {
-    if (isHLS && videoRef.current) {
-      // For HLS streams, we might need HLS.js library in the future
-      // For now, modern browsers support HLS natively
-      videoRef.current.src = videoUrl;
-    }
+    if (isHLS && videoRef.current) videoRef.current.src = videoUrl;
   }, [videoUrl, isHLS]);
 
-  const handleVideoClick = () => {
+  // Apply saved playback speed to HTML5 video
+  useEffect(() => {
     if (videoRef.current) {
-      // Try to enter fullscreen and play
-      if (videoRef.current.requestFullscreen) {
-        videoRef.current.requestFullscreen();
+      videoRef.current.playbackRate = playbackSpeed;
+      setCurrentSpeed(playbackSpeed);
+    }
+  }, [playbackSpeed, isDirectVideo]);
+
+  const handleSpeedChange = (s: number) => {
+    setPlaybackSpeed(s as any);
+    setCurrentSpeed(s);
+    if (videoRef.current) videoRef.current.playbackRate = s;
+    toast({ title: `Velocidade ${s}x` });
+  };
+
+  const enterPiP = async () => {
+    try {
+      if (videoRef.current && document.pictureInPictureEnabled) {
+        if (document.pictureInPictureElement) {
+          await document.exitPictureInPicture();
+        } else {
+          await videoRef.current.requestPictureInPicture();
+        }
+      } else if (iframeRef.current) {
+        // Best-effort: try fullscreen as PiP fallback for iframes (cross-origin PiP not controllable)
+        if (iframeRef.current.requestFullscreen) {
+          await iframeRef.current.requestFullscreen();
+        } else {
+          toast({
+            title: "PiP indisponível",
+            description: "Este player externo não permite controle de PiP a partir do app.",
+            variant: "destructive",
+          });
+        }
       }
-      videoRef.current.play();
+    } catch {
+      toast({ title: "Não foi possível ativar o PiP", variant: "destructive" });
     }
   };
 
-  // If it's a direct video file, use HTML5 video element
+  // Floating controls overlay
+  const Controls = (
+    <div className="absolute top-2 right-2 z-10 flex gap-1">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            size="sm"
+            variant="secondary"
+            className="h-8 px-2 bg-black/60 text-white hover:bg-black/80 backdrop-blur"
+          >
+            <Gauge className="w-4 h-4 mr-1" /> {currentSpeed}x
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          {PLAYBACK_SPEEDS.map((s) => (
+            <DropdownMenuItem key={s} onClick={() => handleSpeedChange(s)}>
+              {s}x {currentSpeed === s && "✓"}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <Button
+        size="sm"
+        variant="secondary"
+        onClick={enterPiP}
+        className="h-8 px-2 bg-black/60 text-white hover:bg-black/80 backdrop-blur"
+        title="Picture-in-Picture"
+      >
+        <PictureInPicture2 className="w-4 h-4" />
+      </Button>
+    </div>
+  );
+
   if (isDirectVideo) {
     return (
       <div className="relative w-full aspect-video" ref={containerRef}>
+        {Controls}
         <video
           ref={videoRef}
           className="w-full h-full absolute inset-0 bg-black"
           controls
           poster={posterUrl}
-          onClick={handleVideoClick}
-          onLoadedData={() => {
-            // Auto-enter fullscreen and landscape on first play
-            if (videoRef.current) {
-              videoRef.current.addEventListener('play', handleVideoClick, { once: true });
-            }
+          onLoadedMetadata={() => {
+            if (videoRef.current) videoRef.current.playbackRate = playbackSpeed;
           }}
         >
           <source src={videoUrl} type={isHLS ? "application/x-mpegURL" : "video/mp4"} />
@@ -68,18 +128,19 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, posterUrl }) => {
     );
   }
 
-  // For iframe-based videos (YouTube, Drive, etc.)
   return (
     <div className="w-full">
-      <div className="relative w-full aspect-video">
+      <div className="relative w-full aspect-video" ref={containerRef}>
+        {Controls}
         <iframe
+          ref={iframeRef}
           src={videoUrl}
           className="w-full h-full absolute inset-0"
           allowFullScreen
           referrerPolicy="no-referrer"
           allow="autoplay; encrypted-media; picture-in-picture; fullscreen; accelerometer; gyroscope"
           sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation"
-          style={{ border: 'none' }}
+          style={{ border: "none" }}
           loading="lazy"
         />
       </div>

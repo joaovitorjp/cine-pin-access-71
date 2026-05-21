@@ -11,6 +11,7 @@ import { FavoritesProvider } from "@/contexts/FavoritesContext";
 import { HistoryProvider } from "@/contexts/HistoryContext";
 import { WatchProgressProvider } from "@/contexts/WatchProgressContext";
 import { KidsModeProvider } from "@/contexts/KidsModeContext";
+import { PreferencesProvider } from "@/contexts/PreferencesContext";
 import Layout from "@/components/Layout";
 import HomePage from "@/pages/HomePage";
 import { SearchProvider } from "@/contexts/SearchContext";
@@ -43,6 +44,7 @@ const App = () => (
             <HistoryProvider>
               <WatchProgressProvider>
                 <KidsModeProvider>
+                  <PreferencesProvider>
                   <BrowserRouter>
                     <SearchProvider>
                     <Layout>
@@ -68,6 +70,7 @@ const App = () => (
                     </Layout>
                     </SearchProvider>
                   </BrowserRouter>
+                  </PreferencesProvider>
                 </KidsModeProvider>
               </WatchProgressProvider>
             </HistoryProvider>

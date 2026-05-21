@@ -14,6 +14,10 @@ import EditorsCollectionsSection from "@/components/EditorsCollectionsSection";
 import RequestContentDialog from "@/components/RequestContentDialog";
 import { getAllSeries } from "@/services/seriesService";
 import { Series } from "@/types";
+import MoodFilter from "@/components/MoodFilter";
+import { MoodKey, matchesMood } from "@/lib/mood";
+import { isAllowedByRating } from "@/lib/ageRating";
+import { usePreferences } from "@/contexts/PreferencesContext";
 
 const HomePage: React.FC = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -23,7 +27,9 @@ const HomePage: React.FC = () => {
   const [error, setError] = useState("");
   const { query: searchQuery } = useSearch();
   const [selectedGenre, setSelectedGenre] = useState("all");
+  const [selectedMood, setSelectedMood] = useState<MoodKey | null>(null);
   const { isLoggedIn, loading: authLoading } = useAuth();
+  const { maxAgeRating } = usePreferences();
 
   // Extract unique, normalized genres from movies
   const genres = getUniqueGenres(movies.map(m => m.genre));
@@ -56,29 +62,35 @@ const HomePage: React.FC = () => {
     }
   }, [isLoggedIn, authLoading]);
 
-  // Filter movies based on search query and selected genre
+  // Filter movies based on search query, genre, mood, age rating
   useEffect(() => {
     let result = movies;
-    
+
+    // Age rating filter (always applied)
+    result = result.filter((m) => isAllowedByRating(m.rating, maxAgeRating));
+
     if (searchQuery) {
-      result = result.filter(movie =>
+      result = result.filter((movie) =>
         movie.title.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
-    
+
     if (selectedGenre !== "all") {
-      result = result.filter(movie => matchesGenre(movie.genre, selectedGenre));
+      result = result.filter((movie) => matchesGenre(movie.genre, selectedGenre));
     }
-    
-    // Keep the year sorting after filtering
+
+    if (selectedMood) {
+      result = result.filter((movie) => matchesMood(movie, selectedMood));
+    }
+
     result = result.sort((a, b) => {
       const yearA = a.year ? parseInt(a.year) : 0;
       const yearB = b.year ? parseInt(b.year) : 0;
       return yearB - yearA;
     });
-    
+
     setFilteredMovies(result);
-  }, [searchQuery, selectedGenre, movies]);
+  }, [searchQuery, selectedGenre, selectedMood, maxAgeRating, movies]);
 
   if (authLoading) {
     return (
@@ -158,6 +170,8 @@ const HomePage: React.FC = () => {
           <h1 className="text-2xl sm:text-3xl font-bold">Filmes</h1>
           <RequestContentDialog />
         </div>
+
+        <MoodFilter selected={selectedMood} onSelect={setSelectedMood} />
 
         <GenreFilter
           genres={genres}

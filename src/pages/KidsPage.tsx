@@ -31,8 +31,17 @@ const KidsPage: React.FC = () => {
     (async () => {
       try {
         const [m, s] = await Promise.all([getAllMovies(), getAllSeries()]);
-        setMovies(filterKidsContent(m));
-        setSeries(filterKidsContent(s));
+        // Kids mode forces strictest rating
+        const safeMovies = filterKidsContent(m).filter((it) => {
+          const r = (it as any).rating?.toString().toLowerCase() || "";
+          return !r.includes("16") && !r.includes("18") && !r.includes("14");
+        });
+        const safeSeries = filterKidsContent(s).filter((it) => {
+          const r = (it as any).rating?.toString().toLowerCase() || "";
+          return !r.includes("16") && !r.includes("18") && !r.includes("14");
+        });
+        setMovies(safeMovies);
+        setSeries(safeSeries);
       } catch (e) {
         console.error(e);
       } finally {
