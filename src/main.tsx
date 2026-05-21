@@ -4,6 +4,13 @@ import './index.css'
 
 const applySavedThemeBeforeRender = () => {
   const keys = ["cineflex:theme", "theme:user", "theme:admin", "theme", "vite-ui-theme", "ui-theme"];
+  const getStorage = (type: "localStorage" | "sessionStorage") => {
+    try {
+      return window[type];
+    } catch {
+      return undefined;
+    }
+  };
   const read = (storage: Storage, key: string) => {
     try {
       const value = storage.getItem(key);
@@ -12,10 +19,12 @@ const applySavedThemeBeforeRender = () => {
       return null;
     }
   };
+  const local = getStorage("localStorage");
+  const session = getStorage("sessionStorage");
 
   const stored = keys.reduce<string | null>((theme, key) => {
     if (theme) return theme;
-    return read(localStorage, key) || read(sessionStorage, key);
+    return (local ? read(local, key) : null) || (session ? read(session, key) : null);
   }, null);
   const system = window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
   const theme = stored || system;
