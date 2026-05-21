@@ -3,6 +3,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { validatePin, validateSession } from "@/services/pinService";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { registerDevice, findPinIdByCode, touchDevice } from "@/services/devicesService";
 
 interface AuthContextType {
   isLoggedIn: boolean;
@@ -103,6 +104,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               description: "Este PIN está sendo usado em outro dispositivo.",
               variant: "destructive",
             });
+          } else {
+            // Keep device entry warm
+            try {
+              const pid = await findPinIdByCode(pinCode);
+              if (pid) await touchDevice(pid, sessionId);
+            } catch { /* ignore */ }
+          }
+            toast({
+              title: "Sessão expirada",
+              description: "Este PIN está sendo usado em outro dispositivo.",
+              variant: "destructive",
+            });
           }
         }
       }
@@ -133,6 +146,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           sessionId: pinData.sessionId,
         };
         localStorage.setItem("authState", JSON.stringify(authState));
+
+        // Register this device session (best-effort)
+        try {
+          const pid = await findPinIdByCode(pin);
+          if (pid && pinData.sessionId) await registerDevice(pid, pinData.sessionId);
+        } catch (e) { console.warn("device register failed", e); }
+
         
         setIsLoggedIn(true);
         setIsAdmin(false);
