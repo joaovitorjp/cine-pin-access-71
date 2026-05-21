@@ -31,11 +31,17 @@ const RequestsManager: React.FC = () => {
   const [filter, setFilter] = useState<"all" | RequestStatus>("all");
   const [loading, setLoading] = useState(true);
 
+  const [movies, setMovies] = useState<Movie[]>([]);
+  const [series, setSeries] = useState<Series[]>([]);
+  const [linkPick, setLinkPick] = useState<Record<string, string>>({}); // requestId -> "movie:id" | "series:id"
+
   useEffect(() => {
     const unsub = subscribeRequests((list) => {
       setItems(list);
       setLoading(false);
     });
+    getAllMovies().then(setMovies).catch(() => {});
+    getAllSeries().then(setSeries).catch(() => {});
     return unsub;
   }, []);
 
