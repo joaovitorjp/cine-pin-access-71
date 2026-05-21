@@ -33,6 +33,9 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
 
+    --cinema-surface: 0 0% 100%;
+    --cinema-surface-elevated: 210 40% 98%;
+
     --radius: 0.5rem;
   }
 
@@ -64,6 +67,9 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
+
+    --cinema-surface: 0 0% 8%;
+    --cinema-surface-elevated: 0 0% 10%;
   }
 
   * {
@@ -92,13 +98,17 @@
     transition: background-color 200ms ease, color 200ms ease;
   }
 
-  /* Transição suave entre temas para superfícies, textos e bordas */
-  html.dark, html.light {
-    color-scheme: light dark;
+  html.light {
+    color-scheme: light;
   }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
   body, body * {
     transition-property: background-color, border-color, color, fill, stroke;
-    transition-duration: 200ms;
+    transition-duration: 120ms;
     transition-timing-function: ease;
   }
   /* Evita transição em elementos que precisam ser instantâneos */
