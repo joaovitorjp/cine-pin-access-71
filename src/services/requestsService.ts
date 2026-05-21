@@ -14,6 +14,9 @@ export interface ContentRequest {
   status: RequestStatus;
   requesterName?: string;
   requesterPin?: string;
+  linkedContentId?: string;
+  linkedContentType?: "movie" | "series";
+  linkedContentTitle?: string;
   createdAt: string;
   updatedAt: string;
 }
