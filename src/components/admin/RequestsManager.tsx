@@ -41,6 +41,14 @@ const RequestsManager: React.FC = () => {
   const [series, setSeries] = useState<Series[]>([]);
   const [linkPick, setLinkPick] = useState<Record<string, string>>({}); // requestId -> "movie:id" | "series:id"
 
+  const [addOpen, setAddOpen] = useState(false);
+  const [addRequest, setAddRequest] = useState<ContentRequest | null>(null);
+  const [addKind, setAddKind] = useState<"movie" | "series">("movie");
+  const [addForm, setAddForm] = useState({
+    title: "", imageUrl: "", videoUrl: "", description: "", year: "", genre: "", rating: "",
+  });
+  const [addLoading, setAddLoading] = useState(false);
+
   useEffect(() => {
     const unsub = subscribeRequests((list) => {
       setItems(list);
