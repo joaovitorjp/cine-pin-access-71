@@ -20,8 +20,8 @@ const GenreFilter: React.FC<GenreFilterProps> = ({
         className={cn(
           "px-4 py-1 rounded-full text-sm whitespace-nowrap transition-colors",
           selectedGenre === "all"
-            ? "bg-netflix-red text-white"
-            : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+            ? "bg-primary text-primary-foreground"
+            : "bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground"
         )}
       >
         Todos
@@ -33,8 +33,8 @@ const GenreFilter: React.FC<GenreFilterProps> = ({
           className={cn(
             "px-4 py-1 rounded-full text-sm whitespace-nowrap transition-colors",
             selectedGenre === genre
-              ? "bg-netflix-red text-white"
-              : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+              ? "bg-primary text-primary-foreground"
+              : "bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground"
           )}
         >
           {genre}
