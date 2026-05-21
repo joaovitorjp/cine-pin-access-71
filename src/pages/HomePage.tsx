@@ -62,29 +62,35 @@ const HomePage: React.FC = () => {
     }
   }, [isLoggedIn, authLoading]);
 
-  // Filter movies based on search query and selected genre
+  // Filter movies based on search query, genre, mood, age rating
   useEffect(() => {
     let result = movies;
-    
+
+    // Age rating filter (always applied)
+    result = result.filter((m) => isAllowedByRating(m.rating, maxAgeRating));
+
     if (searchQuery) {
-      result = result.filter(movie =>
+      result = result.filter((movie) =>
         movie.title.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
-    
+
     if (selectedGenre !== "all") {
-      result = result.filter(movie => matchesGenre(movie.genre, selectedGenre));
+      result = result.filter((movie) => matchesGenre(movie.genre, selectedGenre));
     }
-    
-    // Keep the year sorting after filtering
+
+    if (selectedMood) {
+      result = result.filter((movie) => matchesMood(movie, selectedMood));
+    }
+
     result = result.sort((a, b) => {
       const yearA = a.year ? parseInt(a.year) : 0;
       const yearB = b.year ? parseInt(b.year) : 0;
       return yearB - yearA;
     });
-    
+
     setFilteredMovies(result);
-  }, [searchQuery, selectedGenre, movies]);
+  }, [searchQuery, selectedGenre, selectedMood, maxAgeRating, movies]);
 
   if (authLoading) {
     return (
