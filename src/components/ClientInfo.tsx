@@ -8,6 +8,7 @@ import { User, Calendar, Clock, LogOut, Heart, History, Settings } from "lucide-
 import { Link } from "react-router-dom";
 import ThemeToggle from "@/components/ThemeToggle";
 import ClientProfileEdit from "@/components/ClientProfileEdit";
+import KidsModeCard from "@/components/KidsModeCard";
 
 const ClientInfo: React.FC = () => {
   const { clientName, daysRemaining, logout, isAdmin } = useAuth();
@@ -101,6 +102,8 @@ const ClientInfo: React.FC = () => {
         </Card>
 
         {!isAdmin && <ClientProfileEdit />}
+
+        <KidsModeCard />
 
         <Card className="bg-card border-border">
           <CardHeader>
