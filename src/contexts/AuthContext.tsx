@@ -111,15 +111,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               if (pid) await touchDevice(pid, sessionId);
             } catch { /* ignore */ }
           }
-            toast({
-              title: "Sessão expirada",
-              description: "Este PIN está sendo usado em outro dispositivo.",
-              variant: "destructive",
-            });
-          }
         }
       }
     }, 30000);
+
     
     return () => clearInterval(interval);
   }, []);
