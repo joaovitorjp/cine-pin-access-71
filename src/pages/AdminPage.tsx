@@ -13,6 +13,7 @@ import { Trash, Edit, Plus, Film, Key, Tv, Sparkles, Image as ImageIcon, Star, L
 import AddEditMovieForm from "@/components/AddEditMovieForm";
 import BulkUploadMoviesForm from "@/components/BulkUploadMoviesForm";
 import CreatePinForm from "@/components/CreatePinForm";
+import EditPinForm from "@/components/EditPinForm";
 import { formatDate, isPinValid } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
 import AddEditSeriesForm from "@/components/AddEditSeriesForm";
