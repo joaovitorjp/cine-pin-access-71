@@ -14,6 +14,10 @@ import EditorsCollectionsSection from "@/components/EditorsCollectionsSection";
 import RequestContentDialog from "@/components/RequestContentDialog";
 import { getAllSeries } from "@/services/seriesService";
 import { Series } from "@/types";
+import MoodFilter from "@/components/MoodFilter";
+import { MoodKey, matchesMood } from "@/lib/mood";
+import { isAllowedByRating } from "@/lib/ageRating";
+import { usePreferences } from "@/contexts/PreferencesContext";
 
 const HomePage: React.FC = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -23,7 +27,9 @@ const HomePage: React.FC = () => {
   const [error, setError] = useState("");
   const { query: searchQuery } = useSearch();
   const [selectedGenre, setSelectedGenre] = useState("all");
+  const [selectedMood, setSelectedMood] = useState<MoodKey | null>(null);
   const { isLoggedIn, loading: authLoading } = useAuth();
+  const { maxAgeRating } = usePreferences();
 
   // Extract unique, normalized genres from movies
   const genres = getUniqueGenres(movies.map(m => m.genre));
