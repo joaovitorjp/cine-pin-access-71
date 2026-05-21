@@ -12,9 +12,10 @@ interface SuggestionsProps {
   type: "movie" | "series" | "livetv";
   currentId: string;
   genre?: string;
+  reason?: string;
 }
 
-const Suggestions: React.FC<SuggestionsProps> = ({ type, currentId, genre }) => {
+const Suggestions: React.FC<SuggestionsProps> = ({ type, currentId, genre, reason }) => {
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -51,11 +52,17 @@ const Suggestions: React.FC<SuggestionsProps> = ({ type, currentId, genre }) => 
 
   if (items.length === 0) return null;
 
+  const defaultReason = genre
+    ? `Baseado no seu interesse em ${genre}`
+    : "Semelhante ao que você está assistindo";
+  const displayReason = reason || defaultReason;
+
   return (
     <div>
-      <h2 className="text-lg sm:text-xl font-semibold mb-3 text-foreground">
+      <h2 className="text-lg sm:text-xl font-semibold text-foreground">
         Sugestões para você
       </h2>
+      <p className="text-xs sm:text-sm text-muted-foreground mb-3">{displayReason}</p>
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-7 gap-2 sm:gap-3">
         {items.map((item) => {
           if (type === "movie") return <MovieCard key={item.id} movie={item as Movie} />;
