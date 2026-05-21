@@ -44,6 +44,7 @@ const App = () => (
             <HistoryProvider>
               <WatchProgressProvider>
                 <KidsModeProvider>
+                  <PreferencesProvider>
                   <BrowserRouter>
                     <SearchProvider>
                     <Layout>
@@ -69,6 +70,7 @@ const App = () => (
                     </Layout>
                     </SearchProvider>
                   </BrowserRouter>
+                  </PreferencesProvider>
                 </KidsModeProvider>
               </WatchProgressProvider>
             </HistoryProvider>
