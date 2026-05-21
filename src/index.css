@@ -89,6 +89,21 @@
     -webkit-user-select: none;
     -webkit-touch-callout: none;
     -webkit-tap-highlight-color: transparent;
+    transition: background-color 200ms ease, color 200ms ease;
+  }
+
+  /* Transição suave entre temas para superfícies, textos e bordas */
+  html.dark, html.light {
+    color-scheme: light dark;
+  }
+  body, body * {
+    transition-property: background-color, border-color, color, fill, stroke;
+    transition-duration: 200ms;
+    transition-timing-function: ease;
+  }
+  /* Evita transição em elementos que precisam ser instantâneos */
+  img, video, iframe, svg.no-theme-transition {
+    transition: none !important;
   }
 
   #root {
