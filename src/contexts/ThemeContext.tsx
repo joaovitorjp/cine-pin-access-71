@@ -30,6 +30,15 @@ const THEME_EVENT = "cineflex-theme-change";
 
 const isTheme = (value: unknown): value is Theme => value === "light" || value === "dark";
 
+const getBrowserStorage = (type: "localStorage" | "sessionStorage") => {
+  if (typeof window === "undefined") return undefined;
+  try {
+    return window[type];
+  } catch {
+    return undefined;
+  }
+};
+
 const safeStorageGet = (storage: Storage | undefined, key: string) => {
   try {
     return storage?.getItem(key) ?? null;
@@ -62,11 +71,13 @@ const getSystemTheme = (): Theme => {
 const readStoredTheme = (): Theme | null => {
   if (typeof window === "undefined") return null;
 
-  const current = safeStorageGet(window.localStorage, THEME_STORAGE_KEY);
+  const local = getBrowserStorage("localStorage");
+  const session = getBrowserStorage("sessionStorage");
+  const current = safeStorageGet(local, THEME_STORAGE_KEY);
   if (isTheme(current)) return current;
 
   for (const key of LEGACY_THEME_KEYS) {
-    const legacy = safeStorageGet(window.localStorage, key) || safeStorageGet(window.sessionStorage, key);
+    const legacy = safeStorageGet(local, key) || safeStorageGet(session, key);
     if (isTheme(legacy)) return legacy;
   }
 
@@ -103,10 +114,12 @@ const applyTheme = (theme: Theme) => {
 const persistTheme = (theme: Theme) => {
   if (typeof window === "undefined") return;
 
-  safeStorageSet(window.localStorage, THEME_STORAGE_KEY, theme);
+  const local = getBrowserStorage("localStorage");
+  const session = getBrowserStorage("sessionStorage");
+  safeStorageSet(local, THEME_STORAGE_KEY, theme);
   LEGACY_THEME_KEYS.forEach((key) => {
-    safeStorageRemove(window.localStorage, key);
-    safeStorageRemove(window.sessionStorage, key);
+    safeStorageRemove(local, key);
+    safeStorageRemove(session, key);
   });
 
   window.dispatchEvent(new CustomEvent(THEME_EVENT, { detail: { theme } }));
