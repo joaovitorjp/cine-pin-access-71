@@ -26,11 +26,11 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				netflix: {
-					red: '#E50914',
-					black: '#141414',
-					dark: '#181818',
-					light: '#F5F5F1',
-					gray: '#808080'
+					red: 'hsl(var(--primary))',
+					black: 'hsl(var(--cinema-surface))',
+					dark: 'hsl(var(--cinema-surface-elevated))',
+					light: 'hsl(var(--foreground))',
+					gray: 'hsl(var(--muted-foreground))'
 				},
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
