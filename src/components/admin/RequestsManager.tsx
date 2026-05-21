@@ -13,12 +13,18 @@ import { Badge } from "@/components/ui/badge";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { Trash2, Inbox, Link2, ExternalLink } from "lucide-react";
+import { Trash2, Inbox, Link2, ExternalLink, Plus } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
-import { getAllMovies } from "@/services/movieService";
-import { getAllSeries } from "@/services/seriesService";
+import { addMovie, getAllMovies } from "@/services/movieService";
+import { addSeries, getAllSeries } from "@/services/seriesService";
 import { Movie, Series } from "@/types";
 import { Link } from "react-router-dom";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 
 const STATUS_COLOR: Record<RequestStatus, string> = {
   received: "bg-blue-500/15 text-blue-500 border-blue-500/30",
@@ -34,6 +40,14 @@ const RequestsManager: React.FC = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [series, setSeries] = useState<Series[]>([]);
   const [linkPick, setLinkPick] = useState<Record<string, string>>({}); // requestId -> "movie:id" | "series:id"
+
+  const [addOpen, setAddOpen] = useState(false);
+  const [addRequest, setAddRequest] = useState<ContentRequest | null>(null);
+  const [addKind, setAddKind] = useState<"movie" | "series">("movie");
+  const [addForm, setAddForm] = useState({
+    title: "", imageUrl: "", videoUrl: "", description: "", year: "", genre: "", rating: "",
+  });
+  const [addLoading, setAddLoading] = useState(false);
 
   useEffect(() => {
     const unsub = subscribeRequests((list) => {
@@ -94,6 +108,60 @@ const RequestsManager: React.FC = () => {
       toast({ title: "Erro ao vincular", variant: "destructive" });
     }
   };
+
+  const openAddDialog = (r: ContentRequest) => {
+    setAddRequest(r);
+    setAddKind(r.type === "series" ? "series" : "movie");
+    setAddForm({
+      title: r.title || "",
+      imageUrl: "",
+      videoUrl: "",
+      description: r.notes || "",
+      year: "",
+      genre: r.category || "",
+      rating: "",
+    });
+    setAddOpen(true);
+  };
+
+  const onCreateAndLink = async () => {
+    if (!addRequest) return;
+    const { title, imageUrl, videoUrl, description, year, genre, rating } = addForm;
+    if (!title || !imageUrl || !videoUrl || !description) {
+      toast({ title: "Preencha título, imagem, vídeo e descrição", variant: "destructive" });
+      return;
+    }
+    setAddLoading(true);
+    try {
+      let newId = "";
+      let newTitle = title;
+      if (addKind === "series") {
+        const created = await addSeries({ title, imageUrl, description, year, genre, rating, seasons: [] } as any);
+        newId = created.id;
+        newTitle = created.title;
+        setSeries((prev) => [...prev, created]);
+      } else {
+        const created = await addMovie({ title, imageUrl, videoUrl, description, year, genre, rating } as any);
+        newId = created.id;
+        newTitle = created.title;
+        setMovies((prev) => [...prev, created]);
+      }
+      await linkRequestContent(addRequest.id, {
+        linkedContentId: newId,
+        linkedContentType: addKind,
+        linkedContentTitle: newTitle,
+      });
+      toast({ title: "Conteúdo adicionado e usuário notificado" });
+      setAddOpen(false);
+      setAddRequest(null);
+    } catch {
+      toast({ title: "Erro ao adicionar", variant: "destructive" });
+    } finally {
+      setAddLoading(false);
+    }
+  };
+
+
 
   return (
     <div className="space-y-4">
@@ -186,6 +254,9 @@ const RequestsManager: React.FC = () => {
                   <Button size="sm" variant="secondary" onClick={() => onLink(r)} className="h-8">
                     <Link2 className="w-3 h-3 mr-1" /> Vincular e notificar
                   </Button>
+                  <Button size="sm" onClick={() => openAddDialog(r)} className="h-8">
+                    <Plus className="w-3 h-3 mr-1" /> Adicionar ao catálogo
+                  </Button>
                 </div>
               </div>
               <div className="flex gap-2 items-center">
@@ -205,8 +276,100 @@ const RequestsManager: React.FC = () => {
           ))}
         </div>
       )}
+
+      <Dialog open={addOpen} onOpenChange={setAddOpen}>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Adicionar ao catálogo</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                size="sm"
+                variant={addKind === "movie" ? "default" : "outline"}
+                onClick={() => setAddKind("movie")}
+              >
+                Filme
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant={addKind === "series" ? "default" : "outline"}
+                onClick={() => setAddKind("series")}
+              >
+                Série
+              </Button>
+            </div>
+            <div className="space-y-1">
+              <Label>Título *</Label>
+              <Input
+                value={addForm.title}
+                onChange={(e) => setAddForm((f) => ({ ...f, title: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-1">
+              <Label>URL da Imagem *</Label>
+              <Input
+                value={addForm.imageUrl}
+                onChange={(e) => setAddForm((f) => ({ ...f, imageUrl: e.target.value }))}
+                placeholder="https://..."
+              />
+            </div>
+            {addKind === "movie" && (
+              <div className="space-y-1">
+                <Label>URL do Vídeo *</Label>
+                <Input
+                  value={addForm.videoUrl}
+                  onChange={(e) => setAddForm((f) => ({ ...f, videoUrl: e.target.value }))}
+                  placeholder="https://drive.google.com/file/d/..."
+                />
+              </div>
+            )}
+            <div className="space-y-1">
+              <Label>Descrição *</Label>
+              <Textarea
+                value={addForm.description}
+                onChange={(e) => setAddForm((f) => ({ ...f, description: e.target.value }))}
+              />
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <div className="space-y-1">
+                <Label>Ano</Label>
+                <Input
+                  value={addForm.year}
+                  onChange={(e) => setAddForm((f) => ({ ...f, year: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label>Gênero</Label>
+                <Input
+                  value={addForm.genre}
+                  onChange={(e) => setAddForm((f) => ({ ...f, genre: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label>Avaliação</Label>
+                <Input
+                  value={addForm.rating}
+                  onChange={(e) => setAddForm((f) => ({ ...f, rating: e.target.value }))}
+                />
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAddOpen(false)} disabled={addLoading}>
+              Cancelar
+            </Button>
+            <Button onClick={onCreateAndLink} disabled={addLoading}>
+              {addLoading ? "Salvando..." : "Adicionar e notificar"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
+
 
 export default RequestsManager;
