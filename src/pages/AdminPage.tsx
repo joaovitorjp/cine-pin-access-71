@@ -13,6 +13,7 @@ import { Trash, Edit, Plus, Film, Key, Tv, Sparkles, Image as ImageIcon, Star, L
 import AddEditMovieForm from "@/components/AddEditMovieForm";
 import BulkUploadMoviesForm from "@/components/BulkUploadMoviesForm";
 import CreatePinForm from "@/components/CreatePinForm";
+import EditPinForm from "@/components/EditPinForm";
 import { formatDate, isPinValid } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
 import AddEditSeriesForm from "@/components/AddEditSeriesForm";
@@ -39,6 +40,8 @@ const AdminPage: React.FC = () => {
   const [showAddEditSeriesModal, setShowAddEditSeriesModal] = useState(false);
   const [showAddEditLiveTVModal, setShowAddEditLiveTVModal] = useState(false);
   const [showCreatePinModal, setShowCreatePinModal] = useState(false);
+  const [selectedPin, setSelectedPin] = useState<PinAccess | null>(null);
+  const [showEditPinModal, setShowEditPinModal] = useState(false);
   const [loadingMovies, setLoadingMovies] = useState(true);
   const [loadingSeries, setLoadingSeries] = useState(true);
   const [loadingLiveTV, setLoadingLiveTV] = useState(true);
@@ -704,6 +707,18 @@ const AdminPage: React.FC = () => {
                         </td>
                         <td className="px-2 sm:px-4 py-3">
                           <div className="flex justify-center space-x-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => {
+                                setSelectedPin(pin);
+                                setShowEditPinModal(true);
+                              }}
+                              className="text-netflix-gray hover:text-white h-8 w-8 sm:h-9 sm:w-9"
+                              title="Editar"
+                            >
+                              <Edit className="w-3 h-3 sm:w-4 sm:h-4" />
+                            </Button>
                             {pin.isActive && (
                               <Button
                                 variant="ghost"
@@ -842,6 +857,32 @@ const AdminPage: React.FC = () => {
                   handleRefreshData();
                 }}
               />
+            </ScrollArea>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog
+          open={showEditPinModal}
+          onOpenChange={(open) => {
+            setShowEditPinModal(open);
+            if (!open) setSelectedPin(null);
+          }}
+        >
+          <DialogContent className="w-[95vw] max-w-[480px] max-h-[90vh] bg-netflix-dark text-white">
+            <DialogHeader>
+              <DialogTitle className="text-lg">Editar PIN / Usuário</DialogTitle>
+            </DialogHeader>
+            <ScrollArea className="max-h-[75vh] pr-4">
+              {selectedPin && (
+                <EditPinForm
+                  pin={selectedPin}
+                  onSuccess={() => {
+                    setShowEditPinModal(false);
+                    setSelectedPin(null);
+                    handleRefreshData();
+                  }}
+                />
+              )}
             </ScrollArea>
           </DialogContent>
         </Dialog>
