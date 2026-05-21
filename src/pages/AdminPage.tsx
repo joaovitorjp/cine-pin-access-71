@@ -707,6 +707,18 @@ const AdminPage: React.FC = () => {
                         </td>
                         <td className="px-2 sm:px-4 py-3">
                           <div className="flex justify-center space-x-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => {
+                                setSelectedPin(pin);
+                                setShowEditPinModal(true);
+                              }}
+                              className="text-netflix-gray hover:text-white h-8 w-8 sm:h-9 sm:w-9"
+                              title="Editar"
+                            >
+                              <Edit className="w-3 h-3 sm:w-4 sm:h-4" />
+                            </Button>
                             {pin.isActive && (
                               <Button
                                 variant="ghost"
