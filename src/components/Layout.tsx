@@ -42,9 +42,9 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       {isLoggedIn && <BottomNavigation />}
 
       {!isPlayerPage && (
-        <footer className="bg-netflix-black py-3 px-6 border-t border-gray-800">
+        <footer className="bg-card py-3 px-6 border-t border-border">
           <div className="container mx-auto flex justify-center">
-            <p className="text-netflix-gray text-xs">
+            <p className="text-muted-foreground text-xs">
               &copy; {new Date().getFullYear()} CINE FLEX. Todos os direitos reservados.
             </p>
           </div>
