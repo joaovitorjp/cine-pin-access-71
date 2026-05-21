@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Trash, Edit, Plus, Film, Key, Tv, Sparkles, Image as ImageIcon, Star, Layout as LayoutIcon, LogOut, Inbox } from "lucide-react";
 import RequestsManager from "@/components/admin/RequestsManager";
 import CollectionsManager from "@/components/admin/CollectionsManager";
+import AdminNotificationsBell from "@/components/admin/AdminNotificationsBell";
 import AddEditMovieForm from "@/components/AddEditMovieForm";
 import BulkUploadMoviesForm from "@/components/BulkUploadMoviesForm";
 import CreatePinForm from "@/components/CreatePinForm";
@@ -51,6 +52,7 @@ const AdminPage: React.FC = () => {
   const [movieSearchTerm, setMovieSearchTerm] = useState("");
   const [seriesSearchTerm, setSeriesSearchTerm] = useState("");
   const [liveTVSearchTerm, setLiveTVSearchTerm] = useState("");
+  const [activeTab, setActiveTab] = useState("movies");
 
   useEffect(() => {
     if (!isLoggedIn || !isAdmin) {
@@ -259,15 +261,18 @@ const AdminPage: React.FC = () => {
             </Button>
             <h1 className="text-xl md:text-2xl lg:text-3xl font-bold truncate">Painel Administrativo</h1>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={logout}
-            className="text-netflix-gray hover:text-red-400 hover:bg-red-500/10 flex-shrink-0 gap-2"
-          >
-            <LogOut className="w-4 h-4" />
-            <span className="hidden sm:inline">Sair</span>
-          </Button>
+          <div className="flex items-center gap-1 flex-shrink-0">
+            <AdminNotificationsBell onOpenRequests={() => setActiveTab("requests")} />
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={logout}
+              className="text-netflix-gray hover:text-red-400 hover:bg-red-500/10 gap-2"
+            >
+              <LogOut className="w-4 h-4" />
+              <span className="hidden sm:inline">Sair</span>
+            </Button>
+          </div>
         </div>
 
         {/* Stats */}
@@ -278,7 +283,7 @@ const AdminPage: React.FC = () => {
           pinsCount={pins.length} 
         />
         
-        <Tabs defaultValue="movies" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="mb-6 space-y-3">
             {/* Grupo principal: Filmes, Séries e Animes */}
             <div className="flex flex-col">
