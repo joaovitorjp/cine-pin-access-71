@@ -76,6 +76,25 @@ const RequestsManager: React.FC = () => {
     }
   };
 
+  const onLink = async (r: ContentRequest) => {
+    const pick = linkPick[r.id];
+    if (!pick) {
+      toast({ title: "Selecione um conteúdo", variant: "destructive" });
+      return;
+    }
+    const [linkedContentType, linkedContentId] = pick.split(":") as ["movie" | "series", string];
+    const linkedContentTitle =
+      linkedContentType === "movie"
+        ? movies.find((m) => m.id === linkedContentId)?.title || r.title
+        : series.find((s) => s.id === linkedContentId)?.title || r.title;
+    try {
+      await linkRequestContent(r.id, { linkedContentId, linkedContentType, linkedContentTitle });
+      toast({ title: "Conteúdo vinculado e usuário notificado" });
+    } catch {
+      toast({ title: "Erro ao vincular", variant: "destructive" });
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
