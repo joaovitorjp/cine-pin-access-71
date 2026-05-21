@@ -9,7 +9,9 @@ import { getAllPins, deactivatePin, deletePin } from "@/services/pinService";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Trash, Edit, Plus, Film, Key, Tv, Sparkles, Image as ImageIcon, Star, Layout as LayoutIcon, LogOut } from "lucide-react";
+import { Trash, Edit, Plus, Film, Key, Tv, Sparkles, Image as ImageIcon, Star, Layout as LayoutIcon, LogOut, Inbox } from "lucide-react";
+import RequestsManager from "@/components/admin/RequestsManager";
+import CollectionsManager from "@/components/admin/CollectionsManager";
 import AddEditMovieForm from "@/components/AddEditMovieForm";
 import BulkUploadMoviesForm from "@/components/BulkUploadMoviesForm";
 import CreatePinForm from "@/components/CreatePinForm";
@@ -335,6 +337,20 @@ const AdminPage: React.FC = () => {
                 >
                   <LayoutIcon className="w-4 h-4 flex-shrink-0" />
                   <span className="truncate">Banners</span>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="requests" 
+                  className="flex items-center justify-center gap-2 flex-1 py-2 px-2 text-xs sm:text-sm"
+                >
+                  <Inbox className="w-4 h-4 flex-shrink-0" />
+                  <span className="truncate">Solicitações</span>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="collections" 
+                  className="flex items-center justify-center gap-2 flex-1 py-2 px-2 text-xs sm:text-sm"
+                >
+                  <Sparkles className="w-4 h-4 flex-shrink-0" />
+                  <span className="truncate">Coleções</span>
                 </TabsTrigger>
               </TabsList>
             </div>
@@ -759,6 +775,14 @@ const AdminPage: React.FC = () => {
 
         <TabsContent value="banners">
           <BannerManager />
+        </TabsContent>
+
+        <TabsContent value="requests">
+          <RequestsManager />
+        </TabsContent>
+
+        <TabsContent value="collections">
+          <CollectionsManager />
         </TabsContent>
         </Tabs>
         
