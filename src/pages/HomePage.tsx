@@ -171,6 +171,8 @@ const HomePage: React.FC = () => {
           <RequestContentDialog />
         </div>
 
+        <MoodFilter selected={selectedMood} onSelect={setSelectedMood} />
+
         <GenreFilter
           genres={genres}
           selectedGenre={selectedGenre}
