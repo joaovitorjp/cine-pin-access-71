@@ -4,6 +4,7 @@ import {
   RequestStatus,
   STATUS_LABEL,
   deleteRequest,
+  linkRequestContent,
   subscribeRequests,
   updateRequestStatus,
 } from "@/services/requestsService";
@@ -12,8 +13,12 @@ import { Badge } from "@/components/ui/badge";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { Trash2, Inbox } from "lucide-react";
+import { Trash2, Inbox, Link2, ExternalLink } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
+import { getAllMovies } from "@/services/movieService";
+import { getAllSeries } from "@/services/seriesService";
+import { Movie, Series } from "@/types";
+import { Link } from "react-router-dom";
 
 const STATUS_COLOR: Record<RequestStatus, string> = {
   received: "bg-blue-500/15 text-blue-500 border-blue-500/30",
@@ -26,11 +31,17 @@ const RequestsManager: React.FC = () => {
   const [filter, setFilter] = useState<"all" | RequestStatus>("all");
   const [loading, setLoading] = useState(true);
 
+  const [movies, setMovies] = useState<Movie[]>([]);
+  const [series, setSeries] = useState<Series[]>([]);
+  const [linkPick, setLinkPick] = useState<Record<string, string>>({}); // requestId -> "movie:id" | "series:id"
+
   useEffect(() => {
     const unsub = subscribeRequests((list) => {
       setItems(list);
       setLoading(false);
     });
+    getAllMovies().then(setMovies).catch(() => {});
+    getAllSeries().then(setSeries).catch(() => {});
     return unsub;
   }, []);
 
@@ -62,6 +73,25 @@ const RequestsManager: React.FC = () => {
       toast({ title: "Solicitação removida" });
     } catch {
       toast({ title: "Erro ao remover", variant: "destructive" });
+    }
+  };
+
+  const onLink = async (r: ContentRequest) => {
+    const pick = linkPick[r.id];
+    if (!pick) {
+      toast({ title: "Selecione um conteúdo", variant: "destructive" });
+      return;
+    }
+    const [linkedContentType, linkedContentId] = pick.split(":") as ["movie" | "series", string];
+    const linkedContentTitle =
+      linkedContentType === "movie"
+        ? movies.find((m) => m.id === linkedContentId)?.title || r.title
+        : series.find((s) => s.id === linkedContentId)?.title || r.title;
+    try {
+      await linkRequestContent(r.id, { linkedContentId, linkedContentType, linkedContentTitle });
+      toast({ title: "Conteúdo vinculado e usuário notificado" });
+    } catch {
+      toast({ title: "Erro ao vincular", variant: "destructive" });
     }
   };
 
@@ -113,6 +143,50 @@ const RequestsManager: React.FC = () => {
                 <p className="text-xs text-muted-foreground mt-1">
                   Por {r.requesterName || "Anônimo"} • {new Date(r.createdAt).toLocaleString("pt-BR")}
                 </p>
+                {r.linkedContentId && r.linkedContentType && (
+                  <Link
+                    to={`/${r.linkedContentType}/${r.linkedContentId}`}
+                    className="inline-flex items-center gap-1 text-xs text-primary hover:underline mt-1"
+                  >
+                    <ExternalLink className="w-3 h-3" />
+                    Vinculado: {r.linkedContentTitle}
+                  </Link>
+                )}
+                <div className="mt-2 flex flex-col sm:flex-row gap-2 sm:items-center">
+                  <Select
+                    value={linkPick[r.id] || ""}
+                    onValueChange={(v) => setLinkPick((p) => ({ ...p, [r.id]: v }))}
+                  >
+                    <SelectTrigger className="w-full sm:w-[260px] h-8 text-xs">
+                      <SelectValue placeholder="Vincular ao conteúdo do catálogo..." />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-72">
+                      {movies.length > 0 && (
+                        <>
+                          <div className="px-2 py-1 text-[10px] uppercase text-muted-foreground">Filmes</div>
+                          {movies.map((m) => (
+                            <SelectItem key={`m-${m.id}`} value={`movie:${m.id}`}>
+                              🎬 {m.title}
+                            </SelectItem>
+                          ))}
+                        </>
+                      )}
+                      {series.length > 0 && (
+                        <>
+                          <div className="px-2 py-1 text-[10px] uppercase text-muted-foreground">Séries</div>
+                          {series.map((s) => (
+                            <SelectItem key={`s-${s.id}`} value={`series:${s.id}`}>
+                              📺 {s.title}
+                            </SelectItem>
+                          ))}
+                        </>
+                      )}
+                    </SelectContent>
+                  </Select>
+                  <Button size="sm" variant="secondary" onClick={() => onLink(r)} className="h-8">
+                    <Link2 className="w-3 h-3 mr-1" /> Vincular e notificar
+                  </Button>
+                </div>
               </div>
               <div className="flex gap-2 items-center">
                 <Select value={r.status} onValueChange={(v) => changeStatus(r.id, v as RequestStatus)}>

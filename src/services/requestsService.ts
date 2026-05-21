@@ -14,6 +14,9 @@ export interface ContentRequest {
   status: RequestStatus;
   requesterName?: string;
   requesterPin?: string;
+  linkedContentId?: string;
+  linkedContentType?: "movie" | "series";
+  linkedContentTitle?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -87,6 +90,17 @@ export const updateRequestStatus = async (
 ): Promise<void> => {
   await update(ref(database, `${PATH}/${id}`), {
     status,
+    updatedAt: new Date().toISOString(),
+  });
+};
+
+export const linkRequestContent = async (
+  id: string,
+  link: { linkedContentId: string; linkedContentType: "movie" | "series"; linkedContentTitle: string }
+): Promise<void> => {
+  await update(ref(database, `${PATH}/${id}`), {
+    ...link,
+    status: "added" as RequestStatus,
     updatedAt: new Date().toISOString(),
   });
 };

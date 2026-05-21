@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Bell } from "lucide-react";
+import { Bell, Play } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -138,6 +139,21 @@ const UserNotificationsBell: React.FC = () => {
                   <p className="text-xs text-muted-foreground mt-1">
                     {new Date(r.updatedAt).toLocaleString("pt-BR")}
                   </p>
+                  {r.status === "added" && r.linkedContentId && r.linkedContentType && (
+                    <Button
+                      asChild
+                      size="sm"
+                      className="mt-2 w-full h-8"
+                    >
+                      <Link
+                        to={`/${r.linkedContentType}/${r.linkedContentId}`}
+                        onClick={() => setOpen(false)}
+                      >
+                        <Play className="w-3 h-3 mr-1" />
+                        Assistir agora
+                      </Link>
+                    </Button>
+                  )}
                 </li>
               ))}
             </ul>
