@@ -16,8 +16,6 @@ import { getAllSeries } from "@/services/seriesService";
 import { Series } from "@/types";
 import MoodFilter from "@/components/MoodFilter";
 import { MoodKey, matchesMood } from "@/lib/mood";
-import { isAllowedByRating } from "@/lib/ageRating";
-import { usePreferences } from "@/contexts/PreferencesContext";
 
 const HomePage: React.FC = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -29,7 +27,6 @@ const HomePage: React.FC = () => {
   const [selectedGenre, setSelectedGenre] = useState("all");
   const [selectedMood, setSelectedMood] = useState<MoodKey | null>(null);
   const { isLoggedIn, loading: authLoading } = useAuth();
-  const { maxAgeRating } = usePreferences();
 
   // Extract unique, normalized genres from movies
   const genres = getUniqueGenres(movies.map(m => m.genre));
@@ -62,12 +59,9 @@ const HomePage: React.FC = () => {
     }
   }, [isLoggedIn, authLoading]);
 
-  // Filter movies based on search query, genre, mood, age rating
+  // Filter movies based on search query, genre, mood
   useEffect(() => {
     let result = movies;
-
-    // Age rating filter (always applied)
-    result = result.filter((m) => isAllowedByRating(m.rating, maxAgeRating));
 
     if (searchQuery) {
       result = result.filter((movie) =>
@@ -90,7 +84,7 @@ const HomePage: React.FC = () => {
     });
 
     setFilteredMovies(result);
-  }, [searchQuery, selectedGenre, selectedMood, maxAgeRating, movies]);
+  }, [searchQuery, selectedGenre, selectedMood, movies]);
 
   if (authLoading) {
     return (
