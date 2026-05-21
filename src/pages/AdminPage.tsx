@@ -40,6 +40,8 @@ const AdminPage: React.FC = () => {
   const [showAddEditSeriesModal, setShowAddEditSeriesModal] = useState(false);
   const [showAddEditLiveTVModal, setShowAddEditLiveTVModal] = useState(false);
   const [showCreatePinModal, setShowCreatePinModal] = useState(false);
+  const [selectedPin, setSelectedPin] = useState<PinAccess | null>(null);
+  const [showEditPinModal, setShowEditPinModal] = useState(false);
   const [loadingMovies, setLoadingMovies] = useState(true);
   const [loadingSeries, setLoadingSeries] = useState(true);
   const [loadingLiveTV, setLoadingLiveTV] = useState(true);
