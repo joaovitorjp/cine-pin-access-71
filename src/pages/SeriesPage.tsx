@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import SearchBar from "@/components/SearchBar";
 import GenreFilter from "@/components/GenreFilter";
 import { useSearch } from "@/contexts/SearchContext";
+import { getUniqueGenres, matchesGenre } from "@/lib/genre";
 
 const SeriesPage: React.FC = () => {
   const [series, setSeries] = useState<Series[]>([]);
@@ -17,8 +18,8 @@ const SeriesPage: React.FC = () => {
   const [selectedGenre, setSelectedGenre] = useState("all");
   const { isLoggedIn, loading: authLoading } = useAuth();
 
-  // Extract unique genres from series
-  const genres = [...new Set(series.flatMap(s => s.genre ? [s.genre] : []))];
+  // Extract unique, normalized genres from series
+  const genres = getUniqueGenres(series.map(s => s.genre));
 
   useEffect(() => {
     const fetchSeries = async () => {
@@ -58,7 +59,7 @@ const SeriesPage: React.FC = () => {
     }
     
     if (selectedGenre !== "all") {
-      result = result.filter(s => s.genre === selectedGenre);
+      result = result.filter(s => matchesGenre(s.genre, selectedGenre));
     }
     
     // Keep the year sorting after filtering

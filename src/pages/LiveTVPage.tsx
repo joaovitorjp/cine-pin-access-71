@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import SearchBar from "@/components/SearchBar";
 import GenreFilter from "@/components/GenreFilter";
 import { useSearch } from "@/contexts/SearchContext";
+import { getUniqueGenres, matchesGenre } from "@/lib/genre";
 
 const LiveTVPage: React.FC = () => {
   const [channels, setChannels] = useState<LiveTV[]>([]);
@@ -19,8 +20,8 @@ const LiveTVPage: React.FC = () => {
   const { isLoggedIn, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
-  // Extract unique categories from channels
-  const categories = [...new Set(channels.flatMap(c => c.category ? [c.category] : []))];
+  // Extract unique, normalized categories from channels
+  const categories = getUniqueGenres(channels.map(c => c.category));
 
   useEffect(() => {
     const fetchChannels = async () => {
@@ -54,7 +55,7 @@ const LiveTVPage: React.FC = () => {
     }
     
     if (selectedCategory !== "all") {
-      result = result.filter(c => c.category === selectedCategory);
+      result = result.filter(c => matchesGenre(c.category, selectedCategory));
     }
     
     setFilteredChannels(result);

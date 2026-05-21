@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import SearchBar from "@/components/SearchBar";
 import GenreFilter from "@/components/GenreFilter";
 import { useSearch } from "@/contexts/SearchContext";
+import { getUniqueGenres, matchesGenre } from "@/lib/genre";
 
 const HomePage: React.FC = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -17,8 +18,8 @@ const HomePage: React.FC = () => {
   const [selectedGenre, setSelectedGenre] = useState("all");
   const { isLoggedIn, loading: authLoading } = useAuth();
 
-  // Extract unique genres from movies
-  const genres = [...new Set(movies.flatMap(movie => movie.genre ? [movie.genre] : []))];
+  // Extract unique, normalized genres from movies
+  const genres = getUniqueGenres(movies.map(m => m.genre));
 
   useEffect(() => {
     const fetchMovies = async () => {
@@ -58,7 +59,7 @@ const HomePage: React.FC = () => {
     }
     
     if (selectedGenre !== "all") {
-      result = result.filter(movie => movie.genre === selectedGenre);
+      result = result.filter(movie => matchesGenre(movie.genre, selectedGenre));
     }
     
     // Keep the year sorting after filtering
