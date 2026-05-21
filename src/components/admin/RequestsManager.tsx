@@ -254,6 +254,9 @@ const RequestsManager: React.FC = () => {
                   <Button size="sm" variant="secondary" onClick={() => onLink(r)} className="h-8">
                     <Link2 className="w-3 h-3 mr-1" /> Vincular e notificar
                   </Button>
+                  <Button size="sm" onClick={() => openAddDialog(r)} className="h-8">
+                    <Plus className="w-3 h-3 mr-1" /> Adicionar ao catálogo
+                  </Button>
                 </div>
               </div>
               <div className="flex gap-2 items-center">
