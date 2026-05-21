@@ -1,16 +1,22 @@
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Series, Episode } from "@/types";
 import { getSeriesById } from "@/services/seriesService";
 import VideoPlayer from "@/components/VideoPlayer";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { ArrowLeft, SkipForward } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useHistory } from "@/contexts/HistoryContext";
 import { convertVideoLink } from "@/lib/utils";
 import PlayerActions from "@/components/PlayerActions";
 import Suggestions from "@/components/Suggestions";
+import { useTrackWatchProgress } from "@/hooks/useTrackWatchProgress";
+import { makeEpisodeProgressId, useWatchProgress } from "@/contexts/WatchProgressContext";
+
+const AUTO_NEXT_KEY = "cineflex:autoNextEpisode";
 
 
 const SeriesPlayerPage: React.FC = () => {
@@ -28,6 +34,18 @@ const SeriesPlayerPage: React.FC = () => {
   const navigate = useNavigate();
   const { isLoggedIn } = useAuth();
   const { addToHistory } = useHistory();
+  const { getProgress } = useWatchProgress();
+
+  const [autoNext, setAutoNext] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem(AUTO_NEXT_KEY) !== "false";
+    } catch {
+      return true;
+    }
+  });
+  useEffect(() => {
+    try { localStorage.setItem(AUTO_NEXT_KEY, String(autoNext)); } catch {}
+  }, [autoNext]);
 
   useEffect(() => {
     if (!isLoggedIn) {
