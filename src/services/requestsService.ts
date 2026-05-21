@@ -94,6 +94,17 @@ export const updateRequestStatus = async (
   });
 };
 
+export const linkRequestContent = async (
+  id: string,
+  link: { linkedContentId: string; linkedContentType: "movie" | "series"; linkedContentTitle: string }
+): Promise<void> => {
+  await update(ref(database, `${PATH}/${id}`), {
+    ...link,
+    status: "added" as RequestStatus,
+    updatedAt: new Date().toISOString(),
+  });
+};
+
 export const deleteRequest = async (id: string): Promise<void> => {
   await remove(ref(database, `${PATH}/${id}`));
 };
