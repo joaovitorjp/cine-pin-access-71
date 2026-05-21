@@ -4,6 +4,7 @@ import {
   RequestStatus,
   STATUS_LABEL,
   deleteRequest,
+  linkRequestContent,
   subscribeRequests,
   updateRequestStatus,
 } from "@/services/requestsService";
@@ -12,8 +13,12 @@ import { Badge } from "@/components/ui/badge";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { Trash2, Inbox } from "lucide-react";
+import { Trash2, Inbox, Link2, ExternalLink } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
+import { getAllMovies } from "@/services/movieService";
+import { getAllSeries } from "@/services/seriesService";
+import { Movie, Series } from "@/types";
+import { Link } from "react-router-dom";
 
 const STATUS_COLOR: Record<RequestStatus, string> = {
   received: "bg-blue-500/15 text-blue-500 border-blue-500/30",
