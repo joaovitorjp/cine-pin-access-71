@@ -7,7 +7,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import SearchBar from "@/components/SearchBar";
 import GenreFilter from "@/components/GenreFilter";
 import { useSearch } from "@/contexts/SearchContext";
-import { getUniqueGenres, matchesGenre } from "@/lib/genre";
+import { getUniqueGenres, matchesGenre, normalizeGenre } from "@/lib/genre";
+import ContinueWatchingRow from "@/components/ContinueWatchingRow";
+import { useWatchProgress } from "@/contexts/WatchProgressContext";
 
 const HomePage: React.FC = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
