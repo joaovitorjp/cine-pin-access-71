@@ -7,7 +7,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import SearchBar from "@/components/SearchBar";
 import GenreFilter from "@/components/GenreFilter";
 import { useSearch } from "@/contexts/SearchContext";
-import { getUniqueGenres, matchesGenre } from "@/lib/genre";
+import { getUniqueGenres, matchesGenre, normalizeGenreKey, formatGenreLabel } from "@/lib/genre";
+import ContinueWatchingRow from "@/components/ContinueWatchingRow";
+import { useWatchProgress } from "@/contexts/WatchProgressContext";
 
 const HomePage: React.FC = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -102,9 +104,48 @@ const HomePage: React.FC = () => {
     );
   }
 
+  // Recommendation reason based on watch progress history
+  const { allItems } = useWatchProgress();
+  const recentWatched = Object.values(allItems)
+    .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())[0];
+
+  let recommended: Movie[] = [];
+  let recommendationReason = "";
+  if (recentWatched && movies.length) {
+    const refTitle = recentWatched.type === "series" ? recentWatched.seriesTitle : recentWatched.title;
+    // Try to find original movie by movieId to grab its genre as anchor
+    const anchor = movies.find(m => m.id === recentWatched.movieId);
+    const anchorGenreKey = anchor?.genre ? normalizeGenreKey(anchor.genre) : "";
+    if (anchorGenreKey) {
+      recommended = movies
+        .filter(m => m.id !== anchor?.id && normalizeGenreKey(m.genre) === anchorGenreKey)
+        .slice(0, 12);
+      recommendationReason = `Porque você assistiu "${refTitle}"`;
+    } else if (refTitle) {
+      recommended = movies.slice(0, 12);
+      recommendationReason = `Porque você assistiu "${refTitle}"`;
+    }
+  }
+
   return (
     <div className="container mx-auto py-4 px-3 sm:px-4">
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-6">
+        <ContinueWatchingRow />
+
+        {recommended.length > 0 && (
+          <section className="space-y-2 animate-fade-in">
+            <div>
+              <h2 className="text-xl sm:text-2xl font-bold text-foreground">Recomendado para você</h2>
+              <p className="text-xs sm:text-sm text-muted-foreground">{recommendationReason}</p>
+            </div>
+            <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 xl:grid-cols-8 gap-2 sm:gap-3">
+              {recommended.map(movie => (
+                <MovieCard key={`rec-${movie.id}`} movie={movie} />
+              ))}
+            </div>
+          </section>
+        )}
+
         <div className="flex items-center justify-between gap-3">
           <h1 className="text-2xl sm:text-3xl font-bold">Filmes</h1>
         </div>

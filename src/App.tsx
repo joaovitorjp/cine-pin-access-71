@@ -9,6 +9,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { FavoritesProvider } from "@/contexts/FavoritesContext";
 import { HistoryProvider } from "@/contexts/HistoryContext";
+import { WatchProgressProvider } from "@/contexts/WatchProgressContext";
 import Layout from "@/components/Layout";
 import HomePage from "@/pages/HomePage";
 import { SearchProvider } from "@/contexts/SearchContext";
@@ -38,30 +39,32 @@ const App = () => (
         <ThemeProvider>
           <FavoritesProvider>
             <HistoryProvider>
-              <BrowserRouter>
-                <SearchProvider>
-                <Layout>
-                  <Suspense fallback={null}>
-                    <Routes>
-                      <Route path="/" element={<HomePage />} />
-                      <Route path="/movie/:id" element={<MovieDetailsPage />} />
-                      <Route path="/player/:id" element={<PlayerPage />} />
-                      <Route path="/series" element={<SeriesPage />} />
-                      <Route path="/series/:id" element={<SeriesDetailsPage />} />
-                      <Route path="/player/series/:seriesId/:seasonNumber/:episodeNumber" element={<SeriesPlayerPage />} />
-                      <Route path="/livetv" element={<LiveTVPage />} />
-                      <Route path="/livetv/player/:id" element={<LiveTVPlayerPage />} />
-                      <Route path="/favorites" element={<FavoritesPage />} />
-                      <Route path="/history" element={<HistoryPage />} />
-                      <Route path="/info" element={<ClientInfo />} />
-                      <Route path="/admin" element={<AdminPage />} />
-                      <Route path="/admin-access" element={<AdminAccess />} />
-                      <Route path="*" element={<NotFound />} />
-                    </Routes>
-                  </Suspense>
-                </Layout>
-                </SearchProvider>
-              </BrowserRouter>
+              <WatchProgressProvider>
+                <BrowserRouter>
+                  <SearchProvider>
+                  <Layout>
+                    <Suspense fallback={null}>
+                      <Routes>
+                        <Route path="/" element={<HomePage />} />
+                        <Route path="/movie/:id" element={<MovieDetailsPage />} />
+                        <Route path="/player/:id" element={<PlayerPage />} />
+                        <Route path="/series" element={<SeriesPage />} />
+                        <Route path="/series/:id" element={<SeriesDetailsPage />} />
+                        <Route path="/player/series/:seriesId/:seasonNumber/:episodeNumber" element={<SeriesPlayerPage />} />
+                        <Route path="/livetv" element={<LiveTVPage />} />
+                        <Route path="/livetv/player/:id" element={<LiveTVPlayerPage />} />
+                        <Route path="/favorites" element={<FavoritesPage />} />
+                        <Route path="/history" element={<HistoryPage />} />
+                        <Route path="/info" element={<ClientInfo />} />
+                        <Route path="/admin" element={<AdminPage />} />
+                        <Route path="/admin-access" element={<AdminAccess />} />
+                        <Route path="*" element={<NotFound />} />
+                      </Routes>
+                    </Suspense>
+                  </Layout>
+                  </SearchProvider>
+                </BrowserRouter>
+              </WatchProgressProvider>
             </HistoryProvider>
           </FavoritesProvider>
         </ThemeProvider>

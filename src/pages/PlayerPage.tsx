@@ -11,6 +11,8 @@ import { useHistory } from "@/contexts/HistoryContext";
 import { convertVideoLink } from "@/lib/utils";
 import PlayerActions from "@/components/PlayerActions";
 import Suggestions from "@/components/Suggestions";
+import { useTrackWatchProgress } from "@/hooks/useTrackWatchProgress";
+import { makeMovieProgressId } from "@/contexts/WatchProgressContext";
 
 
 const PlayerPage: React.FC = () => {
@@ -60,6 +62,23 @@ const PlayerPage: React.FC = () => {
     navigate(`/movie/${id}`);
   };
 
+  // Track watch progress (estimated, since iframe playback is opaque)
+  useTrackWatchProgress({
+    enabled: !!movie,
+    item: movie
+      ? {
+          id: makeMovieProgressId(movie.id),
+          type: "movie",
+          title: movie.title,
+          imageUrl: movie.imageUrl,
+          totalSeconds: 90 * 60, // estimated movie length
+          watchedSeconds: 0,
+          updatedAt: new Date().toISOString(),
+          movieId: movie.id,
+        }
+      : null,
+  });
+
   if (loading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
@@ -99,7 +118,7 @@ const PlayerPage: React.FC = () => {
             </div>
             <PlayerActions item={movie} type="movie" shareTitle={movie.title} />
           </div>
-          <Suggestions type="movie" currentId={movie.id} genre={movie.genre} />
+          <Suggestions type="movie" currentId={movie.id} genre={movie.genre} reason={`Porque você assistiu "${movie.title}"`} />
         </div>
       )}
     </div>
