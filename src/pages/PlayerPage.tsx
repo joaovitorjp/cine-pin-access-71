@@ -104,7 +104,7 @@ const PlayerPage: React.FC = () => {
   }
 
   return (
-    <div className="bg-black min-h-screen pb-12">
+    <div className="bg-black min-h-screen pb-24">
       {movie && <VideoPlayer videoUrl={videoUrl} posterUrl={movie.imageUrl} />}
       {movie && (
         <div className="container mx-auto px-4 py-6 space-y-8">

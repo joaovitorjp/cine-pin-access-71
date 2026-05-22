@@ -187,7 +187,7 @@ const SeriesPlayerPage: React.FC = () => {
   }
 
   return (
-    <div className="bg-black min-h-screen pb-12">
+    <div className="bg-black min-h-screen pb-24">
       {series && episode && (
         <>
           <VideoPlayer
