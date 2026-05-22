@@ -27,6 +27,7 @@ const HomePage: React.FC = () => {
   const [selectedGenre, setSelectedGenre] = useState("all");
   const [selectedMood, setSelectedMood] = useState<MoodKey | null>(null);
   const { isLoggedIn, loading: authLoading } = useAuth();
+  const { allItems } = useWatchProgress();
 
   // Extract unique, normalized genres from movies
   const genres = getUniqueGenres(movies.map(m => m.genre));
@@ -117,7 +118,6 @@ const HomePage: React.FC = () => {
   }
 
   // Recommendation reason based on watch progress history
-  const { allItems } = useWatchProgress();
   const recentWatched = Object.values(allItems)
     .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())[0];
 
