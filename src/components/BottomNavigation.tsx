@@ -12,11 +12,8 @@ const BottomNavigation: React.FC = () => {
   const isLiveTVActive = location.pathname.startsWith("/livetv");
   const isInfoActive = location.pathname === "/info";
   const isAdminActive = location.pathname === "/admin" || location.pathname.startsWith("/admin");
-  const isPlayerPage = location.pathname.includes('/player/');
-  
-  if (isPlayerPage) {
-    return null;
-  }
+
+
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-lg border-t border-border z-50">
