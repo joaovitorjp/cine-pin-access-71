@@ -84,7 +84,7 @@ const LiveTVPlayerPage: React.FC = () => {
   }
 
   return (
-    <div className="bg-black min-h-screen pb-12">
+    <div className="bg-black min-h-screen pb-24">
       <div className="absolute top-4 left-4 z-50">
         <Button variant="ghost" onClick={handleGoBack} className="text-white hover:bg-white/20">
           <ArrowLeft className="w-4 h-4 mr-2" />
