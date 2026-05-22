@@ -37,7 +37,7 @@ const HistoryPage: React.FC = () => {
       case 'series':
         return `/player/series/${item.seriesId}/${item.seasonNumber}/${item.episodeNumber}`;
       case 'livetv':
-        return `/livetv/player/${item.id.split('-')[0]}`; // Remove episode suffix if any
+        return `/livetv/player/${item.id}`;
       default:
         return '/';
     }
