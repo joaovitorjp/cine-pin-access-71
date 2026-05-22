@@ -19,11 +19,22 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, posterUrl }) => {
   const { playbackSpeed, setPlaybackSpeed } = usePreferences();
   const [currentSpeed, setCurrentSpeed] = useState<number>(playbackSpeed);
 
-  const isSafeUrl = /^https?:\/\//i.test(videoUrl ?? "");
+  // Hardened URL validation: only allow https:// absolute URLs.
+  // Blocks javascript:, data:, vbscript:, file:, http:, relative paths, etc.
+  const isSafeUrl = (() => {
+    if (typeof videoUrl !== "string" || videoUrl.trim() === "") return false;
+    try {
+      const u = new URL(videoUrl.trim());
+      return u.protocol === "https:";
+    } catch {
+      return false;
+    }
+  })();
+
   if (!isSafeUrl) {
     return (
-      <div className="w-full aspect-video flex items-center justify-center bg-black text-netflix-gray text-sm">
-        URL de vídeo inválida.
+      <div className="w-full aspect-video flex items-center justify-center bg-black text-netflix-gray text-sm px-4 text-center">
+        URL de vídeo inválida ou insegura. Apenas links HTTPS são permitidos.
       </div>
     );
   }
