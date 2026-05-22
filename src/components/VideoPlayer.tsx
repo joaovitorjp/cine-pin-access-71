@@ -149,8 +149,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, posterUrl }) => {
           className="w-full h-full absolute inset-0"
           allowFullScreen
           referrerPolicy="no-referrer"
-          allow="autoplay; encrypted-media; picture-in-picture; fullscreen; accelerometer; gyroscope"
-          sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-presentation"
+          allow="autoplay; encrypted-media; picture-in-picture"
+          sandbox="allow-same-origin allow-scripts allow-forms allow-pointer-lock allow-top-navigation"
           style={{ border: "none" }}
           loading="lazy"
         />
