@@ -8,6 +8,7 @@ import { ArrowLeft, Play } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import FavoriteButton from "@/components/FavoriteButton";
+import { useSafeBack } from "@/hooks/useSafeBack";
 
 const SeriesDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -16,6 +17,7 @@ const SeriesDetailsPage: React.FC = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const { isLoggedIn } = useAuth();
+  const handleBack = useSafeBack("/series");
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -56,7 +58,7 @@ const SeriesDetailsPage: React.FC = () => {
   if (error || !series) {
     return (
       <div className="container mx-auto py-8 px-4">
-        <Button variant="ghost" onClick={() => navigate(-1)} className="mb-4">
+        <Button variant="ghost" onClick={handleBack} className="mb-4">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Voltar
         </Button>
@@ -67,7 +69,7 @@ const SeriesDetailsPage: React.FC = () => {
 
   return (
     <div className="container mx-auto py-8 px-4">
-      <Button variant="ghost" onClick={() => navigate(-1)} className="mb-6">
+      <Button variant="ghost" onClick={handleBack} className="mb-6">
         <ArrowLeft className="w-4 h-4 mr-2" />
         Voltar
       </Button>

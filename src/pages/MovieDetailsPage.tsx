@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Play } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import FavoriteButton from "@/components/FavoriteButton";
+import { useSafeBack } from "@/hooks/useSafeBack";
 
 const MovieDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -43,9 +44,7 @@ const MovieDetailsPage: React.FC = () => {
     fetchMovie();
   }, [id, navigate, isLoggedIn]);
 
-  const handleGoBack = () => {
-    navigate(-1);
-  };
+  const handleGoBack = useSafeBack("/");
 
   const handlePlayMovie = () => {
     navigate(`/player/${id}`);

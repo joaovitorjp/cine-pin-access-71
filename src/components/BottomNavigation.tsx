@@ -8,8 +8,8 @@ const BottomNavigation: React.FC = () => {
   const location = useLocation();
   const { isAdmin } = useAuth();
   const isMoviesActive = location.pathname === "/" || location.pathname.startsWith("/movie");
-  const isSeriesActive = location.pathname === "/series" || location.pathname.startsWith("/series");
-  const isLiveTVActive = location.pathname === "/livetv" || location.pathname.startsWith("/livetv");
+  const isSeriesActive = location.pathname.startsWith("/series");
+  const isLiveTVActive = location.pathname.startsWith("/livetv");
   const isInfoActive = location.pathname === "/info";
   const isAdminActive = location.pathname === "/admin" || location.pathname.startsWith("/admin");
   const isPlayerPage = location.pathname.includes('/player/');
