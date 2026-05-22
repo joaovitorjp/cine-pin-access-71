@@ -4,6 +4,44 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <!--
+      Content Security Policy (CSP) — defense-in-depth for the SPA.
+      Notes / limitations (meta-tag CSP):
+        * `frame-ancestors`, `report-uri/report-to`, `sandbox` and `X-Frame-Options`
+          são IGNORADOS quando declarados via <meta>; só funcionam como header HTTP.
+        * `'unsafe-inline'` em script-src é necessário enquanto o bundle do
+          gptengineer/Vite injeta scripts/estilos inline.
+        * `frame-src https:` é amplo de propósito: o player permite que o admin
+          cadastre qualquer URL de iframe (Streamtape, Vidsrc, etc.).
+    -->
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      base-uri 'self';
+      form-action 'self';
+      object-src 'none';
+      upgrade-insecure-requests;
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://cdn.gpteng.co https://*.lovable.app https://*.lovableproject.com https://*.gpteng.co https://www.gstatic.com https://*.firebaseio.com https://*.googleapis.com;
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+      font-src 'self' data: https://fonts.gstatic.com;
+      img-src 'self' data: blob: https:;
+      media-src 'self' blob: https:;
+      worker-src 'self' blob:;
+      manifest-src 'self';
+      connect-src 'self' blob: data: https://*.supabase.co wss://*.supabase.co https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://*.googleapis.com https://www.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://api.mercadopago.com https://*.mercadopago.com https://*.lovable.app https://*.lovableproject.com https://cdn.gpteng.co;
+      frame-src 'self' https: blob:;
+      child-src 'self' https: blob:;
+    " />
+
+    <!-- Referrer Policy: nunca vaza query string (que poderia conter ?k=token do /admin-access). -->
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+
+    <!-- Permissions Policy: desliga APIs sensíveis do navegador que o app não usa. -->
+    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()" />
+
+    <!-- X-Content-Type-Options simulado (a versão header é a que conta de verdade). -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+
     <title>Cine Flex</title>
     <meta name="description" content="O melhor site de filmes e séries !">
     <meta name="author" content="CINE FLEX" />
