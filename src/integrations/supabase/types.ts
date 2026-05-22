@@ -44,6 +44,7 @@ export type Database = {
           created_at: string
           id: string
           password: string
+          password_hash: string
           username: string
         }
         Insert: {
@@ -51,6 +52,7 @@ export type Database = {
           created_at?: string
           id?: string
           password: string
+          password_hash: string
           username: string
         }
         Update: {
@@ -58,6 +60,7 @@ export type Database = {
           created_at?: string
           id?: string
           password?: string
+          password_hash?: string
           username?: string
         }
         Relationships: []
@@ -106,6 +109,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      set_admin_password: {
+        Args: { _new_password: string; _username: string }
+        Returns: boolean
+      }
       validate_admin_credentials: {
         Args: { _password: string; _username: string }
         Returns: string
