@@ -43,7 +43,6 @@ export type Database = {
           active: boolean
           created_at: string
           id: string
-          password: string
           password_hash: string
           username: string
         }
@@ -51,7 +50,6 @@ export type Database = {
           active?: boolean
           created_at?: string
           id?: string
-          password: string
           password_hash: string
           username: string
         }
@@ -59,7 +57,6 @@ export type Database = {
           active?: boolean
           created_at?: string
           id?: string
-          password?: string
           password_hash?: string
           username?: string
         }
@@ -109,6 +106,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_payment_pin: {
+        Args: { _payment_id: string }
+        Returns: {
+          generated_pin: string
+          status: string
+        }[]
+      }
       set_admin_password: {
         Args: { _new_password: string; _username: string }
         Returns: boolean
