@@ -80,11 +80,10 @@ const PinLoginForm: React.FC = () => {
     let attempts = 0;
     const interval = setInterval(async () => {
       attempts++;
-      const { data } = await supabase
-        .from("payments")
-        .select("generated_pin,status")
-        .eq("id", paymentId)
-        .maybeSingle();
+      const { data: rows } = await supabase.rpc("get_payment_pin", {
+        _payment_id: paymentId,
+      });
+      const data = Array.isArray(rows) ? rows[0] : rows;
 
       if (data?.generated_pin) {
         setGeneratedPin(data.generated_pin);
