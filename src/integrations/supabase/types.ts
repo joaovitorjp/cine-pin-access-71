@@ -172,6 +172,10 @@ export type Database = {
           display_name: string
         }[]
       }
+      credit_coins_from_payment: {
+        Args: { _amount: number; _reference: string; _user_id: string }
+        Returns: number
+      }
       get_payment_pin: {
         Args: { _payment_id: string }
         Returns: {
