@@ -7,6 +7,7 @@ import { getFeaturedLoginItems } from "@/services/featuredLoginService";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Star, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import SafeImage from "@/components/SafeImage";
 
 /**
  * Carrossel diagonal de destaques na tela de login.
@@ -182,16 +183,10 @@ const FeaturedLoginCarousel: React.FC = () => {
                   style={{ width: "clamp(76px, 8vmax, 190px)", WebkitTapHighlightColor: "transparent" }}
                   aria-label={`Ver detalhes de ${m.title}`}
                 >
-                  <img
+                  <SafeImage
                     src={m.imageUrl}
                     alt={m.title}
                     className="w-full h-full object-cover"
-                    loading={rowIdx < 3 ? "eager" : "lazy"}
-                    decoding="async"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src =
-                        "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b";
-                    }}
                   />
                 </button>
               ))}
@@ -211,7 +206,7 @@ const FeaturedLoginCarousel: React.FC = () => {
           {selected && (
             <div>
               <div className="relative aspect-[16/9] bg-black">
-                <img
+                <SafeImage
                   src={selected.imageUrl}
                   alt={selected.title}
                   className="w-full h-full object-cover"

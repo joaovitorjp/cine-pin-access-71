@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { EditorCollection, subscribeCollections } from "@/services/collectionsService";
 import { Movie, Series } from "@/types";
 import { Sparkles } from "lucide-react";
+import SafeImage from "@/components/SafeImage";
 
 interface Props {
   movies: Movie[];
@@ -46,7 +47,7 @@ const EditorsCollectionsSection: React.FC<Props> = ({ movies, series }) => {
           <div key={c.id} className="space-y-2">
             {c.bannerUrl ? (
               <div className="relative rounded-xl overflow-hidden h-32 sm:h-40">
-                <img src={c.bannerUrl} alt={c.title} className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
+                <SafeImage src={c.bannerUrl} alt={c.title} className="absolute inset-0 w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 text-white">
                   <h3 className="text-lg sm:text-xl font-bold">{c.title}</h3>
@@ -67,11 +68,10 @@ const EditorsCollectionsSection: React.FC<Props> = ({ movies, series }) => {
                   to={item._type === "movie" ? `/movie/${item.id}` : `/series/${item.id}`}
                   className="group rounded-md overflow-hidden bg-card hover:scale-105 transition-transform"
                 >
-                  <div className="aspect-[2/3] bg-muted">
-                    <img
+                  <div className="relative aspect-[2/3] bg-muted">
+                    <SafeImage
                       src={item.imageUrl}
                       alt={item.title}
-                      loading="lazy"
                       className="w-full h-full object-cover"
                     />
                   </div>

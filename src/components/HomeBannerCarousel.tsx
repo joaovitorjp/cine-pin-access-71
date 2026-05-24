@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { getHomeBanners, HomeBanner } from "@/services/bannerService";
+import SafeImage from "@/components/SafeImage";
 
 const HomeBannerCarousel: React.FC = () => {
   const [banners, setBanners] = useState<HomeBanner[]>([]);
@@ -23,14 +24,10 @@ const HomeBannerCarousel: React.FC = () => {
     <div className="relative w-full overflow-hidden rounded-lg bg-netflix-dark aspect-[21/9] sm:aspect-[21/8] md:aspect-[21/7] shadow-lg ring-1 ring-white/5">
       {banners.map((b, i) => {
         const content = (
-          <img
+          <SafeImage
             src={b.url}
             alt={`Banner ${i + 1}`}
             className="w-full h-full object-cover"
-            loading={i === 0 ? "eager" : "lazy"}
-            onError={(e) => {
-              (e.target as HTMLImageElement).style.opacity = "0";
-            }}
           />
         );
         return (
