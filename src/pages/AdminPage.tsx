@@ -32,20 +32,15 @@ const AdminPage: React.FC = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [series, setSeries] = useState<Series[]>([]);
   const [liveTVChannels, setLiveTVChannels] = useState<LiveTV[]>([]);
-  const [pins, setPins] = useState<PinAccess[]>([]);
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
   const [selectedSeries, setSelectedSeries] = useState<Series | null>(null);
   const [selectedLiveTVChannel, setSelectedLiveTVChannel] = useState<LiveTV | null>(null);
   const [showAddEditModal, setShowAddEditModal] = useState(false);
   const [showAddEditSeriesModal, setShowAddEditSeriesModal] = useState(false);
   const [showAddEditLiveTVModal, setShowAddEditLiveTVModal] = useState(false);
-  const [showCreatePinModal, setShowCreatePinModal] = useState(false);
-  const [selectedPin, setSelectedPin] = useState<PinAccess | null>(null);
-  const [showEditPinModal, setShowEditPinModal] = useState(false);
   const [loadingMovies, setLoadingMovies] = useState(true);
   const [loadingSeries, setLoadingSeries] = useState(true);
   const [loadingLiveTV, setLoadingLiveTV] = useState(true);
-  const [loadingPins, setLoadingPins] = useState(true);
   const [movieSearchTerm, setMovieSearchTerm] = useState("");
   const [seriesSearchTerm, setSeriesSearchTerm] = useState("");
   const [liveTVSearchTerm, setLiveTVSearchTerm] = useState("");
@@ -59,17 +54,14 @@ const AdminPage: React.FC = () => {
 
     const fetchData = async () => {
       try {
-        const [moviesData, seriesData, liveTVData, pinsData] = await Promise.all([
+        const [moviesData, seriesData, liveTVData] = await Promise.all([
           getAllMovies(),
           getAllSeries(),
           getAllLiveTVChannels(),
-          getAllPins()
         ]);
-        
         setMovies(moviesData);
         setSeries(seriesData);
         setLiveTVChannels(liveTVData);
-        setPins(pinsData);
       } catch (error) {
         console.error("Erro ao buscar dados:", error);
         toast({
@@ -81,7 +73,6 @@ const AdminPage: React.FC = () => {
         setLoadingMovies(false);
         setLoadingSeries(false);
         setLoadingLiveTV(false);
-        setLoadingPins(false);
       }
     };
 
@@ -92,28 +83,24 @@ const AdminPage: React.FC = () => {
     setLoadingMovies(true);
     setLoadingSeries(true);
     setLoadingLiveTV(true);
-    setLoadingPins(true);
     try {
-      const [moviesData, seriesData, liveTVData, pinsData] = await Promise.all([
+      const [moviesData, seriesData, liveTVData] = await Promise.all([
         getAllMovies(),
         getAllSeries(),
         getAllLiveTVChannels(),
-        getAllPins()
       ]);
-      
       setMovies(moviesData);
       setSeries(seriesData);
       setLiveTVChannels(liveTVData);
-      setPins(pinsData);
     } catch (error) {
       console.error("Erro ao atualizar dados:", error);
     } finally {
       setLoadingMovies(false);
       setLoadingSeries(false);
       setLoadingLiveTV(false);
-      setLoadingPins(false);
     }
   };
+
 
   const handleEditMovie = (movie: Movie) => {
     setSelectedMovie(movie);
