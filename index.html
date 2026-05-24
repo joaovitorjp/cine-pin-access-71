@@ -21,14 +21,14 @@
       form-action 'self';
       object-src 'none';
       upgrade-insecure-requests;
-      script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://cdn.gpteng.co https://*.lovable.app https://*.lovableproject.com https://*.gpteng.co https://www.gstatic.com https://*.firebaseio.com https://*.googleapis.com;
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://cdn.gpteng.co https://*.lovable.app https://*.lovableproject.com https://*.gpteng.co https://www.gstatic.com https://*.firebaseio.com https://*.googleapis.com https://js.stripe.com https://*.js.stripe.com;
       style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
       font-src 'self' data: https://fonts.gstatic.com;
       img-src 'self' data: blob: https:;
       media-src 'self' blob: https:;
       worker-src 'self' blob:;
       manifest-src 'self';
-      connect-src 'self' blob: data: https://*.supabase.co wss://*.supabase.co https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://*.googleapis.com https://www.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://api.mercadopago.com https://*.mercadopago.com https://*.lovable.app https://*.lovableproject.com https://cdn.gpteng.co;
+      connect-src 'self' blob: data: https://*.supabase.co wss://*.supabase.co https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://*.googleapis.com https://www.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://api.mercadopago.com https://*.mercadopago.com https://*.lovable.app https://*.lovableproject.com https://cdn.gpteng.co https://api.stripe.com https://*.stripe.com https://maps.googleapis.com;
       frame-src 'self' https: blob:;
       child-src 'self' https: blob:;
     " />
@@ -37,7 +37,7 @@
     <meta name="referrer" content="strict-origin-when-cross-origin" />
 
     <!-- Permissions Policy: desliga APIs sensíveis do navegador que o app não usa. -->
-    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()" />
+    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=(self https://js.stripe.com https://*.stripe.com), usb=(), magnetometer=(), gyroscope=(), accelerometer=()" />
 
     <!-- X-Content-Type-Options simulado (a versão header é a que conta de verdade). -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
