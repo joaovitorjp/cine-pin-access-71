@@ -48,15 +48,30 @@ const ClientInfo: React.FC = () => {
           <CardContent className="space-y-6">
             <div className="space-y-4">
               <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                    <User className="w-6 h-6 text-primary" />
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="relative w-14 h-14 rounded-full bg-primary/10 overflow-hidden flex items-center justify-center shrink-0">
+                    {avatar ? (
+                      <img src={avatar} alt={clientName} className="w-full h-full object-cover" />
+                    ) : (
+                      <User className="w-7 h-7 text-primary" />
+                    )}
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-sm text-muted-foreground">Nome do Cliente</p>
-                    <p className="font-semibold text-lg">{clientName}</p>
+                    <p className="font-semibold text-lg truncate">{clientName}</p>
                   </div>
                 </div>
+                {!isAdmin && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPickerOpen(true)}
+                    className="gap-1 shrink-0"
+                  >
+                    <Pencil className="w-3 h-3" />
+                    Avatar
+                  </Button>
+                )}
               </div>
 
               {isAdmin && (
