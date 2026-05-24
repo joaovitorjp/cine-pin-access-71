@@ -4,6 +4,7 @@ import { validatePin, validateSession } from "@/services/pinService";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { registerDevice, findPinIdByCode, touchDevice } from "@/services/devicesService";
+import { getPinByCode, updatePinSelf } from "@/services/pinService";
 
 interface AuthContextType {
   isLoggedIn: boolean;
@@ -12,9 +13,11 @@ interface AuthContextType {
   clientName: string;
   daysRemaining: number;
   adminUsername: string;
+  avatar: string;
   loginWithPin: (pin: string) => Promise<boolean>;
   loginAsAdmin: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
+  updateAvatar: (url: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -24,9 +27,11 @@ const AuthContext = createContext<AuthContextType>({
   clientName: "",
   daysRemaining: 0,
   adminUsername: "",
+  avatar: "",
   loginWithPin: async () => false,
   loginAsAdmin: async () => false,
   logout: () => {},
+  updateAvatar: async () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
