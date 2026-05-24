@@ -98,11 +98,13 @@ const HistoryPage: React.FC = () => {
               <Card key={item.id} className="hover:bg-muted/50 transition-colors">
                 <CardContent className="p-4">
                   <div className="flex items-center gap-4">
-                    <img
-                      src={item.imageUrl}
-                      alt={item.title}
-                      className="w-16 h-24 object-cover rounded-md"
-                    />
+                    <div className="relative w-16 h-24 rounded-md overflow-hidden shrink-0 bg-muted">
+                      <SafeImage
+                        src={item.imageUrl}
+                        alt={item.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
                     
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
