@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { EditorCollection, subscribeCollections } from "@/services/collectionsService";
 import { Movie, Series } from "@/types";
 import { Sparkles } from "lucide-react";
+import SafeImage from "@/components/SafeImage";
 
 interface Props {
   movies: Movie[];
