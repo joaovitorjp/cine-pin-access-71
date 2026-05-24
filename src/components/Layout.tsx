@@ -9,6 +9,7 @@ import UserNotificationsBell from "@/components/UserNotificationsBell";
 import AvatarPickerDialog from "@/components/AvatarPickerDialog";
 import { toast } from "@/components/ui/use-toast";
 import logo from "@/assets/cineflex-logo.png";
+import { isValidAvatar } from "@/lib/avatars";
 
 const LISTING_ROUTES = ["/", "/series", "/livetv"];
 
