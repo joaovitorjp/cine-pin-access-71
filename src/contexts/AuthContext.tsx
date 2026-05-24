@@ -55,7 +55,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [clientName, setClientName] = useState("");
   const [avatar, setAvatar] = useState("");
   const [loading, setLoading] = useState(true);
+  const [profileLoaded, setProfileLoaded] = useState(false);
   const sessionIdRef = useRef<string>(ensureSessionId());
+  const claimedRef = useRef<boolean>(false);
 
   // Bootstrap admin from localStorage
   useEffect(() => {
