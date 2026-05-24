@@ -206,7 +206,7 @@ const FeaturedLoginCarousel: React.FC = () => {
           {selected && (
             <div>
               <div className="relative aspect-[16/9] bg-black">
-                <img
+                <SafeImage
                   src={selected.imageUrl}
                   alt={selected.title}
                   className="w-full h-full object-cover"
