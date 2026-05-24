@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Clock, Trash2, Play, Film, Tv, Radio } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "@/components/ui/use-toast";
+import SafeImage from "@/components/SafeImage";
 
 const HistoryPage: React.FC = () => {
   const { history, clearHistory, removeFromHistory } = useHistory();
