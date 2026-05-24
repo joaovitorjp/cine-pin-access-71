@@ -9,6 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import FavoriteButton from "@/components/FavoriteButton";
 import { useSafeBack } from "@/hooks/useSafeBack";
+import SafeImage from "@/components/SafeImage";
 
 const SeriesDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
