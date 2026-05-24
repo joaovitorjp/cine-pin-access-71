@@ -143,6 +143,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         "postgres_changes",
         { event: "UPDATE", schema: "public", table: "profiles", filter: `id=eq.${user.id}` },
         (payload) => {
+          // Ignore events that fire before we've successfully claimed our own session.
+          if (!claimedRef.current) return;
           const remote = (payload.new as { active_session_id?: string })?.active_session_id;
           if (remote && remote !== sessionIdRef.current) {
             toast({
