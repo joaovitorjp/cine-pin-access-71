@@ -104,9 +104,19 @@ const BottomNavigation: React.FC = () => {
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                <User className={`w-6 h-6 transition-transform duration-300 ${
-                  isInfoActive ? 'scale-110' : ''
-                }`} />
+                {avatar ? (
+                  <img
+                    src={avatar}
+                    alt="Perfil"
+                    className={`w-6 h-6 rounded-full object-cover border border-border transition-transform duration-300 ${
+                      isInfoActive ? 'scale-110' : ''
+                    }`}
+                  />
+                ) : (
+                  <User className={`w-6 h-6 transition-transform duration-300 ${
+                    isInfoActive ? 'scale-110' : ''
+                  }`} />
+                )}
                 <span className={`text-xs mt-1 transition-all duration-300 ${
                   isInfoActive ? 'opacity-100' : 'opacity-70'
                 }`}>
