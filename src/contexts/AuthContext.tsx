@@ -43,6 +43,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [clientName, setClientName] = useState<string>("");
   const [daysRemaining, setDaysRemaining] = useState<number>(0);
   const [adminUsername, setAdminUsername] = useState<string>("");
+  const [avatar, setAvatar] = useState<string>("");
 
   // Check local storage for auth state on mount and validate session
   useEffect(() => {
