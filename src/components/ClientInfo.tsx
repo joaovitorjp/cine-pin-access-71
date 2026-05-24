@@ -1,18 +1,21 @@
-import React from "react";
+import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useFavorites } from "@/contexts/FavoritesContext";
 import { useHistory } from "@/contexts/HistoryContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { User, Calendar, Clock, LogOut, Heart, History, Settings } from "lucide-react";
+import { User, Calendar, Clock, LogOut, Heart, History, Settings, Pencil } from "lucide-react";
 import { Link } from "react-router-dom";
 import ThemeToggle from "@/components/ThemeToggle";
 import ClientProfileEdit from "@/components/ClientProfileEdit";
 import SecuritySettings from "@/components/SecuritySettings";
 import PlaybackPreferences from "@/components/PlaybackPreferences";
+import AvatarPickerDialog from "@/components/AvatarPickerDialog";
+import { toast } from "@/components/ui/use-toast";
 
 const ClientInfo: React.FC = () => {
-  const { clientName, daysRemaining, logout, isAdmin } = useAuth();
+  const { clientName, daysRemaining, logout, isAdmin, avatar, updateAvatar } = useAuth();
+  const [pickerOpen, setPickerOpen] = useState(false);
   const { favoriteMovies, favoriteSeries, favoriteLiveTV } = useFavorites();
   const { history } = useHistory();
 
