@@ -58,6 +58,26 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           </div>
         </footer>
       )}
+
+      <AvatarPickerDialog
+        open={needsAvatar}
+        dismissible={false}
+        title="Escolha seu avatar"
+        description="Selecione uma imagem para o seu perfil. Você poderá alterá-la depois nas configurações."
+        onSelect={async (url) => {
+          try {
+            await updateAvatar(url);
+            toast({ title: "Avatar definido", description: "Bem-vindo(a)!" });
+          } catch {
+            toast({
+              title: "Erro ao salvar avatar",
+              description: "Tente novamente.",
+              variant: "destructive",
+            });
+            throw new Error("failed");
+          }
+        }}
+      />
     </div>
   );
 };
