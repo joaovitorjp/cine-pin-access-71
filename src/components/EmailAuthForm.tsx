@@ -125,8 +125,8 @@ const EmailAuthForm: React.FC = () => {
           <p className="text-sm text-white/60 mt-1">Filmes, séries e TV ao vivo</p>
         </div>
 
-        <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl p-6 sm:p-8">
-          <div className="flex gap-2 mb-6 p-1 bg-white/5 rounded-xl">
+        <div className="rounded-2xl border border-white/15 bg-black/50 backdrop-blur-2xl shadow-[0_25px_80px_-12px_rgba(0,0,0,0.6)] p-6 sm:p-8 ring-1 ring-white/10">
+          <div className="flex gap-2 mb-6 p-1 bg-white/8 rounded-xl border border-white/10">
             <button
               type="button"
               onClick={() => setMode("signin")}
