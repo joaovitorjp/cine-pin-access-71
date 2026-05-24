@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { X, Play } from "lucide-react";
 import { useWatchProgress, WatchProgressItem } from "@/contexts/WatchProgressContext";
 import { Button } from "@/components/ui/button";
+import SafeImage from "@/components/SafeImage";
 
 const formatRemaining = (totalSec: number, watchedSec: number) => {
   const remaining = Math.max(0, totalSec - watchedSec);
