@@ -190,9 +190,9 @@ export type Database = {
       unlock_movie: {
         Args: { _movie_id: string }
         Returns: {
-          already: boolean
-          balance: number
-          unlocked: boolean
+          out_already: boolean
+          out_balance: number
+          out_unlocked: boolean
         }[]
       }
       validate_admin_credentials: {
