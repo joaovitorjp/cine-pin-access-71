@@ -8,6 +8,7 @@ import { useSearch } from "@/contexts/SearchContext";
 import UserNotificationsBell from "@/components/UserNotificationsBell";
 import AvatarPickerDialog from "@/components/AvatarPickerDialog";
 import { toast } from "@/components/ui/use-toast";
+import logo from "@/assets/cineflex-logo.png";
 
 const LISTING_ROUTES = ["/", "/series", "/livetv"];
 
