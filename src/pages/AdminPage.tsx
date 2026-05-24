@@ -1,23 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { Movie, Series, LiveTV, PinAccess } from "@/types";
+import { Movie, Series, LiveTV } from "@/types";
 import { getAllMovies, deleteMovie } from "@/services/movieService";
 import { getAllSeries, deleteSeries } from "@/services/seriesService";
 import { getAllLiveTVChannels, deleteLiveTVChannel } from "@/services/liveTvService";
-import { getAllPins, deactivatePin, deletePin } from "@/services/pinService";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Trash, Edit, Plus, Film, Key, Tv, Sparkles, Image as ImageIcon, Star, Layout as LayoutIcon, LogOut, Inbox } from "lucide-react";
+import { Trash, Edit, Plus, Film, Tv, Sparkles, Image as ImageIcon, Star, Layout as LayoutIcon, LogOut, Inbox } from "lucide-react";
 import RequestsManager from "@/components/admin/RequestsManager";
 import CollectionsManager from "@/components/admin/CollectionsManager";
 import AdminNotificationsBell from "@/components/admin/AdminNotificationsBell";
 import AddEditMovieForm from "@/components/AddEditMovieForm";
 import BulkUploadMoviesForm from "@/components/BulkUploadMoviesForm";
-import CreatePinForm from "@/components/CreatePinForm";
-import EditPinForm from "@/components/EditPinForm";
-import { formatDate, isPinValid } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
 import AddEditSeriesForm from "@/components/AddEditSeriesForm";
 import AddEditLiveTVForm from "@/components/AddEditLiveTVForm";
@@ -29,26 +25,22 @@ import BannerManager from "@/components/BannerManager";
 import AdminSearchBar from "@/components/AdminSearchBar";
 import { ChevronLeft } from "lucide-react";
 
+
 const AdminPage: React.FC = () => {
   const { isAdmin, isLoggedIn, logout } = useAuth();
   const navigate = useNavigate();
   const [movies, setMovies] = useState<Movie[]>([]);
   const [series, setSeries] = useState<Series[]>([]);
   const [liveTVChannels, setLiveTVChannels] = useState<LiveTV[]>([]);
-  const [pins, setPins] = useState<PinAccess[]>([]);
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
   const [selectedSeries, setSelectedSeries] = useState<Series | null>(null);
   const [selectedLiveTVChannel, setSelectedLiveTVChannel] = useState<LiveTV | null>(null);
   const [showAddEditModal, setShowAddEditModal] = useState(false);
   const [showAddEditSeriesModal, setShowAddEditSeriesModal] = useState(false);
   const [showAddEditLiveTVModal, setShowAddEditLiveTVModal] = useState(false);
-  const [showCreatePinModal, setShowCreatePinModal] = useState(false);
-  const [selectedPin, setSelectedPin] = useState<PinAccess | null>(null);
-  const [showEditPinModal, setShowEditPinModal] = useState(false);
   const [loadingMovies, setLoadingMovies] = useState(true);
   const [loadingSeries, setLoadingSeries] = useState(true);
   const [loadingLiveTV, setLoadingLiveTV] = useState(true);
-  const [loadingPins, setLoadingPins] = useState(true);
   const [movieSearchTerm, setMovieSearchTerm] = useState("");
   const [seriesSearchTerm, setSeriesSearchTerm] = useState("");
   const [liveTVSearchTerm, setLiveTVSearchTerm] = useState("");
@@ -62,17 +54,14 @@ const AdminPage: React.FC = () => {
 
     const fetchData = async () => {
       try {
-        const [moviesData, seriesData, liveTVData, pinsData] = await Promise.all([
+        const [moviesData, seriesData, liveTVData] = await Promise.all([
           getAllMovies(),
           getAllSeries(),
           getAllLiveTVChannels(),
-          getAllPins()
         ]);
-        
         setMovies(moviesData);
         setSeries(seriesData);
         setLiveTVChannels(liveTVData);
-        setPins(pinsData);
       } catch (error) {
         console.error("Erro ao buscar dados:", error);
         toast({
@@ -84,7 +73,6 @@ const AdminPage: React.FC = () => {
         setLoadingMovies(false);
         setLoadingSeries(false);
         setLoadingLiveTV(false);
-        setLoadingPins(false);
       }
     };
 
@@ -95,28 +83,24 @@ const AdminPage: React.FC = () => {
     setLoadingMovies(true);
     setLoadingSeries(true);
     setLoadingLiveTV(true);
-    setLoadingPins(true);
     try {
-      const [moviesData, seriesData, liveTVData, pinsData] = await Promise.all([
+      const [moviesData, seriesData, liveTVData] = await Promise.all([
         getAllMovies(),
         getAllSeries(),
         getAllLiveTVChannels(),
-        getAllPins()
       ]);
-      
       setMovies(moviesData);
       setSeries(seriesData);
       setLiveTVChannels(liveTVData);
-      setPins(pinsData);
     } catch (error) {
       console.error("Erro ao atualizar dados:", error);
     } finally {
       setLoadingMovies(false);
       setLoadingSeries(false);
       setLoadingLiveTV(false);
-      setLoadingPins(false);
     }
   };
+
 
   const handleEditMovie = (movie: Movie) => {
     setSelectedMovie(movie);
@@ -143,47 +127,8 @@ const AdminPage: React.FC = () => {
     }
   };
 
-  const handleDeactivatePin = async (id: string) => {
-    if (window.confirm("Tem certeza que deseja desativar este PIN?")) {
-      try {
-        await deactivatePin(id);
-        setPins(pins.map(pin => 
-          pin.id === id ? { ...pin, isActive: false } : pin
-        ));
-        toast({
-          title: "PIN desativado",
-          description: "O PIN foi desativado com sucesso",
-        });
-      } catch (error) {
-        console.error("Erro ao desativar PIN:", error);
-        toast({
-          title: "Erro",
-          description: "Não foi possível desativar o PIN",
-          variant: "destructive",
-        });
-      }
-    }
-  };
 
-  const handleDeletePin = async (id: string) => {
-    if (window.confirm("Tem certeza que deseja excluir este PIN permanentemente?")) {
-      try {
-        await deletePin(id);
-        setPins(pins.filter(pin => pin.id !== id));
-        toast({
-          title: "PIN excluído",
-          description: "O PIN foi excluído permanentemente",
-        });
-      } catch (error) {
-        console.error("Erro ao excluir PIN:", error);
-        toast({
-          title: "Erro",
-          description: "Não foi possível excluir o PIN",
-          variant: "destructive",
-        });
-      }
-    }
-  };
+
 
   const handleDeleteSeries = async (id: string) => {
     if (window.confirm("Tem certeza que deseja excluir esta série?")) {
@@ -280,8 +225,8 @@ const AdminPage: React.FC = () => {
           moviesCount={movies.length} 
           seriesCount={series.length} 
           animesCount={liveTVChannels.length}
-          pinsCount={pins.length} 
         />
+
         
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="mb-6 space-y-3">
@@ -316,12 +261,13 @@ const AdminPage: React.FC = () => {
             <div className="flex justify-center">
               <TabsList className="w-full max-w-3xl flex-wrap h-auto">
                 <TabsTrigger 
-                  value="pins" 
+                  value="background" 
                   className="flex items-center justify-center gap-2 flex-1 py-2 px-2 text-xs sm:text-sm"
                 >
-                  <Key className="w-4 h-4 flex-shrink-0" />
-                  <span className="truncate">PINs</span>
+                  <ImageIcon className="w-4 h-4 flex-shrink-0" />
+                  <span className="truncate">Fundo</span>
                 </TabsTrigger>
+
                 <TabsTrigger 
                   value="background" 
                   className="flex items-center justify-center gap-2 flex-1 py-2 px-2 text-xs sm:text-sm"
@@ -651,124 +597,8 @@ const AdminPage: React.FC = () => {
           )}
         </TabsContent>
         
-        <TabsContent value="pins">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
-            <h2 className="text-xl md:text-2xl font-semibold">Gerenciar PINs de Acesso</h2>
-            <Button 
-              onClick={() => setShowCreatePinModal(true)}
-              className="bg-netflix-red hover:bg-red-700 w-full sm:w-auto"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              <span className="hidden sm:inline">Criar Novo PIN</span>
-              <span className="sm:hidden">Criar PIN</span>
-            </Button>
-          </div>
-          
-          {loadingPins ? (
-            <div className="animate-pulse text-netflix-gray">Carregando PINs...</div>
-          ) : pins.length === 0 ? (
-            <div className="text-netflix-gray bg-netflix-dark p-6 rounded-md text-center">
-              Nenhum PIN cadastrado. Clique em "Criar Novo PIN" para começar.
-            </div>
-          ) : (
-            <div className="bg-netflix-dark rounded-md overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[700px]">
-                  <thead className="bg-gray-800">
-                    <tr>
-                      <th className="px-2 sm:px-4 py-3 text-left text-sm font-medium">PIN</th>
-                      <th className="px-2 sm:px-4 py-3 text-left text-sm font-medium">Cliente</th>
-                      <th className="px-2 sm:px-4 py-3 text-left text-sm font-medium hidden md:table-cell">Validade</th>
-                      <th className="px-2 sm:px-4 py-3 text-left text-sm font-medium">Status</th>
-                      <th className="px-2 sm:px-4 py-3 text-center w-20 sm:w-32 text-sm font-medium">Ações</th>
-                    </tr>
-                  </thead>
-                <tbody>
-                  {pins.map((pin) => {
-                    const isValid = isPinValid(pin);
-                    
-                    return (
-                      <tr key={pin.id} className="border-t border-gray-700">
-                        <td className="px-2 sm:px-4 py-3">
-                          <div className="font-mono text-xs sm:text-sm truncate">{pin.pin}</div>
-                        </td>
-                        <td className="px-2 sm:px-4 py-3">
-                          <div className="text-xs sm:text-sm font-medium truncate">{pin.clientName}</div>
-                          <div className="text-[10px] sm:text-xs text-netflix-gray mt-0.5">
-                            Criado por: <span className="font-medium">{pin.createdBy || "desconhecido"}</span>
-                          </div>
-                          <div className="md:hidden text-xs text-netflix-gray mt-1">
-                            {formatDate(pin.expiryDate)} • {pin.daysValid} dias
-                          </div>
-                        </td>
-                        <td className="px-2 sm:px-4 py-3 hidden md:table-cell">
-                          <div>
-                            <div className="text-sm">{formatDate(pin.expiryDate)}</div>
-                            <div className="text-xs text-netflix-gray">
-                              {pin.daysValid} dias de acesso
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-2 sm:px-4 py-3">
-                          {pin.isActive ? (
-                            isValid ? (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-900 text-green-300">
-                                Ativo
-                              </span>
-                            ) : (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-900 text-yellow-300">
-                                Expirado
-                              </span>
-                            )
-                          ) : (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-800 text-gray-300">
-                              Inativo
-                            </span>
-                          )}
-                        </td>
-                        <td className="px-2 sm:px-4 py-3">
-                          <div className="flex justify-center space-x-1">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => {
-                                setSelectedPin(pin);
-                                setShowEditPinModal(true);
-                              }}
-                              className="text-netflix-gray hover:text-white h-8 w-8 sm:h-9 sm:w-9"
-                              title="Editar"
-                            >
-                              <Edit className="w-3 h-3 sm:w-4 sm:h-4" />
-                            </Button>
-                            {pin.isActive && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleDeactivatePin(pin.id)}
-                                className="text-netflix-gray hover:text-yellow-500 text-xs px-2 py-1 h-auto hidden sm:flex"
-                              >
-                                Desativar
-                              </Button>
-                            )}
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleDeletePin(pin.id)}
-                              className="text-netflix-gray hover:text-red-500 h-8 w-8 sm:h-9 sm:w-9"
-                            >
-                              <Trash className="w-3 h-3 sm:w-4 sm:h-4" />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
-          )}
-        </TabsContent>
+
+
 
         <TabsContent value="background">
           <BackgroundImageManager />
@@ -873,48 +703,8 @@ const AdminPage: React.FC = () => {
             </ScrollArea>
           </DialogContent>
         </Dialog>
-        
-        <Dialog open={showCreatePinModal} onOpenChange={setShowCreatePinModal}>
-          <DialogContent className="w-[95vw] max-w-[425px] max-h-[90vh] bg-netflix-dark text-white">
-            <DialogHeader>
-              <DialogTitle className="text-lg">Criar Novo PIN de Acesso</DialogTitle>
-            </DialogHeader>
-            <ScrollArea className="max-h-[75vh] pr-4">
-              <CreatePinForm
-                onSuccess={() => {
-                  setShowCreatePinModal(false);
-                  handleRefreshData();
-                }}
-              />
-            </ScrollArea>
-          </DialogContent>
-        </Dialog>
 
-        <Dialog
-          open={showEditPinModal}
-          onOpenChange={(open) => {
-            setShowEditPinModal(open);
-            if (!open) setSelectedPin(null);
-          }}
-        >
-          <DialogContent className="w-[95vw] max-w-[480px] max-h-[90vh] bg-netflix-dark text-white">
-            <DialogHeader>
-              <DialogTitle className="text-lg">Editar PIN / Usuário</DialogTitle>
-            </DialogHeader>
-            <ScrollArea className="max-h-[75vh] pr-4">
-              {selectedPin && (
-                <EditPinForm
-                  pin={selectedPin}
-                  onSuccess={() => {
-                    setShowEditPinModal(false);
-                    setSelectedPin(null);
-                    handleRefreshData();
-                  }}
-                />
-              )}
-            </ScrollArea>
-          </DialogContent>
-        </Dialog>
+
       </div>
     </div>
   );
