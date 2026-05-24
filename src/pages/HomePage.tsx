@@ -8,7 +8,7 @@ import GenreFilter from "@/components/GenreFilter";
 import { useSearch } from "@/contexts/SearchContext";
 import { getUniqueGenres, matchesGenre } from "@/lib/genre";
 import ContinueWatchingRow from "@/components/ContinueWatchingRow";
-import { useWatchProgress } from "@/contexts/WatchProgressContext";
+
 import EditorsCollectionsSection from "@/components/EditorsCollectionsSection";
 import RequestContentDialog from "@/components/RequestContentDialog";
 import { getAllSeries } from "@/services/seriesService";
