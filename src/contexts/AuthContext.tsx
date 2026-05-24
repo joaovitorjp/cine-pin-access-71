@@ -60,7 +60,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               setIsLoggedIn(isLoggedIn);
               setIsAdmin(isAdmin);
               setClientName(storedClientName || "");
-              setAvatar(storedAvatar || "");
+              // Show resolved URL immediately from cache (id or legacy URL)
+              setAvatar(resolveAvatar(storedAvatar));
+
+              // Re-fetch fresh avatar from DB (source of truth) without blocking UI
+              (async () => {
+                try {
+                  const fresh = await getPinByCode(pinCode);
+                  const freshAvatar = fresh?.avatar || "";
+                  const resolved = resolveAvatar(freshAvatar);
+                  setAvatar(resolved);
+                  // Keep local cache in sync (normalized to stable id when possible)
+                  const stored = localStorage.getItem("authState");
+                  if (stored) {
+                    const parsed = JSON.parse(stored);
+                    parsed.avatar = getAvatarId(freshAvatar) || freshAvatar || "";
+                    localStorage.setItem("authState", JSON.stringify(parsed));
+                  }
+                } catch { /* ignore */ }
+              })();
 
               // Calculate days remaining
               const expiryDate = new Date(expiry);
