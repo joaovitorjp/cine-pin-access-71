@@ -114,7 +114,11 @@ export type Database = {
         }[]
       }
       set_admin_password: {
-        Args: { _new_password: string; _username: string }
+        Args: {
+          _current_password: string
+          _new_password: string
+          _username: string
+        }
         Returns: boolean
       }
       validate_admin_credentials: {
