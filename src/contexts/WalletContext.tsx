@@ -66,9 +66,9 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (error) throw error;
     const row = Array.isArray(data) ? data[0] : data;
     const result = {
-      unlocked: !!row?.unlocked,
-      balance: Number(row?.balance) || 0,
-      already: !!row?.already,
+      unlocked: !!row?.out_unlocked,
+      balance: Number(row?.out_balance) || 0,
+      already: !!row?.out_already,
     };
     setBalance(result.balance);
     if (result.unlocked) {
