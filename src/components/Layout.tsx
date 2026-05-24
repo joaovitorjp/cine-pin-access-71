@@ -6,16 +6,20 @@ import SearchBar from "@/components/SearchBar";
 import HomeBannerCarousel from "@/components/HomeBannerCarousel";
 import { useSearch } from "@/contexts/SearchContext";
 import UserNotificationsBell from "@/components/UserNotificationsBell";
+import AvatarPickerDialog from "@/components/AvatarPickerDialog";
+import { toast } from "@/components/ui/use-toast";
 
 const LISTING_ROUTES = ["/", "/series", "/livetv"];
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isLoggedIn, isAdmin } = useAuth();
+  const { isLoggedIn, isAdmin, avatar, updateAvatar, loading } = useAuth();
   const location = useLocation();
   const { setQuery } = useSearch();
 
   const isPlayerPage = location.pathname.includes("/player/");
   const isListing = LISTING_ROUTES.includes(location.pathname);
+
+  const needsAvatar = isLoggedIn && !isAdmin && !loading && !avatar;
 
   if (!isLoggedIn) {
     return (
