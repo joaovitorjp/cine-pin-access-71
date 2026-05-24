@@ -30,7 +30,7 @@ const HomePage: React.FC = () => {
   const [selectedGenre, setSelectedGenre] = useState("all");
   const [selectedMood, setSelectedMood] = useState<MoodKey | null>(null);
   const { isLoggedIn, loading: authLoading } = useAuth();
-  const { allItems } = useWatchProgress();
+  
 
   const genres = getUniqueGenres(movies.map(m => m.genre));
 
