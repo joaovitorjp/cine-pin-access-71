@@ -62,41 +62,29 @@ export type Database = {
         }
         Relationships: []
       }
-      payments: {
+      profiles: {
         Row: {
-          amount: number
-          client_name: string | null
+          active_session_id: string | null
+          avatar: string | null
           created_at: string
-          generated_pin: string | null
+          display_name: string | null
           id: string
-          mp_payment_id: string | null
-          mp_preference_id: string | null
-          plan_days: number
-          status: string
           updated_at: string
         }
         Insert: {
-          amount: number
-          client_name?: string | null
+          active_session_id?: string | null
+          avatar?: string | null
           created_at?: string
-          generated_pin?: string | null
-          id?: string
-          mp_payment_id?: string | null
-          mp_preference_id?: string | null
-          plan_days: number
-          status?: string
+          display_name?: string | null
+          id: string
           updated_at?: string
         }
         Update: {
-          amount?: number
-          client_name?: string | null
+          active_session_id?: string | null
+          avatar?: string | null
           created_at?: string
-          generated_pin?: string | null
+          display_name?: string | null
           id?: string
-          mp_payment_id?: string | null
-          mp_preference_id?: string | null
-          plan_days?: number
-          status?: string
           updated_at?: string
         }
         Relationships: []
