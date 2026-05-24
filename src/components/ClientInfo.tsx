@@ -187,6 +187,27 @@ const ClientInfo: React.FC = () => {
           </CardContent>
         </Card>
       </div>
+
+      <AvatarPickerDialog
+        open={pickerOpen}
+        initialAvatar={avatar}
+        title="Trocar avatar"
+        description="Escolha uma nova imagem para o seu perfil."
+        onOpenChange={setPickerOpen}
+        onSelect={async (url) => {
+          try {
+            await updateAvatar(url);
+            toast({ title: "Avatar atualizado" });
+          } catch {
+            toast({
+              title: "Erro ao atualizar avatar",
+              description: "Tente novamente.",
+              variant: "destructive",
+            });
+            throw new Error("failed");
+          }
+        }}
+      />
     </div>
   );
 };
