@@ -3,17 +3,9 @@ import { Bell, Play } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useAuth } from "@/contexts/AuthContext";
-import {
-  ContentRequest,
-  STATUS_LABEL,
-  subscribeRequestsByPin,
-} from "@/services/requestsService";
+import { ContentRequest, STATUS_LABEL, subscribeRequestsByUser } from "@/services/requestsService";
 import { toast } from "@/components/ui/use-toast";
 
 const SEEN_KEY = "cineflex:seenAddedRequests";
@@ -25,39 +17,22 @@ const readSet = (key: string): Set<string> => {
     if (!raw) return new Set();
     const arr = JSON.parse(raw);
     return new Set(Array.isArray(arr) ? arr : []);
-  } catch {
-    return new Set();
-  }
+  } catch { return new Set(); }
 };
 const writeSet = (key: string, s: Set<string>) => {
-  try {
-    localStorage.setItem(key, JSON.stringify(Array.from(s)));
-  } catch { /* ignore */ }
+  try { localStorage.setItem(key, JSON.stringify(Array.from(s))); } catch { /* ignore */ }
 };
 
 const UserNotificationsBell: React.FC = () => {
-  const { isLoggedIn, isAdmin } = useAuth();
+  const { isLoggedIn, isAdmin, user } = useAuth();
   const [requests, setRequests] = useState<ContentRequest[]>([]);
-  const [pinCode, setPinCode] = useState<string | null>(null);
   const [seen, setSeen] = useState<Set<string>>(() => readSet(SEEN_KEY));
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    if (!isLoggedIn || isAdmin) return;
-    try {
-      const stored = localStorage.getItem("authState");
-      if (!stored) return;
-      const { pinCode } = JSON.parse(stored);
-      if (pinCode) setPinCode(pinCode);
-    } catch { /* ignore */ }
-  }, [isLoggedIn, isAdmin]);
-
-  useEffect(() => {
-    if (!pinCode) return;
-    const unsub = subscribeRequestsByPin(pinCode, (list) => {
+    if (!user?.id) return;
+    const unsub = subscribeRequestsByUser(user.id, (list) => {
       setRequests(list);
-
-      // toast notify newly added ones we haven't notified yet
       const added = list.filter((r) => r.status === "added");
       const notified = readSet(NOTIFIED_KEY);
       const toNotify = added.filter((r) => !notified.has(r.id));
@@ -73,7 +48,7 @@ const UserNotificationsBell: React.FC = () => {
       }
     });
     return unsub;
-  }, [pinCode]);
+  }, [user?.id]);
 
   const unread = useMemo(
     () => requests.filter((r) => r.status === "added" && !seen.has(r.id)),
@@ -90,13 +65,7 @@ const UserNotificationsBell: React.FC = () => {
   if (!isLoggedIn || isAdmin) return null;
 
   return (
-    <Popover
-      open={open}
-      onOpenChange={(v) => {
-        setOpen(v);
-        if (v) markAllSeen();
-      }}
-    >
+    <Popover open={open} onOpenChange={(v) => { setOpen(v); if (v) markAllSeen(); }}>
       <PopoverTrigger asChild>
         <Button variant="ghost" size="icon" className="relative shrink-0" aria-label="Notificações">
           <Bell className="w-5 h-5" />
@@ -123,16 +92,11 @@ const UserNotificationsBell: React.FC = () => {
                 <li key={r.id} className="p-3 text-sm">
                   <div className="flex items-start justify-between gap-2">
                     <span className="font-medium truncate">{r.title}</span>
-                    <Badge
-                      variant="outline"
-                      className={
-                        r.status === "added"
-                          ? "bg-green-500/15 text-green-500 border-green-500/30"
-                          : r.status === "in_review"
-                          ? "bg-yellow-500/15 text-yellow-500 border-yellow-500/30"
-                          : "bg-blue-500/15 text-blue-500 border-blue-500/30"
-                      }
-                    >
+                    <Badge variant="outline" className={
+                      r.status === "added" ? "bg-green-500/15 text-green-500 border-green-500/30"
+                      : r.status === "in_review" ? "bg-yellow-500/15 text-yellow-500 border-yellow-500/30"
+                      : "bg-blue-500/15 text-blue-500 border-blue-500/30"
+                    }>
                       {STATUS_LABEL[r.status]}
                     </Badge>
                   </div>
@@ -140,17 +104,9 @@ const UserNotificationsBell: React.FC = () => {
                     {new Date(r.updatedAt).toLocaleString("pt-BR")}
                   </p>
                   {r.status === "added" && r.linkedContentId && r.linkedContentType && (
-                    <Button
-                      asChild
-                      size="sm"
-                      className="mt-2 w-full h-8"
-                    >
-                      <Link
-                        to={`/${r.linkedContentType}/${r.linkedContentId}`}
-                        onClick={() => setOpen(false)}
-                      >
-                        <Play className="w-3 h-3 mr-1" />
-                        Assistir agora
+                    <Button asChild size="sm" className="mt-2 w-full h-8">
+                      <Link to={`/${r.linkedContentType}/${r.linkedContentId}`} onClick={() => setOpen(false)}>
+                        <Play className="w-3 h-3 mr-1" /> Assistir agora
                       </Link>
                     </Button>
                   )}

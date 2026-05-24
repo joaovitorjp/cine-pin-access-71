@@ -2,12 +2,11 @@ import React, { useEffect, useState } from "react";
 import { Movie } from "@/types";
 import { getAllMovies } from "@/services/movieService";
 import MovieCard from "@/components/MovieCard";
-import PinLoginForm from "@/components/PinLoginForm";
+import EmailAuthForm from "@/components/EmailAuthForm";
 import { useAuth } from "@/contexts/AuthContext";
-import SearchBar from "@/components/SearchBar";
 import GenreFilter from "@/components/GenreFilter";
 import { useSearch } from "@/contexts/SearchContext";
-import { getUniqueGenres, matchesGenre, normalizeGenreKey, formatGenreLabel } from "@/lib/genre";
+import { getUniqueGenres, matchesGenre } from "@/lib/genre";
 import ContinueWatchingRow from "@/components/ContinueWatchingRow";
 import { useWatchProgress } from "@/contexts/WatchProgressContext";
 import EditorsCollectionsSection from "@/components/EditorsCollectionsSection";
@@ -33,7 +32,6 @@ const HomePage: React.FC = () => {
   const { isLoggedIn, loading: authLoading } = useAuth();
   const { allItems } = useWatchProgress();
 
-  // Extract unique, normalized genres from movies
   const genres = getUniqueGenres(movies.map(m => m.genre));
 
   const fetchMovies = React.useCallback(async () => {
@@ -54,44 +52,23 @@ const HomePage: React.FC = () => {
       setFilteredMovies(sortedMovies);
     } catch (error) {
       console.error("Erro ao buscar filmes:", error);
-      setError("Não foi possível carregar os filmes. Verifique sua conexão e tente novamente.");
+      setError("Não foi possível carregar os filmes.");
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    if (isLoggedIn) {
-      fetchMovies();
-    } else if (!authLoading) {
-      setLoading(false);
-    }
+    if (isLoggedIn) fetchMovies();
+    else if (!authLoading) setLoading(false);
   }, [isLoggedIn, authLoading, fetchMovies]);
 
-  // Filter movies based on search query, genre, mood
   useEffect(() => {
     let result = movies;
-
-    if (searchQuery) {
-      result = result.filter((movie) =>
-        movie.title.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-    if (selectedGenre !== "all") {
-      result = result.filter((movie) => matchesGenre(movie.genre, selectedGenre));
-    }
-
-    if (selectedMood) {
-      result = result.filter((movie) => matchesMood(movie, selectedMood));
-    }
-
-    result = result.sort((a, b) => {
-      const yearA = a.year ? parseInt(a.year) : 0;
-      const yearB = b.year ? parseInt(b.year) : 0;
-      return yearB - yearA;
-    });
-
+    if (searchQuery) result = result.filter((m) => m.title.toLowerCase().includes(searchQuery.toLowerCase()));
+    if (selectedGenre !== "all") result = result.filter((m) => matchesGenre(m.genre, selectedGenre));
+    if (selectedMood) result = result.filter((m) => matchesMood(m, selectedMood));
+    result = result.sort((a, b) => (parseInt(b.year || "0") - parseInt(a.year || "0")));
     setFilteredMovies(result);
   }, [searchQuery, selectedGenre, selectedMood, movies]);
 
@@ -103,9 +80,7 @@ const HomePage: React.FC = () => {
     );
   }
 
-  if (!isLoggedIn) {
-    return <PinLoginForm />;
-  }
+  if (!isLoggedIn) return <EmailAuthForm />;
 
   if (loading) {
     return (
@@ -118,83 +93,27 @@ const HomePage: React.FC = () => {
 
   if (error) {
     return (
-      <div className="container mx-auto py-8 px-4 text-center space-y-4">
-        <h1 className="text-2xl sm:text-3xl font-bold">Filmes</h1>
-        <p className="text-destructive">{error}</p>
-        <Button onClick={fetchMovies} variant="outline">
-          <RefreshCw className="w-4 h-4 mr-2" /> Tentar novamente
+      <div className="container mx-auto py-8 text-center">
+        <p className="text-muted-foreground mb-4">{error}</p>
+        <Button onClick={fetchMovies} variant="outline" className="gap-2">
+          <RefreshCw className="w-4 h-4" /> Tentar novamente
         </Button>
       </div>
     );
   }
 
-  // Recommendation reason based on watch progress history
-  const recentWatched = Object.values(allItems)
-    .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())[0];
-
-  let recommended: Movie[] = [];
-  let recommendationReason = "";
-  if (recentWatched && movies.length) {
-    const refTitle = recentWatched.type === "series" ? recentWatched.seriesTitle : recentWatched.title;
-    // Try to find original movie by movieId to grab its genre as anchor
-    const anchor = movies.find(m => m.id === recentWatched.movieId);
-    const anchorGenreKey = anchor?.genre ? normalizeGenreKey(anchor.genre) : "";
-    if (anchorGenreKey) {
-      recommended = movies
-        .filter(m => m.id !== anchor?.id && normalizeGenreKey(m.genre) === anchorGenreKey)
-        .slice(0, 12);
-      recommendationReason = `Porque você assistiu "${refTitle}"`;
-    } else if (refTitle) {
-      recommended = movies.slice(0, 12);
-      recommendationReason = `Porque você assistiu "${refTitle}"`;
-    }
-  }
-
   return (
     <div className="container mx-auto py-4 px-3 sm:px-4">
-      <div className="flex flex-col gap-6">
-        <ContinueWatchingRow />
-
-        {recommended.length > 0 && (
-          <section className="space-y-2 animate-fade-in">
-            <div>
-              <h2 className="text-xl sm:text-2xl font-bold text-foreground">Recomendado para você</h2>
-              <p className="text-xs sm:text-sm text-muted-foreground">{recommendationReason}</p>
-            </div>
-            <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 xl:grid-cols-8 gap-2 sm:gap-3">
-              {recommended.map(movie => (
-                <MovieCard key={`rec-${movie.id}`} movie={movie} />
-              ))}
-            </div>
-          </section>
-        )}
-
-        <EditorsCollectionsSection movies={movies} series={seriesList} />
-
-        <div className="flex items-center justify-between gap-3 flex-wrap">
-          <h1 className="text-2xl sm:text-3xl font-bold">Filmes</h1>
-          <RequestContentDialog />
-        </div>
-
-        <MoodFilter selected={selectedMood} onSelect={setSelectedMood} />
-
-        <GenreFilter
-          genres={genres}
-          selectedGenre={selectedGenre}
-          onGenreSelect={setSelectedGenre}
-        />
-
-        {filteredMovies.length === 0 ? (
-          <div className="text-netflix-gray text-center py-8">
-            Nenhum filme encontrado.
-          </div>
-        ) : (
-          <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 xl:grid-cols-8 gap-2 sm:gap-3">
-            {filteredMovies.map((movie) => (
-              <MovieCard key={movie.id} movie={movie} />
-            ))}
-          </div>
-        )}
+      <ContinueWatchingRow items={allItems} movies={movies} series={seriesList} />
+      <EditorsCollectionsSection movies={movies} series={seriesList} />
+      <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+        <h1 className="text-2xl sm:text-3xl font-bold">Filmes</h1>
+        <RequestContentDialog />
+      </div>
+      <MoodFilter selected={selectedMood} onChange={setSelectedMood} />
+      <GenreFilter genres={genres} selected={selectedGenre} onSelect={setSelectedGenre} />
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 mt-4">
+        {filteredMovies.map((movie) => <MovieCard key={movie.id} movie={movie} />)}
       </div>
     </div>
   );

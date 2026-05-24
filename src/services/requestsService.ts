@@ -13,7 +13,7 @@ export interface ContentRequest {
   notes?: string;
   status: RequestStatus;
   requesterName?: string;
-  requesterPin?: string;
+  requesterId?: string;
   linkedContentId?: string;
   linkedContentType?: "movie" | "series";
   linkedContentTitle?: string;
@@ -65,8 +65,8 @@ export const subscribeRequests = (
   return () => off(r, "value", handler);
 };
 
-export const subscribeRequestsByPin = (
-  pinCode: string,
+export const subscribeRequestsByUser = (
+  userId: string,
   cb: (items: ContentRequest[]) => void
 ): (() => void) => {
   const r = ref(database, PATH);
@@ -75,7 +75,7 @@ export const subscribeRequestsByPin = (
     const val = snap.val();
     const list = Object.keys(val)
       .map((k) => ({ id: k, ...val[k] }))
-      .filter((i: ContentRequest) => i.requesterPin === pinCode) as ContentRequest[];
+      .filter((i: ContentRequest) => i.requesterId === userId) as ContentRequest[];
     list.sort(
       (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
     );
