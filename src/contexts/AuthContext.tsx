@@ -231,6 +231,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isLoggedIn,
         isAdmin,
         loading,
+        profileLoaded: isAdmin ? true : profileLoaded,
         clientName,
         adminUsername,
         avatar,
