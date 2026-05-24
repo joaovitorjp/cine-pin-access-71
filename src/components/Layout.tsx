@@ -14,14 +14,15 @@ import { isValidAvatar } from "@/lib/avatars";
 const LISTING_ROUTES = ["/", "/series", "/livetv"];
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isLoggedIn, isAdmin, avatar, updateAvatar, loading } = useAuth();
+  const { isLoggedIn, isAdmin, avatar, updateAvatar, loading, profileLoaded } = useAuth();
   const location = useLocation();
   const { setQuery } = useSearch();
 
   const isPlayerPage = location.pathname.includes("/player/");
   const isListing = LISTING_ROUTES.includes(location.pathname);
 
-  const needsAvatar = isLoggedIn && !isAdmin && !loading && !isValidAvatar(avatar);
+  const needsAvatar =
+    isLoggedIn && !isAdmin && !loading && profileLoaded && !isValidAvatar(avatar);
 
   if (!isLoggedIn) {
     return (

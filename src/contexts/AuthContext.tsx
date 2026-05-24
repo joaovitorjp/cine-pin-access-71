@@ -8,6 +8,7 @@ interface AuthContextType {
   isLoggedIn: boolean;
   isAdmin: boolean;
   loading: boolean;
+  profileLoaded: boolean;
   clientName: string;
   adminUsername: string;
   avatar: string;
@@ -22,6 +23,7 @@ const AuthContext = createContext<AuthContextType>({
   isLoggedIn: false,
   isAdmin: false,
   loading: true,
+  profileLoaded: false,
   clientName: "",
   adminUsername: "",
   avatar: "",
@@ -53,7 +55,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [clientName, setClientName] = useState("");
   const [avatar, setAvatar] = useState("");
   const [loading, setLoading] = useState(true);
+  const [profileLoaded, setProfileLoaded] = useState(false);
   const sessionIdRef = useRef<string>(ensureSessionId());
+  const claimedRef = useRef<boolean>(false);
 
   // Bootstrap admin from localStorage
   useEffect(() => {
@@ -76,7 +80,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const claimSession = async (uid: string) => {
       const sid = sessionIdRef.current;
-      await supabase.from("profiles").update({ active_session_id: sid }).eq("id", uid);
+      const { error } = await supabase
+        .from("profiles")
+        .update({ active_session_id: sid })
+        .eq("id", uid);
+      if (!error) claimedRef.current = true;
     };
 
     const loadProfile = async (uid: string) => {
@@ -89,6 +97,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setClientName(data.display_name || "");
         setAvatar(resolveAvatar(data.avatar || ""));
       }
+      setProfileLoaded(true);
     };
 
     const { data: sub } = supabase.auth.onAuthStateChange((event, newSession) => {
@@ -102,6 +111,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           loadProfile(uid).catch(() => undefined);
         }, 0);
       } else {
+        claimedRef.current = false;
+        setProfileLoaded(false);
         setClientName("");
         setAvatar("");
       }
@@ -114,6 +125,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const uid = s.user.id;
         claimSession(uid).catch(() => undefined);
         loadProfile(uid).catch(() => undefined);
+      } else {
+        setProfileLoaded(true);
       }
       setLoading(false);
     });
@@ -130,6 +143,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         "postgres_changes",
         { event: "UPDATE", schema: "public", table: "profiles", filter: `id=eq.${user.id}` },
         (payload) => {
+          // Ignore events that fire before we've successfully claimed our own session.
+          if (!claimedRef.current) return;
           const remote = (payload.new as { active_session_id?: string })?.active_session_id;
           if (remote && remote !== sessionIdRef.current) {
             toast({
@@ -216,6 +231,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isLoggedIn,
         isAdmin,
         loading,
+        profileLoaded: isAdmin ? true : profileLoaded,
         clientName,
         adminUsername,
         avatar,
