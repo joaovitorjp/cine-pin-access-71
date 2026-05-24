@@ -1,27 +1,19 @@
-// Curated set of pre-built avatars (DiceBear, no API key needed).
-// Each entry is a stable PNG URL safe to render in <img>.
-const STYLES = [
-  "avataaars",
-  "bottts",
-  "fun-emoji",
-  "lorelei",
-  "micah",
-  "notionists",
-  "personas",
-  "thumbs",
-] as const;
+import avatar1 from "@/assets/avatar-1.jpg";
+import avatar2 from "@/assets/avatar-2.jpg";
+import avatar3 from "@/assets/avatar-3.jpg";
+import avatar4 from "@/assets/avatar-4.jpg";
+import avatar5 from "@/assets/avatar-5.jpg";
+import avatar6 from "@/assets/avatar-6.jpg";
+import avatar7 from "@/assets/avatar-7.jpg";
 
-const SEEDS = [
-  "Atlas", "Nova", "Lumen", "Echo", "Pixel", "Mango",
-  "Onyx", "Sable", "Vega", "Zephyr", "Kairo", "Iris",
+export const AVATAR_OPTIONS: string[] = [
+  avatar1,
+  avatar2,
+  avatar3,
+  avatar4,
+  avatar5,
+  avatar6,
+  avatar7,
 ];
 
-export const AVATAR_OPTIONS: string[] = STYLES.flatMap((style) =>
-  SEEDS.slice(0, 4).map(
-    (seed) =>
-      `https://api.dicebear.com/9.x/${style}/svg?seed=${encodeURIComponent(seed)}&radius=50&backgroundType=gradientLinear`
-  )
-);
-
-export const isValidAvatar = (url?: string | null): boolean =>
-  !!url && /^https:\/\/api\.dicebear\.com\//.test(url);
+export const isValidAvatar = (url?: string | null): boolean => !!url;
