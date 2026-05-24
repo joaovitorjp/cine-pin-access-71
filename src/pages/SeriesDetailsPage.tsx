@@ -77,16 +77,15 @@ const SeriesDetailsPage: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="md:col-span-1">
-          <img
-            src={series.imageUrl}
-            alt={series.title}
-            className="w-full rounded-md object-cover aspect-[2/3]"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.src = "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b";
-            }}
-          />
+          <div className="relative w-full rounded-md overflow-hidden aspect-[2/3] bg-muted">
+            <SafeImage
+              src={series.imageUrl}
+              alt={series.title}
+              className="w-full h-full object-cover"
+            />
+          </div>
         </div>
+
 
         <div className="md:col-span-2">
           <h1 className="text-3xl font-bold mb-2">{series.title}</h1>
