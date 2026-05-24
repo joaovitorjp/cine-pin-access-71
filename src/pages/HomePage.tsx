@@ -113,7 +113,7 @@ const HomePage: React.FC = () => {
       <MoodFilter selected={selectedMood} onSelect={setSelectedMood} />
       <GenreFilter genres={genres} selectedGenre={selectedGenre} onGenreSelect={setSelectedGenre} />
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 mt-4">
+      <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 xl:grid-cols-8 gap-2 sm:gap-3 mt-4">
         {filteredMovies.map((movie) => <MovieCard key={movie.id} movie={movie} />)}
       </div>
     </div>
