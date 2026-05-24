@@ -94,6 +94,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_user_session: {
+        Args: { _session_id: string }
+        Returns: {
+          active_session_id: string
+          avatar: string
+          display_name: string
+        }[]
+      }
       get_payment_pin: {
         Args: { _payment_id: string }
         Returns: {
