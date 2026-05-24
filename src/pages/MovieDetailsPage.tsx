@@ -74,12 +74,13 @@ const MovieDetailsPage: React.FC = () => {
   return (
     <div>
       {/* Hero Section with Backdrop */}
-      <div 
-        className="relative h-[60vh] bg-cover bg-center"
-        style={{ 
-          backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(20,20,20,1)), url(${movie.imageUrl})` 
-        }}
-      >
+      <div className="relative h-[60vh] overflow-hidden bg-netflix-black">
+        <SafeImage
+          src={movie.imageUrl}
+          alt={movie.title}
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-netflix-black" />
         <div className="absolute inset-0 bg-gradient-to-r from-netflix-black via-transparent to-transparent">
           <div className="container mx-auto h-full flex flex-col justify-end px-4 py-12">
             <Button variant="ghost" onClick={handleGoBack} className="self-start mb-4 text-white">
