@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Movie } from "@/types";
 import { Star, Calendar } from "lucide-react";
+import SafeImage from "@/components/SafeImage";
 
 interface MovieCardProps {
   movie: Movie;
@@ -11,14 +12,10 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie }) => {
   return (
     <Link to={`/movie/${movie.id}`} className="block group">
       <div className="relative overflow-hidden rounded-md transition-transform duration-300 transform group-hover:scale-105">
-        <img
+        <SafeImage
           src={movie.imageUrl}
           alt={movie.title}
           className="w-full aspect-[9/16] object-cover object-center"
-          onError={(e) => {
-            const target = e.target as HTMLImageElement;
-            target.src = "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b";
-          }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <div className="absolute bottom-1 left-1 right-1 flex items-center gap-2">

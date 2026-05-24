@@ -18,6 +18,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, posterUrl }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { playbackSpeed, setPlaybackSpeed } = usePreferences();
   const [currentSpeed, setCurrentSpeed] = useState<number>(playbackSpeed);
+  const [iframeLoaded, setIframeLoaded] = useState(false);
+  const [iframeError, setIframeError] = useState(false);
+  const [videoError, setVideoError] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
 
   // Hardened URL validation: only allow https:// absolute URLs.
   // Blocks javascript:, data:, vbscript:, file:, http:, relative paths, etc.
@@ -119,11 +123,49 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, posterUrl }) => {
     </div>
   );
 
+  const retryPlayback = () => {
+    setIframeError(false);
+    setIframeLoaded(false);
+    setVideoError(false);
+    setReloadKey((k) => k + 1);
+  };
+
+  const ErrorOverlay = ({ message }: { message: string }) => (
+    <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 bg-black/90 text-center px-4">
+      {posterUrl && (
+        <img
+          src={posterUrl}
+          alt=""
+          aria-hidden
+          className="absolute inset-0 w-full h-full object-cover opacity-20"
+          onError={(e) => ((e.target as HTMLImageElement).style.display = "none")}
+        />
+      )}
+      <p className="text-white text-sm relative z-10">{message}</p>
+      <Button size="sm" variant="secondary" onClick={retryPlayback} className="relative z-10">
+        Tentar novamente
+      </Button>
+    </div>
+  );
+
+  // Iframe load timeout fallback (15s)
+  useEffect(() => {
+    if (isDirectVideo) return;
+    setIframeLoaded(false);
+    setIframeError(false);
+    const t = window.setTimeout(() => {
+      setIframeError((prev) => prev || !iframeLoaded);
+    }, 15000);
+    return () => window.clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [videoUrl, reloadKey]);
+
   if (isDirectVideo) {
     return (
       <div className="relative w-full aspect-video" ref={containerRef}>
         {Controls}
         <video
+          key={reloadKey}
           ref={videoRef}
           className="w-full h-full absolute inset-0 bg-black"
           controls
@@ -131,19 +173,29 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, posterUrl }) => {
           onLoadedMetadata={() => {
             if (videoRef.current) videoRef.current.playbackRate = playbackSpeed;
           }}
+          onError={() => setVideoError(true)}
         >
           <source src={videoUrl} type={isHLS ? "application/x-mpegURL" : "video/mp4"} />
           Seu navegador não suporta a reprodução deste vídeo.
         </video>
+        {videoError && (
+          <ErrorOverlay message="Não foi possível carregar o vídeo. Verifique sua conexão." />
+        )}
       </div>
     );
   }
 
   return (
     <div className="w-full">
-      <div className="relative w-full aspect-video" ref={containerRef}>
+      <div className="relative w-full aspect-video bg-black" ref={containerRef}>
         {Controls}
+        {!iframeLoaded && !iframeError && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black z-10">
+            <div className="animate-pulse text-netflix-gray text-sm">Carregando player...</div>
+          </div>
+        )}
         <iframe
+          key={reloadKey}
           ref={iframeRef}
           src={videoUrl}
           className="w-full h-full absolute inset-0"
@@ -153,7 +205,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, posterUrl }) => {
           sandbox="allow-same-origin allow-scripts allow-forms allow-pointer-lock allow-top-navigation"
           style={{ border: "none" }}
           loading="lazy"
+          onLoad={() => setIframeLoaded(true)}
+          onError={() => setIframeError(true)}
         />
+        {iframeError && (
+          <ErrorOverlay message="Falha ao carregar o player. A mídia pode estar indisponível ou o Drive bloqueou o acesso." />
+        )}
       </div>
     </div>
   );
