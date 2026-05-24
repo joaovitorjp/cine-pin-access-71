@@ -23,6 +23,7 @@ const AuthContext = createContext<AuthContextType>({
   isLoggedIn: false,
   isAdmin: false,
   loading: true,
+  profileLoaded: false,
   clientName: "",
   adminUsername: "",
   avatar: "",
