@@ -111,22 +111,22 @@ const EmailAuthForm: React.FC = () => {
   };
 
   return (
-    <div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden">
+    <div className="relative min-h-dvh w-full flex items-center justify-center overflow-hidden">
       {/* Background dos pôsteres passando (mantido obrigatório) */}
       <FeaturedLoginCarousel />
       <div className="fixed inset-0 z-10 bg-gradient-to-b from-black/35 via-black/15 to-black/45 pointer-events-none" />
 
-      <div className="relative z-20 w-full max-w-md px-4 py-10">
-        <div className="flex flex-col items-center mb-8">
-          <img src={cineflexLogo} alt="CINE FLEX" className="w-16 h-16 mb-3 drop-shadow-[0_0_18px_rgba(229,9,20,0.45)]" />
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+      <div className="relative z-20 w-full max-w-sm sm:max-w-md px-5 sm:px-6 py-6 sm:py-8 flex flex-col items-center justify-center min-h-dvh">
+        <div className="flex flex-col items-center mb-6 sm:mb-8">
+          <img src={cineflexLogo} alt="CINE FLEX" className="w-14 h-14 sm:w-16 sm:h-16 mb-3 drop-shadow-[0_0_18px_rgba(229,9,20,0.45)]" />
+          <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight text-center">
             CINE <span className="text-netflix-red">FLEX</span>
           </h1>
-          <p className="text-sm text-white/60 mt-1">Filmes, séries e TV ao vivo</p>
+          <p className="text-xs sm:text-sm text-white/60 mt-1 text-center">Filmes, séries e TV ao vivo</p>
         </div>
 
-        <div className="p-4 sm:p-0">
-          <div className="flex gap-2 mb-6 p-1 bg-white/10 rounded-xl border border-white/10">
+        <div className="w-full">
+          <div className="flex gap-2 mb-5 sm:mb-6 p-1 bg-white/10 rounded-xl border border-white/10">
             <button
               type="button"
               onClick={() => setMode("signin")}
@@ -147,7 +147,7 @@ const EmailAuthForm: React.FC = () => {
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
             {mode === "signup" && (
               <div className="space-y-1.5">
                 <Label htmlFor="name" className="text-white/90 text-xs font-medium">Nome</Label>
@@ -158,7 +158,7 @@ const EmailAuthForm: React.FC = () => {
                     value={displayName}
                     onChange={(e) => setDisplayName(e.target.value)}
                     placeholder="Como devemos te chamar"
-                    className="pl-10 h-12 bg-white/10 border-white/25 text-white placeholder:text-white/45 focus:border-netflix-red/80 focus:ring-1 focus:ring-netflix-red/30"
+                    className="pl-10 h-11 sm:h-12 bg-white/10 border-white/25 text-white placeholder:text-white/45 focus:border-netflix-red/80 focus:ring-1 focus:ring-netflix-red/30"
                     required
                   />
                 </div>
@@ -176,7 +176,7 @@ const EmailAuthForm: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="seu@email.com"
-                  className="pl-10 h-12 bg-white/10 border-white/25 text-white placeholder:text-white/45 focus:border-netflix-red/80 focus:ring-1 focus:ring-netflix-red/30"
+                  className="pl-10 h-11 sm:h-12 bg-white/10 border-white/25 text-white placeholder:text-white/45 focus:border-netflix-red/80 focus:ring-1 focus:ring-netflix-red/30"
                   required
                 />
               </div>
@@ -193,7 +193,7 @@ const EmailAuthForm: React.FC = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="pl-10 h-12 bg-white/10 border-white/25 text-white placeholder:text-white/45 focus:border-netflix-red/80 focus:ring-1 focus:ring-netflix-red/30"
+                  className="pl-10 h-11 sm:h-12 bg-white/10 border-white/25 text-white placeholder:text-white/45 focus:border-netflix-red/80 focus:ring-1 focus:ring-netflix-red/30"
                   minLength={6}
                   required
                 />
@@ -203,7 +203,7 @@ const EmailAuthForm: React.FC = () => {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full h-12 bg-netflix-red hover:bg-netflix-red/90 text-white font-bold text-base"
+              className="w-full h-11 sm:h-12 bg-netflix-red hover:bg-netflix-red/90 text-white font-bold text-base"
             >
               {loading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -216,7 +216,7 @@ const EmailAuthForm: React.FC = () => {
             </Button>
           </form>
 
-          <div className="my-5 flex items-center gap-3">
+          <div className="my-4 sm:my-5 flex items-center gap-3">
             <div className="h-px flex-1 bg-white/20" />
             <span className="text-[10px] uppercase tracking-wider text-white/55">ou</span>
             <div className="h-px flex-1 bg-white/20" />
@@ -227,7 +227,7 @@ const EmailAuthForm: React.FC = () => {
             onClick={handleGoogle}
             disabled={googleLoading}
             variant="outline"
-            className="w-full h-12 bg-white hover:bg-white/90 text-black border-white font-semibold"
+            className="w-full h-11 sm:h-12 bg-white hover:bg-white/90 text-black border-white font-semibold"
           >
             {googleLoading ? (
               <Loader2 className="w-5 h-5 animate-spin" />
@@ -239,7 +239,7 @@ const EmailAuthForm: React.FC = () => {
             )}
           </Button>
 
-          <p className="text-[11px] text-white/60 text-center mt-5 leading-relaxed">
+          <p className="text-[11px] text-white/60 text-center mt-4 sm:mt-5 leading-relaxed">
             {mode === "signup"
               ? "Ao criar a conta, você receberá um email de confirmação."
               : "Acesso liberado em 1 dispositivo por vez."}
