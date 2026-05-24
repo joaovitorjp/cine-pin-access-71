@@ -5,6 +5,7 @@ import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { registerDevice, findPinIdByCode, touchDevice } from "@/services/devicesService";
 import { getPinByCode, updatePinSelf } from "@/services/pinService";
+import { resolveAvatar, getAvatarId } from "@/lib/avatars";
 
 interface AuthContextType {
   isLoggedIn: boolean;
@@ -59,7 +60,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               setIsLoggedIn(isLoggedIn);
               setIsAdmin(isAdmin);
               setClientName(storedClientName || "");
-              setAvatar(storedAvatar || "");
+              // Show resolved URL immediately from cache (id or legacy URL)
+              setAvatar(resolveAvatar(storedAvatar));
+
+              // Re-fetch fresh avatar from DB (source of truth) without blocking UI
+              (async () => {
+                try {
+                  const fresh = await getPinByCode(pinCode);
+                  const freshAvatar = fresh?.avatar || "";
+                  const resolved = resolveAvatar(freshAvatar);
+                  setAvatar(resolved);
+                  // Keep local cache in sync (normalized to stable id when possible)
+                  const stored = localStorage.getItem("authState");
+                  if (stored) {
+                    const parsed = JSON.parse(stored);
+                    parsed.avatar = getAvatarId(freshAvatar) || freshAvatar || "";
+                    localStorage.setItem("authState", JSON.stringify(parsed));
+                  }
+                } catch { /* ignore */ }
+              })();
 
               // Calculate days remaining
               const expiryDate = new Date(expiry);
@@ -139,11 +158,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         
         // Fetch full pin record to recover the stored avatar (if any)
-        let storedAvatar = "";
+        let storedAvatarRaw = "";
         try {
           const fullPin = await getPinByCode(pin);
-          storedAvatar = fullPin?.avatar || "";
+          storedAvatarRaw = fullPin?.avatar || "";
         } catch { /* ignore */ }
+        // Normalize to stable id when possible for persistence
+        const avatarForStorage = getAvatarId(storedAvatarRaw) || storedAvatarRaw;
 
         // Save auth state with session info
         const authState = {
@@ -153,7 +174,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           clientName: pinData.clientName,
           pinCode: pin,
           sessionId: pinData.sessionId,
-          avatar: storedAvatar,
+          avatar: avatarForStorage,
         };
         localStorage.setItem("authState", JSON.stringify(authState));
 
@@ -167,7 +188,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setIsLoggedIn(true);
         setIsAdmin(false);
         setClientName(pinData.clientName);
-        setAvatar(storedAvatar);
+        setAvatar(resolveAvatar(storedAvatarRaw));
         setDaysRemaining(Math.max(0, diffDays));
         
         toast({
@@ -256,7 +277,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // Update avatar (persist in Firebase + local session)
-  const updateAvatar = async (url: string) => {
+  // Accepts a stable avatar id (e.g. "avatar-3") or a legacy URL.
+  // Persists the stable id when possible so build hashes don't break loading.
+  const updateAvatar = async (value: string) => {
     const stored = localStorage.getItem("authState");
     if (!stored) return;
     const parsed = JSON.parse(stored);
@@ -264,10 +287,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!pinCode) return;
     const pin = await getPinByCode(pinCode);
     if (!pin) throw new Error("PIN não encontrado");
-    await updatePinSelf(pin.id, { avatar: url });
-    parsed.avatar = url;
+    const idToStore = getAvatarId(value) || value;
+    await updatePinSelf(pin.id, { avatar: idToStore });
+    parsed.avatar = idToStore;
     localStorage.setItem("authState", JSON.stringify(parsed));
-    setAvatar(url);
+    setAvatar(resolveAvatar(idToStore));
   };
 
   // Logout
