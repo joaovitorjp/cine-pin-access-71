@@ -7,6 +7,7 @@ import { getFeaturedLoginItems } from "@/services/featuredLoginService";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Star, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import SafeImage from "@/components/SafeImage";
 
 /**
  * Carrossel diagonal de destaques na tela de login.
