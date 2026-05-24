@@ -127,47 +127,8 @@ const AdminPage: React.FC = () => {
     }
   };
 
-  const handleDeactivatePin = async (id: string) => {
-    if (window.confirm("Tem certeza que deseja desativar este PIN?")) {
-      try {
-        await deactivatePin(id);
-        setPins(pins.map(pin => 
-          pin.id === id ? { ...pin, isActive: false } : pin
-        ));
-        toast({
-          title: "PIN desativado",
-          description: "O PIN foi desativado com sucesso",
-        });
-      } catch (error) {
-        console.error("Erro ao desativar PIN:", error);
-        toast({
-          title: "Erro",
-          description: "Não foi possível desativar o PIN",
-          variant: "destructive",
-        });
-      }
-    }
-  };
 
-  const handleDeletePin = async (id: string) => {
-    if (window.confirm("Tem certeza que deseja excluir este PIN permanentemente?")) {
-      try {
-        await deletePin(id);
-        setPins(pins.filter(pin => pin.id !== id));
-        toast({
-          title: "PIN excluído",
-          description: "O PIN foi excluído permanentemente",
-        });
-      } catch (error) {
-        console.error("Erro ao excluir PIN:", error);
-        toast({
-          title: "Erro",
-          description: "Não foi possível excluir o PIN",
-          variant: "destructive",
-        });
-      }
-    }
-  };
+
 
   const handleDeleteSeries = async (id: string) => {
     if (window.confirm("Tem certeza que deseja excluir esta série?")) {
