@@ -1,10 +1,7 @@
-
-import React, { createContext, useContext, useState, useEffect } from "react";
-import { validatePin, validateSession } from "@/services/pinService";
-import { toast } from "@/components/ui/use-toast";
+import React, { createContext, useContext, useEffect, useRef, useState } from "react";
+import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { registerDevice, findPinIdByCode, touchDevice } from "@/services/devicesService";
-import { getPinByCode, updatePinSelf } from "@/services/pinService";
+import { toast } from "@/components/ui/use-toast";
 import { resolveAvatar, getAvatarId } from "@/lib/avatars";
 
 interface AuthContextType {
@@ -12,13 +9,13 @@ interface AuthContextType {
   isAdmin: boolean;
   loading: boolean;
   clientName: string;
-  daysRemaining: number;
   adminUsername: string;
   avatar: string;
-  loginWithPin: (pin: string) => Promise<boolean>;
+  user: User | null;
   loginAsAdmin: (username: string, password: string) => Promise<boolean>;
-  logout: () => void;
+  logout: () => Promise<void>;
   updateAvatar: (url: string) => Promise<void>;
+  updateDisplayName: (name: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -26,286 +23,192 @@ const AuthContext = createContext<AuthContextType>({
   isAdmin: false,
   loading: true,
   clientName: "",
-  daysRemaining: 0,
   adminUsername: "",
   avatar: "",
-  loginWithPin: async () => false,
+  user: null,
   loginAsAdmin: async () => false,
-  logout: () => {},
+  logout: async () => {},
   updateAvatar: async () => {},
+  updateDisplayName: async () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
 
+const SESSION_ID_KEY = "cf_session_id";
+
+const ensureSessionId = (): string => {
+  let id = localStorage.getItem(SESSION_ID_KEY);
+  if (!id) {
+    id = crypto.randomUUID();
+    localStorage.setItem(SESSION_ID_KEY, id);
+  }
+  return id;
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  const [isAdmin, setIsAdmin] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [clientName, setClientName] = useState<string>("");
-  const [daysRemaining, setDaysRemaining] = useState<number>(0);
-  const [adminUsername, setAdminUsername] = useState<string>("");
-  const [avatar, setAvatar] = useState<string>("");
+  const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [adminUsername, setAdminUsername] = useState("");
+  const [clientName, setClientName] = useState("");
+  const [avatar, setAvatar] = useState("");
+  const [loading, setLoading] = useState(true);
+  const sessionIdRef = useRef<string>(ensureSessionId());
 
-  // Check local storage for auth state on mount and validate session
+  // Bootstrap admin from localStorage
   useEffect(() => {
-    const checkAuthState = async () => {
-      const storedAuthState = localStorage.getItem("authState");
-      if (storedAuthState) {
-        const { isLoggedIn, isAdmin, expiry, clientName: storedClientName, pinCode, sessionId, adminUsername: storedAdminUsername, avatar: storedAvatar } = JSON.parse(storedAuthState);
-        if (new Date(expiry) > new Date()) {
-          // For PIN users, validate session to ensure single device login
-          if (!isAdmin && pinCode && sessionId) {
-            const sessionValid = await validateSession(pinCode, sessionId);
-            if (sessionValid) {
-              setIsLoggedIn(isLoggedIn);
-              setIsAdmin(isAdmin);
-              setClientName(storedClientName || "");
-              // Show resolved URL immediately from cache (id or legacy URL)
-              setAvatar(resolveAvatar(storedAvatar));
-
-              // Re-fetch fresh avatar from DB (source of truth) without blocking UI
-              (async () => {
-                try {
-                  const fresh = await getPinByCode(pinCode);
-                  const freshAvatar = fresh?.avatar || "";
-                  const resolved = resolveAvatar(freshAvatar);
-                  setAvatar(resolved);
-                  // Keep local cache in sync (normalized to stable id when possible)
-                  const stored = localStorage.getItem("authState");
-                  if (stored) {
-                    const parsed = JSON.parse(stored);
-                    parsed.avatar = getAvatarId(freshAvatar) || freshAvatar || "";
-                    localStorage.setItem("authState", JSON.stringify(parsed));
-                  }
-                } catch { /* ignore */ }
-              })();
-
-              // Calculate days remaining
-              const expiryDate = new Date(expiry);
-              const currentDate = new Date();
-              const diffTime = expiryDate.getTime() - currentDate.getTime();
-              const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-              setDaysRemaining(Math.max(0, diffDays));
-            } else {
-              // Session invalid, logout
-              localStorage.removeItem("authState");
-              toast({
-                title: "Sessão expirada",
-                description: "Este PIN está sendo usado em outro dispositivo.",
-                variant: "destructive",
-              });
-            }
-          } else {
-            // Admin login
-            setIsLoggedIn(isLoggedIn);
-            setIsAdmin(isAdmin);
-            setClientName(storedClientName || "");
-            setAdminUsername(storedAdminUsername || "");
-          }
+    try {
+      const adminRaw = localStorage.getItem("adminAuth");
+      if (adminRaw) {
+        const a = JSON.parse(adminRaw);
+        if (a?.username && a?.expiry && new Date(a.expiry) > new Date()) {
+          setIsAdmin(true);
+          setAdminUsername(a.username);
+          setClientName(a.username);
         } else {
-          // Auth expired
-          localStorage.removeItem("authState");
+          localStorage.removeItem("adminAuth");
         }
       }
-      setLoading(false);
-    };
-
-    checkAuthState();
-    
-    // Check session validity every 30 seconds for PIN users
-    const interval = setInterval(async () => {
-      const storedAuthState = localStorage.getItem("authState");
-      if (storedAuthState) {
-        const { isAdmin, pinCode, sessionId } = JSON.parse(storedAuthState);
-        if (!isAdmin && pinCode && sessionId) {
-          const sessionValid = await validateSession(pinCode, sessionId);
-          if (!sessionValid) {
-            localStorage.removeItem("authState");
-            setIsLoggedIn(false);
-            setIsAdmin(false);
-            setClientName("");
-            setDaysRemaining(0);
-            toast({
-              title: "Sessão expirada",
-              description: "Este PIN está sendo usado em outro dispositivo.",
-              variant: "destructive",
-            });
-          } else {
-            // Keep device entry warm
-            try {
-              const pid = await findPinIdByCode(pinCode);
-              if (pid) await touchDevice(pid, sessionId);
-            } catch { /* ignore */ }
-          }
-        }
-      }
-    }, 30000);
-
-    
-    return () => clearInterval(interval);
+    } catch { /* ignore */ }
   }, []);
 
-  // Login with PIN
-  const loginWithPin = async (pin: string): Promise<boolean> => {
-    try {
-      const pinData = await validatePin(pin);
-      if (pinData) {
-        const expiryDate = new Date(pinData.expiryDate);
-        
-        // Calculate days remaining
-        const currentDate = new Date();
-        const diffTime = expiryDate.getTime() - currentDate.getTime();
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        
-        // Fetch full pin record to recover the stored avatar (if any)
-        let storedAvatarRaw = "";
-        try {
-          const fullPin = await getPinByCode(pin);
-          storedAvatarRaw = fullPin?.avatar || "";
-        } catch { /* ignore */ }
-        // Normalize to stable id when possible for persistence
-        const avatarForStorage = getAvatarId(storedAvatarRaw) || storedAvatarRaw;
+  // Supabase auth listener + single-device claim
+  useEffect(() => {
+    const claimSession = async (uid: string) => {
+      const sid = sessionIdRef.current;
+      await supabase.from("profiles").update({ active_session_id: sid }).eq("id", uid);
+    };
 
-        // Save auth state with session info
-        const authState = {
-          isLoggedIn: true,
-          isAdmin: false,
-          expiry: expiryDate.toISOString(),
-          clientName: pinData.clientName,
-          pinCode: pin,
-          sessionId: pinData.sessionId,
-          avatar: avatarForStorage,
-        };
-        localStorage.setItem("authState", JSON.stringify(authState));
-
-        // Register this device session (best-effort)
-        try {
-          const pid = await findPinIdByCode(pin);
-          if (pid && pinData.sessionId) await registerDevice(pid, pinData.sessionId);
-        } catch (e) { console.warn("device register failed", e); }
-
-        
-        setIsLoggedIn(true);
-        setIsAdmin(false);
-        setClientName(pinData.clientName);
-        setAvatar(resolveAvatar(storedAvatarRaw));
-        setDaysRemaining(Math.max(0, diffDays));
-        
-        toast({
-          title: "Login efetuado com sucesso",
-          description: `Bem-vindo, ${pinData.clientName}! Seu acesso expira em ${diffDays} dias.`,
-        });
-        
-        return true;
+    const loadProfile = async (uid: string) => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("display_name, avatar")
+        .eq("id", uid)
+        .maybeSingle();
+      if (data) {
+        setClientName(data.display_name || "");
+        setAvatar(resolveAvatar(data.avatar || ""));
       }
-      
-      toast({
-        title: "PIN inválido",
-        description: "O PIN fornecido é inválido ou expirou.",
-        variant: "destructive",
-      });
-      
-      return false;
-    } catch (error) {
-      console.error("Erro ao fazer login:", error);
-      
-      toast({
-        title: "Erro ao fazer login",
-        description: "Ocorreu um erro ao tentar fazer login. Tente novamente.",
-        variant: "destructive",
-      });
-      
-      return false;
-    }
-  };
+    };
 
-  // Login as admin (validates username + password via Lovable Cloud)
+    const { data: sub } = supabase.auth.onAuthStateChange((event, newSession) => {
+      setSession(newSession);
+      setUser(newSession?.user ?? null);
+      if (newSession?.user) {
+        const uid = newSession.user.id;
+        // Defer to avoid deadlocks
+        setTimeout(() => {
+          claimSession(uid).catch(() => undefined);
+          loadProfile(uid).catch(() => undefined);
+        }, 0);
+      } else {
+        setClientName("");
+        setAvatar("");
+      }
+    });
+
+    supabase.auth.getSession().then(({ data: { session: s } }) => {
+      setSession(s);
+      setUser(s?.user ?? null);
+      if (s?.user) {
+        const uid = s.user.id;
+        claimSession(uid).catch(() => undefined);
+        loadProfile(uid).catch(() => undefined);
+      }
+      setLoading(false);
+    });
+
+    return () => sub.subscription.unsubscribe();
+  }, []);
+
+  // Realtime: detect when another device takes over the session
+  useEffect(() => {
+    if (!user?.id) return;
+    const channel = supabase
+      .channel(`profile-${user.id}`)
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "profiles", filter: `id=eq.${user.id}` },
+        (payload) => {
+          const remote = (payload.new as { active_session_id?: string })?.active_session_id;
+          if (remote && remote !== sessionIdRef.current) {
+            toast({
+              title: "Sessão encerrada",
+              description: "Sua conta foi acessada em outro dispositivo.",
+              variant: "destructive",
+            });
+            supabase.auth.signOut().finally(() => {
+              localStorage.removeItem(SESSION_ID_KEY);
+              window.location.replace("/");
+            });
+          }
+        }
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id]);
+
   const loginAsAdmin = async (username: string, password: string): Promise<boolean> => {
     try {
       const { data, error } = await supabase.rpc("validate_admin_credentials", {
         _username: username,
         _password: password,
       });
-
-      if (error) {
-        console.error("Erro ao validar credenciais admin:", error);
-        toast({
-          title: "Erro ao validar credenciais",
-          description: "Não foi possível validar as credenciais. Tente novamente.",
-          variant: "destructive",
-        });
-        return false;
-      }
-
+      if (error) throw error;
       if (data) {
-        const validatedUsername = data as string;
+        const validated = data as string;
         const expiry = new Date();
         expiry.setHours(expiry.getHours() + 24);
-
-        const authState = {
-          isLoggedIn: true,
-          isAdmin: true,
-          expiry: expiry.toISOString(),
-          clientName: validatedUsername,
-          adminUsername: validatedUsername,
-        };
-        localStorage.setItem("authState", JSON.stringify(authState));
-
-        setIsLoggedIn(true);
+        localStorage.setItem("adminAuth", JSON.stringify({ username: validated, expiry: expiry.toISOString() }));
         setIsAdmin(true);
-        setClientName(validatedUsername);
-        setAdminUsername(validatedUsername);
-
-        toast({
-          title: "Login admin efetuado com sucesso",
-          description: `Bem-vindo, ${validatedUsername}.`,
-        });
-
+        setAdminUsername(validated);
+        setClientName(validated);
+        toast({ title: "Login admin efetuado", description: `Bem-vindo, ${validated}.` });
         return true;
       }
-
-      toast({
-        title: "Credenciais inválidas",
-        description: "Usuário ou senha incorretos.",
-        variant: "destructive",
-      });
+      toast({ title: "Credenciais inválidas", description: "Usuário ou senha incorretos.", variant: "destructive" });
       return false;
     } catch (err) {
-      console.error("Erro inesperado no login admin:", err);
+      console.error(err);
+      toast({ title: "Erro no login admin", variant: "destructive" });
       return false;
     }
   };
 
-  // Update avatar (persist in Firebase + local session)
-  // Accepts a stable avatar id (e.g. "avatar-3") or a legacy URL.
-  // Persists the stable id when possible so build hashes don't break loading.
+  const logout = async () => {
+    if (isAdmin) {
+      localStorage.removeItem("adminAuth");
+      setIsAdmin(false);
+      setAdminUsername("");
+      setClientName("");
+      window.location.replace("/admin-access");
+      return;
+    }
+    await supabase.auth.signOut();
+    localStorage.removeItem(SESSION_ID_KEY);
+    window.location.replace("/");
+  };
+
   const updateAvatar = async (value: string) => {
-    const stored = localStorage.getItem("authState");
-    if (!stored) return;
-    const parsed = JSON.parse(stored);
-    const pinCode = parsed?.pinCode as string | undefined;
-    if (!pinCode) return;
-    const pin = await getPinByCode(pinCode);
-    if (!pin) throw new Error("PIN não encontrado");
+    if (!user) throw new Error("Não autenticado");
     const idToStore = getAvatarId(value) || value;
-    await updatePinSelf(pin.id, { avatar: idToStore });
-    parsed.avatar = idToStore;
-    localStorage.setItem("authState", JSON.stringify(parsed));
+    const { error } = await supabase.from("profiles").update({ avatar: idToStore }).eq("id", user.id);
+    if (error) throw error;
     setAvatar(resolveAvatar(idToStore));
   };
 
-  // Logout
-  const logout = () => {
-    const wasAdmin = isAdmin;
-    const redirectTo = wasAdmin ? "/admin-access" : "/";
-    localStorage.removeItem("authState");
-    toast({
-      title: "Logout efetuado com sucesso",
-      description: "Você foi desconectado.",
-    });
-    // Redireciona imediatamente para evitar piscar a tela do usuário
-    window.location.replace(redirectTo);
+  const updateDisplayName = async (name: string) => {
+    if (!user) throw new Error("Não autenticado");
+    const trimmed = name.trim();
+    if (!trimmed) throw new Error("Informe um nome");
+    const { error } = await supabase.from("profiles").update({ display_name: trimmed }).eq("id", user.id);
+    if (error) throw error;
+    setClientName(trimmed);
   };
+
+  const isLoggedIn = isAdmin || !!session;
 
   return (
     <AuthContext.Provider
@@ -314,13 +217,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isAdmin,
         loading,
         clientName,
-        daysRemaining,
         adminUsername,
         avatar,
-        loginWithPin,
+        user,
         loginAsAdmin,
         logout,
         updateAvatar,
+        updateDisplayName,
       }}
     >
       {children}
