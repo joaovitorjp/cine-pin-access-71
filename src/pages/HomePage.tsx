@@ -16,6 +16,10 @@ import { getAllSeries } from "@/services/seriesService";
 import { Series } from "@/types";
 import MoodFilter from "@/components/MoodFilter";
 import { MoodKey, matchesMood } from "@/lib/mood";
+import { retry } from "@/lib/retry";
+import CardGridSkeleton from "@/components/CardGridSkeleton";
+import { Button } from "@/components/ui/button";
+import { RefreshCw } from "lucide-react";
 
 const HomePage: React.FC = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -32,33 +36,37 @@ const HomePage: React.FC = () => {
   // Extract unique, normalized genres from movies
   const genres = getUniqueGenres(movies.map(m => m.genre));
 
-  useEffect(() => {
-    const fetchMovies = async () => {
-      try {
-        const [data, seriesData] = await Promise.all([getAllMovies(), getAllSeries().catch(() => [])]);
-        setSeriesList(seriesData);
-        // Sort movies by year (most recent first)
-        const sortedMovies = data.sort((a, b) => {
-          const yearA = a.year ? parseInt(a.year) : 0;
-          const yearB = b.year ? parseInt(b.year) : 0;
-          return yearB - yearA;
-        });
-        setMovies(sortedMovies);
-        setFilteredMovies(sortedMovies);
-      } catch (error) {
-        console.error("Erro ao buscar filmes:", error);
-        setError("Não foi possível carregar os filmes. Tente novamente mais tarde.");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchMovies = React.useCallback(async () => {
+    try {
+      setError("");
+      setLoading(true);
+      const [data, seriesData] = await Promise.all([
+        retry(() => getAllMovies()),
+        retry(() => getAllSeries()).catch(() => []),
+      ]);
+      setSeriesList(seriesData);
+      const sortedMovies = data.sort((a, b) => {
+        const yearA = a.year ? parseInt(a.year) : 0;
+        const yearB = b.year ? parseInt(b.year) : 0;
+        return yearB - yearA;
+      });
+      setMovies(sortedMovies);
+      setFilteredMovies(sortedMovies);
+    } catch (error) {
+      console.error("Erro ao buscar filmes:", error);
+      setError("Não foi possível carregar os filmes. Verifique sua conexão e tente novamente.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
+  useEffect(() => {
     if (isLoggedIn) {
       fetchMovies();
     } else if (!authLoading) {
       setLoading(false);
     }
-  }, [isLoggedIn, authLoading]);
+  }, [isLoggedIn, authLoading, fetchMovies]);
 
   // Filter movies based on search query, genre, mood
   useEffect(() => {
@@ -101,18 +109,21 @@ const HomePage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="container mx-auto py-8 px-4">
-        <h1 className="text-3xl font-bold mb-8">Filmes</h1>
-        <div className="animate-pulse text-netflix-gray">Carregando filmes...</div>
+      <div className="container mx-auto py-4 px-3 sm:px-4">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-4">Filmes</h1>
+        <CardGridSkeleton />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="container mx-auto py-8 px-4">
-        <h1 className="text-3xl font-bold mb-8">Filmes</h1>
-        <div className="text-red-500">{error}</div>
+      <div className="container mx-auto py-8 px-4 text-center space-y-4">
+        <h1 className="text-2xl sm:text-3xl font-bold">Filmes</h1>
+        <p className="text-destructive">{error}</p>
+        <Button onClick={fetchMovies} variant="outline">
+          <RefreshCw className="w-4 h-4 mr-2" /> Tentar novamente
+        </Button>
       </div>
     );
   }

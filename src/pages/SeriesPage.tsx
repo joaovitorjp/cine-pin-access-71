@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Series } from "@/types";
 import { getAllSeries } from "@/services/seriesService";
 import SeriesCard from "@/components/SeriesCard";
@@ -8,6 +8,10 @@ import SearchBar from "@/components/SearchBar";
 import GenreFilter from "@/components/GenreFilter";
 import { useSearch } from "@/contexts/SearchContext";
 import { getUniqueGenres, matchesGenre } from "@/lib/genre";
+import { retry } from "@/lib/retry";
+import CardGridSkeleton from "@/components/CardGridSkeleton";
+import { Button } from "@/components/ui/button";
+import { RefreshCw } from "lucide-react";
 
 const SeriesPage: React.FC = () => {
   const [series, setSeries] = useState<Series[]>([]);
@@ -21,32 +25,33 @@ const SeriesPage: React.FC = () => {
   // Extract unique, normalized genres from series
   const genres = getUniqueGenres(series.map(s => s.genre));
 
-  useEffect(() => {
-    const fetchSeries = async () => {
-      try {
-        const data = await getAllSeries();
-        // Sort series by year (most recent first)
-        const sortedSeries = data.sort((a, b) => {
-          const yearA = a.year ? parseInt(a.year) : 0;
-          const yearB = b.year ? parseInt(b.year) : 0;
-          return yearB - yearA;
-        });
-        setSeries(sortedSeries);
-        setFilteredSeries(sortedSeries);
-      } catch (error) {
-        console.error("Erro ao buscar séries:", error);
-        setError("Não foi possível carregar as séries. Tente novamente mais tarde.");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchSeries = useCallback(async () => {
+    try {
+      setError("");
+      setLoading(true);
+      const data = await retry(() => getAllSeries());
+      const sortedSeries = data.sort((a, b) => {
+        const yearA = a.year ? parseInt(a.year) : 0;
+        const yearB = b.year ? parseInt(b.year) : 0;
+        return yearB - yearA;
+      });
+      setSeries(sortedSeries);
+      setFilteredSeries(sortedSeries);
+    } catch (error) {
+      console.error("Erro ao buscar séries:", error);
+      setError("Não foi possível carregar as séries. Verifique sua conexão e tente novamente.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
+  useEffect(() => {
     if (isLoggedIn) {
       fetchSeries();
     } else if (!authLoading) {
       setLoading(false);
     }
-  }, [isLoggedIn, authLoading]);
+  }, [isLoggedIn, authLoading, fetchSeries]);
 
   // Filter series based on search query and selected genre
   useEffect(() => {
@@ -90,18 +95,21 @@ const SeriesPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="container mx-auto py-8 px-4">
-        <h1 className="text-3xl font-bold mb-8">Séries</h1>
-        <div className="animate-pulse text-netflix-gray">Carregando séries...</div>
+      <div className="container mx-auto py-4 px-3 sm:px-4">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-4">Séries</h1>
+        <CardGridSkeleton />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="container mx-auto py-8 px-4">
-        <h1 className="text-3xl font-bold mb-8">Séries</h1>
-        <div className="text-red-500">{error}</div>
+      <div className="container mx-auto py-8 px-4 text-center space-y-4">
+        <h1 className="text-2xl sm:text-3xl font-bold">Séries</h1>
+        <p className="text-destructive">{error}</p>
+        <Button onClick={fetchSeries} variant="outline">
+          <RefreshCw className="w-4 h-4 mr-2" /> Tentar novamente
+        </Button>
       </div>
     );
   }
