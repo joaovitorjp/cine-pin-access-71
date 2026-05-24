@@ -8,6 +8,7 @@ import { ArrowLeft, Play } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import FavoriteButton from "@/components/FavoriteButton";
 import { useSafeBack } from "@/hooks/useSafeBack";
+import SafeImage from "@/components/SafeImage";
 
 const MovieDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
