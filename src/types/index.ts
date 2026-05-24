@@ -58,4 +58,5 @@ export interface PinAccess {
   clientName: string;
   sessionId?: string;
   createdBy?: string;
+  avatar?: string;
 }

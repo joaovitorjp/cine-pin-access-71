@@ -4,6 +4,7 @@ import { validatePin, validateSession } from "@/services/pinService";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { registerDevice, findPinIdByCode, touchDevice } from "@/services/devicesService";
+import { getPinByCode, updatePinSelf } from "@/services/pinService";
 
 interface AuthContextType {
   isLoggedIn: boolean;
@@ -12,9 +13,11 @@ interface AuthContextType {
   clientName: string;
   daysRemaining: number;
   adminUsername: string;
+  avatar: string;
   loginWithPin: (pin: string) => Promise<boolean>;
   loginAsAdmin: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
+  updateAvatar: (url: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -24,9 +27,11 @@ const AuthContext = createContext<AuthContextType>({
   clientName: "",
   daysRemaining: 0,
   adminUsername: "",
+  avatar: "",
   loginWithPin: async () => false,
   loginAsAdmin: async () => false,
   logout: () => {},
+  updateAvatar: async () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -38,13 +43,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [clientName, setClientName] = useState<string>("");
   const [daysRemaining, setDaysRemaining] = useState<number>(0);
   const [adminUsername, setAdminUsername] = useState<string>("");
+  const [avatar, setAvatar] = useState<string>("");
 
   // Check local storage for auth state on mount and validate session
   useEffect(() => {
     const checkAuthState = async () => {
       const storedAuthState = localStorage.getItem("authState");
       if (storedAuthState) {
-        const { isLoggedIn, isAdmin, expiry, clientName: storedClientName, pinCode, sessionId, adminUsername: storedAdminUsername } = JSON.parse(storedAuthState);
+        const { isLoggedIn, isAdmin, expiry, clientName: storedClientName, pinCode, sessionId, adminUsername: storedAdminUsername, avatar: storedAvatar } = JSON.parse(storedAuthState);
         if (new Date(expiry) > new Date()) {
           // For PIN users, validate session to ensure single device login
           if (!isAdmin && pinCode && sessionId) {
@@ -53,7 +59,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               setIsLoggedIn(isLoggedIn);
               setIsAdmin(isAdmin);
               setClientName(storedClientName || "");
-              
+              setAvatar(storedAvatar || "");
+
               // Calculate days remaining
               const expiryDate = new Date(expiry);
               const currentDate = new Date();
@@ -131,6 +138,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const diffTime = expiryDate.getTime() - currentDate.getTime();
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         
+        // Fetch full pin record to recover the stored avatar (if any)
+        let storedAvatar = "";
+        try {
+          const fullPin = await getPinByCode(pin);
+          storedAvatar = fullPin?.avatar || "";
+        } catch { /* ignore */ }
+
         // Save auth state with session info
         const authState = {
           isLoggedIn: true,
@@ -139,6 +153,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           clientName: pinData.clientName,
           pinCode: pin,
           sessionId: pinData.sessionId,
+          avatar: storedAvatar,
         };
         localStorage.setItem("authState", JSON.stringify(authState));
 
@@ -152,6 +167,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setIsLoggedIn(true);
         setIsAdmin(false);
         setClientName(pinData.clientName);
+        setAvatar(storedAvatar);
         setDaysRemaining(Math.max(0, diffDays));
         
         toast({
@@ -239,6 +255,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // Update avatar (persist in Firebase + local session)
+  const updateAvatar = async (url: string) => {
+    const stored = localStorage.getItem("authState");
+    if (!stored) return;
+    const parsed = JSON.parse(stored);
+    const pinCode = parsed?.pinCode as string | undefined;
+    if (!pinCode) return;
+    const pin = await getPinByCode(pinCode);
+    if (!pin) throw new Error("PIN não encontrado");
+    await updatePinSelf(pin.id, { avatar: url });
+    parsed.avatar = url;
+    localStorage.setItem("authState", JSON.stringify(parsed));
+    setAvatar(url);
+  };
+
   // Logout
   const logout = () => {
     const wasAdmin = isAdmin;
@@ -261,9 +292,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         clientName,
         daysRemaining,
         adminUsername,
+        avatar,
         loginWithPin,
         loginAsAdmin,
         logout,
+        updateAvatar,
       }}
     >
       {children}

@@ -1,18 +1,21 @@
-import React from "react";
+import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useFavorites } from "@/contexts/FavoritesContext";
 import { useHistory } from "@/contexts/HistoryContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { User, Calendar, Clock, LogOut, Heart, History, Settings } from "lucide-react";
+import { User, Calendar, Clock, LogOut, Heart, History, Settings, Pencil } from "lucide-react";
 import { Link } from "react-router-dom";
 import ThemeToggle from "@/components/ThemeToggle";
 import ClientProfileEdit from "@/components/ClientProfileEdit";
 import SecuritySettings from "@/components/SecuritySettings";
 import PlaybackPreferences from "@/components/PlaybackPreferences";
+import AvatarPickerDialog from "@/components/AvatarPickerDialog";
+import { toast } from "@/components/ui/use-toast";
 
 const ClientInfo: React.FC = () => {
-  const { clientName, daysRemaining, logout, isAdmin } = useAuth();
+  const { clientName, daysRemaining, logout, isAdmin, avatar, updateAvatar } = useAuth();
+  const [pickerOpen, setPickerOpen] = useState(false);
   const { favoriteMovies, favoriteSeries, favoriteLiveTV } = useFavorites();
   const { history } = useHistory();
 
@@ -45,15 +48,30 @@ const ClientInfo: React.FC = () => {
           <CardContent className="space-y-6">
             <div className="space-y-4">
               <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                    <User className="w-6 h-6 text-primary" />
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="relative w-14 h-14 rounded-full bg-primary/10 overflow-hidden flex items-center justify-center shrink-0">
+                    {avatar ? (
+                      <img src={avatar} alt={clientName} className="w-full h-full object-cover" />
+                    ) : (
+                      <User className="w-7 h-7 text-primary" />
+                    )}
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-sm text-muted-foreground">Nome do Cliente</p>
-                    <p className="font-semibold text-lg">{clientName}</p>
+                    <p className="font-semibold text-lg truncate">{clientName}</p>
                   </div>
                 </div>
+                {!isAdmin && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPickerOpen(true)}
+                    className="gap-1 shrink-0"
+                  >
+                    <Pencil className="w-3 h-3" />
+                    Avatar
+                  </Button>
+                )}
               </div>
 
               {isAdmin && (
@@ -169,6 +187,27 @@ const ClientInfo: React.FC = () => {
           </CardContent>
         </Card>
       </div>
+
+      <AvatarPickerDialog
+        open={pickerOpen}
+        initialAvatar={avatar}
+        title="Trocar avatar"
+        description="Escolha uma nova imagem para o seu perfil."
+        onOpenChange={setPickerOpen}
+        onSelect={async (url) => {
+          try {
+            await updateAvatar(url);
+            toast({ title: "Avatar atualizado" });
+          } catch {
+            toast({
+              title: "Erro ao atualizar avatar",
+              description: "Tente novamente.",
+              variant: "destructive",
+            });
+            throw new Error("failed");
+          }
+        }}
+      />
     </div>
   );
 };

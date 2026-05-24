@@ -6,16 +6,20 @@ import SearchBar from "@/components/SearchBar";
 import HomeBannerCarousel from "@/components/HomeBannerCarousel";
 import { useSearch } from "@/contexts/SearchContext";
 import UserNotificationsBell from "@/components/UserNotificationsBell";
+import AvatarPickerDialog from "@/components/AvatarPickerDialog";
+import { toast } from "@/components/ui/use-toast";
 
 const LISTING_ROUTES = ["/", "/series", "/livetv"];
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isLoggedIn, isAdmin } = useAuth();
+  const { isLoggedIn, isAdmin, avatar, updateAvatar, loading } = useAuth();
   const location = useLocation();
   const { setQuery } = useSearch();
 
   const isPlayerPage = location.pathname.includes("/player/");
   const isListing = LISTING_ROUTES.includes(location.pathname);
+
+  const needsAvatar = isLoggedIn && !isAdmin && !loading && !avatar;
 
   if (!isLoggedIn) {
     return (
@@ -54,6 +58,26 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           </div>
         </footer>
       )}
+
+      <AvatarPickerDialog
+        open={needsAvatar}
+        dismissible={false}
+        title="Escolha seu avatar"
+        description="Selecione uma imagem para o seu perfil. Você poderá alterá-la depois nas configurações."
+        onSelect={async (url) => {
+          try {
+            await updateAvatar(url);
+            toast({ title: "Avatar definido", description: "Bem-vindo(a)!" });
+          } catch {
+            toast({
+              title: "Erro ao salvar avatar",
+              description: "Tente novamente.",
+              variant: "destructive",
+            });
+            throw new Error("failed");
+          }
+        }}
+      />
     </div>
   );
 };

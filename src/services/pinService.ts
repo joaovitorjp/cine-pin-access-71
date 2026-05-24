@@ -173,11 +173,12 @@ export const getPinByCode = async (pinCode: string): Promise<PinAccess | null> =
 // Client self-update: only name + PIN allowed
 export const updatePinSelf = async (
   id: string,
-  payload: { clientName?: string; pin?: string }
+  payload: { clientName?: string; pin?: string; avatar?: string }
 ): Promise<{ sessionId?: string }> => {
   const updates: Record<string, unknown> = {};
   let newSessionId: string | undefined;
   if (payload.clientName !== undefined) updates.clientName = payload.clientName.trim();
+  if (payload.avatar !== undefined) updates.avatar = payload.avatar;
   if (payload.pin !== undefined) {
     const newPin = payload.pin.trim();
     if (newPin.length < 4) throw new Error("O PIN deve ter pelo menos 4 caracteres");
