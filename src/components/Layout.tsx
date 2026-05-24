@@ -43,12 +43,18 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               {!isAdmin && <UserNotificationsBell />}
             </div>
             <SearchBar onSearch={setQuery} />
-            <HomeBannerCarousel />
           </div>
         </div>
       )}
 
-      <main className="flex-grow pb-20">{children}</main>
+      <main className="flex-grow pb-20">
+        {!isPlayerPage && isListing && (
+          <div className="container mx-auto px-3 sm:px-4 pt-3">
+            <HomeBannerCarousel />
+          </div>
+        )}
+        {children}
+      </main>
 
       {isLoggedIn && <BottomNavigation />}
 
