@@ -7,6 +7,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { createPin, createCustomPin } from "@/services/pinService";
 import { toast } from "@/components/ui/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { retry } from "@/lib/retry";
+import { Loader2 } from "lucide-react";
 
 interface CreatePinFormProps {
   onSuccess: () => void;
@@ -39,17 +41,19 @@ const CreatePinForm: React.FC<CreatePinFormProps> = ({ onSuccess }) => {
     setError("");
     
     try {
-      const newPin = await createPin(daysValid, clientName.trim(), adminUsername);
+      const newPin = await retry(() => createPin(daysValid, clientName.trim(), adminUsername));
       
       toast({
-        title: "PIN criado com sucesso",
-        description: `PIN: ${newPin.pin} - Cliente: ${clientName} - Válido por ${daysValid} dias`,
+        title: "✓ PIN criado com sucesso",
+        description: `PIN: ${newPin.pin} — Cliente: ${clientName} — Válido por ${daysValid} dias`,
       });
       
       onSuccess();
     } catch (error) {
       console.error("Erro ao criar PIN:", error);
-      setError("Ocorreu um erro ao criar o PIN. Tente novamente.");
+      const msg = "Falha ao criar o PIN. Verifique sua conexão e tente novamente.";
+      setError(msg);
+      toast({ title: "Erro ao criar PIN", description: msg, variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -82,17 +86,19 @@ const CreatePinForm: React.FC<CreatePinFormProps> = ({ onSuccess }) => {
     setError("");
     
     try {
-      const newPin = await createCustomPin(customPin.trim(), customDaysValid, customClientName.trim(), adminUsername);
+      const newPin = await retry(() => createCustomPin(customPin.trim(), customDaysValid, customClientName.trim(), adminUsername));
       
       toast({
-        title: "PIN personalizado criado com sucesso",
-        description: `PIN: ${newPin.pin} - Cliente: ${customClientName} - Válido por ${customDaysValid} dias`,
+        title: "✓ PIN personalizado criado",
+        description: `PIN: ${newPin.pin} — Cliente: ${customClientName} — Válido por ${customDaysValid} dias`,
       });
       
       onSuccess();
     } catch (error) {
       console.error("Erro ao criar PIN personalizado:", error);
-      setError("Ocorreu um erro ao criar o PIN personalizado. Tente novamente.");
+      const msg = "Falha ao criar o PIN personalizado. Pode já existir ou houve erro de conexão.";
+      setError(msg);
+      toast({ title: "Erro ao criar PIN", description: msg, variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -147,6 +153,7 @@ const CreatePinForm: React.FC<CreatePinFormProps> = ({ onSuccess }) => {
               className="bg-netflix-red hover:bg-red-700"
               disabled={loading}
             >
+              {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
               {loading ? "Criando..." : "Criar PIN"}
             </Button>
           </div>
@@ -212,6 +219,7 @@ const CreatePinForm: React.FC<CreatePinFormProps> = ({ onSuccess }) => {
               className="bg-netflix-red hover:bg-red-700"
               disabled={loading}
             >
+              {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
               {loading ? "Criando..." : "Criar PIN Personalizado"}
             </Button>
           </div>

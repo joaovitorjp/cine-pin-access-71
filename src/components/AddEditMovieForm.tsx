@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { addMovie, updateMovie } from "@/services/movieService";
 import { toast } from "@/components/ui/use-toast";
+import { retry } from "@/lib/retry";
+import { Loader2 } from "lucide-react";
 
 interface AddEditMovieFormProps {
   movie?: Movie;
@@ -48,21 +50,18 @@ const AddEditMovieForm: React.FC<AddEditMovieFormProps> = ({ movie, onSuccess })
       };
       
       if (movie) {
-        // Update existing movie
-        await updateMovie(movie.id, movieData);
+        await retry(() => updateMovie(movie.id, movieData));
         toast({
-          title: "Filme atualizado",
-          description: "O filme foi atualizado com sucesso.",
+          title: "✓ Filme atualizado",
+          description: `"${title}" foi atualizado com sucesso.`,
         });
       } else {
-        // Add new movie
-        await addMovie(movieData);
+        await retry(() => addMovie(movieData));
         toast({
-          title: "Filme adicionado",
-          description: "O filme foi adicionado com sucesso.",
+          title: "✓ Filme adicionado",
+          description: `"${title}" foi adicionado ao catálogo.`,
         });
         
-        // Reset form
         setTitle("");
         setImageUrl("");
         setVideoUrl("");
@@ -75,7 +74,13 @@ const AddEditMovieForm: React.FC<AddEditMovieFormProps> = ({ movie, onSuccess })
       onSuccess();
     } catch (error) {
       console.error("Erro ao salvar filme:", error);
-      setError("Ocorreu um erro ao salvar o filme. Tente novamente.");
+      const msg = "Falha ao salvar. Verifique sua conexão e tente novamente.";
+      setError(msg);
+      toast({
+        title: "Erro ao salvar filme",
+        description: msg,
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -174,6 +179,7 @@ const AddEditMovieForm: React.FC<AddEditMovieFormProps> = ({ movie, onSuccess })
           className="bg-netflix-red hover:bg-red-700"
           disabled={loading}
         >
+          {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
           {loading ? "Salvando..." : movie ? "Atualizar Filme" : "Adicionar Filme"}
         </Button>
       </div>
