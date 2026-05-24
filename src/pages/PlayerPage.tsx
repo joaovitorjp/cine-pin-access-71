@@ -13,6 +13,8 @@ import PlayerActions from "@/components/PlayerActions";
 import Suggestions from "@/components/Suggestions";
 import { useTrackWatchProgress } from "@/hooks/useTrackWatchProgress";
 import { makeMovieProgressId } from "@/contexts/WatchProgressContext";
+import { useWallet } from "@/contexts/WalletContext";
+import MoviePaywall from "@/components/MoviePaywall";
 
 
 const PlayerPage: React.FC = () => {
@@ -24,6 +26,8 @@ const PlayerPage: React.FC = () => {
   const navigate = useNavigate();
   const { isLoggedIn } = useAuth();
   const { addToHistory } = useHistory();
+  const { isUnlocked } = useWallet();
+  const unlocked = movie ? isUnlocked(movie.id) : false;
 
   useEffect(() => {
     if (!isLoggedIn) {
