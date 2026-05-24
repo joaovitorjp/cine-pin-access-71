@@ -68,11 +68,10 @@ const EditorsCollectionsSection: React.FC<Props> = ({ movies, series }) => {
                   to={item._type === "movie" ? `/movie/${item.id}` : `/series/${item.id}`}
                   className="group rounded-md overflow-hidden bg-card hover:scale-105 transition-transform"
                 >
-                  <div className="aspect-[2/3] bg-muted">
-                    <img
+                  <div className="relative aspect-[2/3] bg-muted">
+                    <SafeImage
                       src={item.imageUrl}
                       alt={item.title}
-                      loading="lazy"
                       className="w-full h-full object-cover"
                     />
                   </div>
