@@ -277,7 +277,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // Update avatar (persist in Firebase + local session)
-  const updateAvatar = async (url: string) => {
+  // Accepts a stable avatar id (e.g. "avatar-3") or a legacy URL.
+  // Persists the stable id when possible so build hashes don't break loading.
+  const updateAvatar = async (value: string) => {
     const stored = localStorage.getItem("authState");
     if (!stored) return;
     const parsed = JSON.parse(stored);
@@ -285,10 +287,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!pinCode) return;
     const pin = await getPinByCode(pinCode);
     if (!pin) throw new Error("PIN não encontrado");
-    await updatePinSelf(pin.id, { avatar: url });
-    parsed.avatar = url;
+    const idToStore = getAvatarId(value) || value;
+    await updatePinSelf(pin.id, { avatar: idToStore });
+    parsed.avatar = idToStore;
     localStorage.setItem("authState", JSON.stringify(parsed));
-    setAvatar(url);
+    setAvatar(resolveAvatar(idToStore));
   };
 
   // Logout
