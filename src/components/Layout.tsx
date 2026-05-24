@@ -8,6 +8,7 @@ import { useSearch } from "@/contexts/SearchContext";
 import UserNotificationsBell from "@/components/UserNotificationsBell";
 import AvatarPickerDialog from "@/components/AvatarPickerDialog";
 import { toast } from "@/components/ui/use-toast";
+import logo from "@/assets/cineflex-logo.png";
 
 const LISTING_ROUTES = ["/", "/series", "/livetv"];
 
@@ -34,12 +35,14 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       {!isPlayerPage && isListing && (
         <div className="sticky top-0 z-30 bg-background/95 backdrop-blur border-b border-border">
           <div className="container mx-auto px-3 sm:px-4 py-3 space-y-3">
-            <div className="flex items-center gap-2">
-              <div className="flex-1 min-w-0">
-                <SearchBar onSearch={setQuery} />
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 shrink-0">
+                <img src={logo} alt="CINE FLEX" className="h-8 w-auto" />
+                <span className="font-bold text-lg text-white tracking-wide">CINE FLEX</span>
               </div>
               {!isAdmin && <UserNotificationsBell />}
             </div>
+            <SearchBar onSearch={setQuery} />
             <HomeBannerCarousel />
           </div>
         </div>
