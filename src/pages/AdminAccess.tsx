@@ -16,10 +16,11 @@ import {
   Activity,
   Cpu,
 } from "lucide-react";
+import cineflexLogo from "@/assets/cineflex-logo.png";
 
 /**
  * Hidden route: /admin-access
- * Modern split-layout admin login (indigo / cyan / fuchsia theme).
+ * Modern split-layout admin login — Netflix red/black theme.
  */
 const AdminAccess: React.FC = () => {
   const navigate = useNavigate();
@@ -49,17 +50,17 @@ const AdminAccess: React.FC = () => {
   };
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-[#05060a] text-white">
-      {/* Ambient background */}
+    <div className="relative min-h-screen w-full overflow-hidden bg-black text-white">
+      {/* Ambient background — red glows on black */}
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-40 -left-40 w-[560px] h-[560px] rounded-full bg-indigo-600/25 blur-[140px] animate-pulse" />
-        <div className="absolute -bottom-40 -right-40 w-[600px] h-[600px] rounded-full bg-cyan-500/20 blur-[160px]" />
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[420px] h-[420px] rounded-full bg-fuchsia-500/15 blur-[140px]" />
+        <div className="absolute -top-40 -left-40 w-[560px] h-[560px] rounded-full bg-netflix-red/30 blur-[140px] animate-pulse" />
+        <div className="absolute -bottom-40 -right-40 w-[600px] h-[600px] rounded-full bg-red-700/25 blur-[160px]" />
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[420px] h-[420px] rounded-full bg-red-500/10 blur-[140px]" />
         <div
-          className="absolute inset-0 opacity-[0.05]"
+          className="absolute inset-0 opacity-[0.06]"
           style={{
             backgroundImage:
-              "linear-gradient(rgba(255,255,255,.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.6) 1px, transparent 1px)",
+              "linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px)",
             backgroundSize: "44px 44px",
             maskImage:
               "radial-gradient(ellipse at center, black 30%, transparent 75%)",
@@ -80,14 +81,15 @@ const AdminAccess: React.FC = () => {
         {/* LEFT — brand panel */}
         <aside className="hidden lg:flex flex-col justify-between p-12 xl:p-16 relative overflow-hidden">
           <div className="flex items-center gap-3">
-            <div className="relative">
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-indigo-500 to-cyan-400 blur-md opacity-70" />
-              <div className="relative w-11 h-11 rounded-xl bg-gradient-to-br from-indigo-500 to-cyan-400 flex items-center justify-center shadow-lg">
-                <ShieldCheck className="w-6 h-6 text-white" />
-              </div>
-            </div>
+            <img
+              src={cineflexLogo}
+              alt="CINE FLEX"
+              className="w-12 h-12 drop-shadow-[0_0_18px_rgba(229,9,20,0.55)]"
+            />
             <div>
-              <p className="text-sm font-semibold tracking-tight">CINE FLEX</p>
+              <p className="text-base font-extrabold tracking-tight">
+                CINE <span className="text-netflix-red">FLEX</span>
+              </p>
               <p className="text-[11px] text-white/40 uppercase tracking-[0.2em]">
                 Control Center
               </p>
@@ -96,14 +98,14 @@ const AdminAccess: React.FC = () => {
 
           <div className="space-y-8 max-w-lg">
             <div>
-              <div className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-indigo-200/90 bg-indigo-400/10 border border-indigo-400/20 rounded-full px-2.5 py-1 mb-5">
+              <div className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-red-200/90 bg-netflix-red/15 border border-netflix-red/30 rounded-full px-2.5 py-1 mb-5">
                 <Sparkles className="w-3 h-3" />
                 Painel administrativo
               </div>
               <h2 className="text-4xl xl:text-5xl font-semibold tracking-tight leading-[1.05]">
                 Gerencie tudo
                 <br />
-                <span className="bg-gradient-to-r from-indigo-300 via-cyan-200 to-fuchsia-300 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-red-400 via-netflix-red to-red-600 bg-clip-text text-transparent">
                   em um só lugar.
                 </span>
               </h2>
@@ -122,9 +124,9 @@ const AdminAccess: React.FC = () => {
               ].map((f) => (
                 <div
                   key={f.label}
-                  className="group rounded-xl border border-white/10 bg-white/[0.03] backdrop-blur-md p-3 hover:bg-white/[0.06] hover:border-white/20 transition-colors"
+                  className="group rounded-xl border border-white/10 bg-white/[0.03] backdrop-blur-md p-3 hover:bg-white/[0.06] hover:border-netflix-red/40 transition-colors"
                 >
-                  <f.icon className="w-4 h-4 text-cyan-300/90 mb-2" />
+                  <f.icon className="w-4 h-4 text-netflix-red mb-2" />
                   <p className="text-xs font-medium">{f.label}</p>
                   <p className="text-[11px] text-white/40">{f.hint}</p>
                 </div>
@@ -140,29 +142,38 @@ const AdminAccess: React.FC = () => {
         {/* RIGHT — form */}
         <main className="flex items-center justify-center px-4 py-10 sm:px-8">
           <div className="relative w-full max-w-md">
-            <div className="absolute -inset-px rounded-3xl bg-gradient-to-br from-indigo-400/30 via-white/5 to-cyan-400/20 opacity-70 blur" />
-            <div className="relative rounded-3xl border border-white/10 bg-white/[0.04] backdrop-blur-2xl shadow-[0_30px_100px_-30px_rgba(0,0,0,0.8)] p-7 sm:p-10">
+            <div className="absolute -inset-px rounded-3xl bg-gradient-to-br from-netflix-red/40 via-white/5 to-red-900/30 opacity-70 blur" />
+            <div className="relative rounded-3xl border border-white/10 bg-black/60 backdrop-blur-2xl shadow-[0_30px_100px_-30px_rgba(229,9,20,0.35)] p-7 sm:p-10">
               {/* Mobile brand */}
               <div className="lg:hidden flex flex-col items-center text-center mb-6">
-                <div className="relative">
-                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-indigo-500 to-cyan-400 blur-md opacity-70" />
-                  <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-cyan-400 flex items-center justify-center shadow-lg">
-                    <ShieldCheck className="w-7 h-7 text-white" />
-                  </div>
-                </div>
-                <p className="mt-3 text-[11px] uppercase tracking-[0.25em] text-white/40">
-                  CINE FLEX
+                <img
+                  src={cineflexLogo}
+                  alt="CINE FLEX"
+                  className="w-16 h-16 mb-3 drop-shadow-[0_0_18px_rgba(229,9,20,0.55)]"
+                />
+                <p className="text-lg font-extrabold tracking-tight">
+                  CINE <span className="text-netflix-red">FLEX</span>
+                </p>
+                <p className="text-[11px] uppercase tracking-[0.25em] text-white/40 mt-0.5">
+                  Control Center
                 </p>
               </div>
 
               <div className="mb-7">
-                <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">
-                  Acesso administrativo
-                </h1>
-                <p className="text-sm text-white/50 mt-1.5">
-                  Entre com suas credenciais para continuar.
-                </p>
-                <div className="mt-4 inline-flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-emerald-300/90 bg-emerald-400/10 border border-emerald-400/20 rounded-full px-2.5 py-1">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-netflix-red to-red-700 flex items-center justify-center shadow-lg shadow-netflix-red/30">
+                    <ShieldCheck className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h1 className="text-xl sm:text-2xl font-semibold tracking-tight leading-none">
+                      Acesso administrativo
+                    </h1>
+                    <p className="text-xs text-white/50 mt-1">
+                      Entre com suas credenciais para continuar.
+                    </p>
+                  </div>
+                </div>
+                <div className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-emerald-300/90 bg-emerald-400/10 border border-emerald-400/20 rounded-full px-2.5 py-1">
                   <Lock className="w-3 h-3" />
                   Conexão segura · TLS
                 </div>
@@ -174,7 +185,7 @@ const AdminAccess: React.FC = () => {
                     Usuário
                   </Label>
                   <div className="relative group">
-                    <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 group-focus-within:text-indigo-300 transition-colors" />
+                    <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 group-focus-within:text-netflix-red transition-colors" />
                     <Input
                       id="admin-username"
                       type="text"
@@ -183,7 +194,7 @@ const AdminAccess: React.FC = () => {
                       onChange={(e) => setUsername(e.target.value)}
                       placeholder="seu.usuario"
                       autoFocus
-                      className="h-12 pl-9 bg-white/[0.04] border-white/10 text-white placeholder:text-white/30 focus-visible:ring-2 focus-visible:ring-indigo-400/60 focus-visible:border-indigo-400/40 rounded-xl"
+                      className="h-12 pl-9 bg-white/[0.04] border-white/10 text-white placeholder:text-white/30 focus-visible:ring-2 focus-visible:ring-netflix-red/60 focus-visible:border-netflix-red/50 rounded-xl"
                     />
                   </div>
                 </div>
@@ -193,7 +204,7 @@ const AdminAccess: React.FC = () => {
                     Senha
                   </Label>
                   <div className="relative group">
-                    <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 group-focus-within:text-indigo-300 transition-colors" />
+                    <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 group-focus-within:text-netflix-red transition-colors" />
                     <Input
                       id="admin-password"
                       type={showPassword ? "text" : "password"}
@@ -201,7 +212,7 @@ const AdminAccess: React.FC = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="h-12 pl-9 pr-10 bg-white/[0.04] border-white/10 text-white placeholder:text-white/30 focus-visible:ring-2 focus-visible:ring-indigo-400/60 focus-visible:border-indigo-400/40 rounded-xl"
+                      className="h-12 pl-9 pr-10 bg-white/[0.04] border-white/10 text-white placeholder:text-white/30 focus-visible:ring-2 focus-visible:ring-netflix-red/60 focus-visible:border-netflix-red/50 rounded-xl"
                     />
                     <button
                       type="button"
@@ -215,7 +226,7 @@ const AdminAccess: React.FC = () => {
                 </div>
 
                 {error && (
-                  <div className="text-sm text-red-300 bg-red-500/10 border border-red-500/20 rounded-xl px-3 py-2.5">
+                  <div className="text-sm text-red-300 bg-red-500/10 border border-red-500/30 rounded-xl px-3 py-2.5">
                     {error}
                   </div>
                 )}
@@ -223,7 +234,7 @@ const AdminAccess: React.FC = () => {
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="w-full h-12 rounded-xl bg-gradient-to-r from-indigo-500 via-indigo-400 to-cyan-400 hover:from-indigo-400 hover:via-indigo-300 hover:to-cyan-300 text-white font-medium shadow-lg shadow-indigo-500/30 border-0 transition-all"
+                  className="w-full h-12 rounded-xl bg-gradient-to-r from-netflix-red to-red-700 hover:from-red-600 hover:to-red-800 text-white font-semibold shadow-lg shadow-netflix-red/30 border-0 transition-all"
                 >
                   {loading ? "Verificando..." : "Acessar painel"}
                 </Button>
