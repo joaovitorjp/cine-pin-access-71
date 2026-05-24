@@ -194,8 +194,9 @@ const FeaturedLoginCarousel: React.FC = () => {
           ))}
         </div>
 
-        {/* Overlay para legibilidade do formulário */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/80 pointer-events-none" />
+        {/* Overlay para legibilidade do formulário - mais leve para mostrar os pôsteres */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/20 to-black/55 pointer-events-none" />
+        <div className="absolute inset-0 backdrop-brightness-[1.15] saturate-[1.2] pointer-events-none mix-blend-normal" />
       </div>
 
 
@@ -240,7 +241,7 @@ const FeaturedLoginCarousel: React.FC = () => {
                   {selected.description || "Sem sinopse disponível."}
                 </p>
                 <p className="text-xs text-netflix-gray italic pt-2 border-t border-gray-700">
-                  Faça login com seu PIN para assistir.
+                  Faça login para assistir.
                 </p>
               </div>
             </div>

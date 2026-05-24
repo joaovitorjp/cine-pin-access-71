@@ -114,7 +114,7 @@ const EmailAuthForm: React.FC = () => {
     <div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden">
       {/* Background dos pôsteres passando (mantido obrigatório) */}
       <FeaturedLoginCarousel />
-      <div className="fixed inset-0 z-10 bg-gradient-to-b from-black/85 via-black/80 to-black/95 pointer-events-none" />
+      <div className="fixed inset-0 z-10 bg-gradient-to-b from-black/50 via-black/30 to-black/65 pointer-events-none" />
 
       <div className="relative z-20 w-full max-w-md px-4 py-10">
         <div className="flex flex-col items-center mb-8">
@@ -125,8 +125,8 @@ const EmailAuthForm: React.FC = () => {
           <p className="text-sm text-white/60 mt-1">Filmes, séries e TV ao vivo</p>
         </div>
 
-        <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl p-6 sm:p-8">
-          <div className="flex gap-2 mb-6 p-1 bg-white/5 rounded-xl">
+        <div className="rounded-2xl border border-white/15 bg-black/50 backdrop-blur-2xl shadow-[0_25px_80px_-12px_rgba(0,0,0,0.6)] p-6 sm:p-8 ring-1 ring-white/10">
+          <div className="flex gap-2 mb-6 p-1 bg-white/10 rounded-xl border border-white/10">
             <button
               type="button"
               onClick={() => setMode("signin")}
@@ -150,15 +150,15 @@ const EmailAuthForm: React.FC = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             {mode === "signup" && (
               <div className="space-y-1.5">
-                <Label htmlFor="name" className="text-white/80 text-xs">Nome</Label>
+                <Label htmlFor="name" className="text-white/90 text-xs font-medium">Nome</Label>
                 <div className="relative">
-                  <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+                  <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60" />
                   <Input
                     id="name"
                     value={displayName}
                     onChange={(e) => setDisplayName(e.target.value)}
                     placeholder="Como devemos te chamar"
-                    className="pl-10 h-12 bg-white/5 border-white/15 text-white placeholder:text-white/30"
+                    className="pl-10 h-12 bg-white/10 border-white/25 text-white placeholder:text-white/45 focus:border-netflix-red/80 focus:ring-1 focus:ring-netflix-red/30"
                     required
                   />
                 </div>
@@ -166,9 +166,9 @@ const EmailAuthForm: React.FC = () => {
             )}
 
             <div className="space-y-1.5">
-              <Label htmlFor="email" className="text-white/80 text-xs">Email</Label>
+              <Label htmlFor="email" className="text-white/90 text-xs font-medium">Email</Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60" />
                 <Input
                   id="email"
                   type="email"
@@ -176,16 +176,16 @@ const EmailAuthForm: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="seu@email.com"
-                  className="pl-10 h-12 bg-white/5 border-white/15 text-white placeholder:text-white/30"
+                  className="pl-10 h-12 bg-white/10 border-white/25 text-white placeholder:text-white/45 focus:border-netflix-red/80 focus:ring-1 focus:ring-netflix-red/30"
                   required
                 />
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="password" className="text-white/80 text-xs">Senha</Label>
+              <Label htmlFor="password" className="text-white/90 text-xs font-medium">Senha</Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60" />
                 <Input
                   id="password"
                   type="password"
@@ -193,7 +193,7 @@ const EmailAuthForm: React.FC = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="pl-10 h-12 bg-white/5 border-white/15 text-white placeholder:text-white/30"
+                  className="pl-10 h-12 bg-white/10 border-white/25 text-white placeholder:text-white/45 focus:border-netflix-red/80 focus:ring-1 focus:ring-netflix-red/30"
                   minLength={6}
                   required
                 />
@@ -217,9 +217,9 @@ const EmailAuthForm: React.FC = () => {
           </form>
 
           <div className="my-5 flex items-center gap-3">
-            <div className="h-px flex-1 bg-white/10" />
-            <span className="text-[10px] uppercase tracking-wider text-white/40">ou</span>
-            <div className="h-px flex-1 bg-white/10" />
+            <div className="h-px flex-1 bg-white/20" />
+            <span className="text-[10px] uppercase tracking-wider text-white/55">ou</span>
+            <div className="h-px flex-1 bg-white/20" />
           </div>
 
           <Button
@@ -239,7 +239,7 @@ const EmailAuthForm: React.FC = () => {
             )}
           </Button>
 
-          <p className="text-[11px] text-white/50 text-center mt-5 leading-relaxed">
+          <p className="text-[11px] text-white/60 text-center mt-5 leading-relaxed">
             {mode === "signup"
               ? "Ao criar a conta, você receberá um email de confirmação."
               : "Acesso liberado em 1 dispositivo por vez."}
