@@ -166,9 +166,9 @@ const EmailAuthForm: React.FC = () => {
             )}
 
             <div className="space-y-1.5">
-              <Label htmlFor="email" className="text-white/80 text-xs">Email</Label>
+              <Label htmlFor="email" className="text-white/90 text-xs font-medium">Email</Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60" />
                 <Input
                   id="email"
                   type="email"
@@ -176,16 +176,16 @@ const EmailAuthForm: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="seu@email.com"
-                  className="pl-10 h-12 bg-white/5 border-white/15 text-white placeholder:text-white/30"
+                  className="pl-10 h-12 bg-white/10 border-white/25 text-white placeholder:text-white/45 focus:border-netflix-red/80 focus:ring-1 focus:ring-netflix-red/30"
                   required
                 />
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="password" className="text-white/80 text-xs">Senha</Label>
+              <Label htmlFor="password" className="text-white/90 text-xs font-medium">Senha</Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60" />
                 <Input
                   id="password"
                   type="password"
@@ -193,7 +193,7 @@ const EmailAuthForm: React.FC = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="pl-10 h-12 bg-white/5 border-white/15 text-white placeholder:text-white/30"
+                  className="pl-10 h-12 bg-white/10 border-white/25 text-white placeholder:text-white/45 focus:border-netflix-red/80 focus:ring-1 focus:ring-netflix-red/30"
                   minLength={6}
                   required
                 />
