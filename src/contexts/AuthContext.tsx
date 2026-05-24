@@ -5,6 +5,7 @@ import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { registerDevice, findPinIdByCode, touchDevice } from "@/services/devicesService";
 import { getPinByCode, updatePinSelf } from "@/services/pinService";
+import { resolveAvatar, getAvatarId } from "@/lib/avatars";
 
 interface AuthContextType {
   isLoggedIn: boolean;
