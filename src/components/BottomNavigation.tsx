@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 const BottomNavigation: React.FC = () => {
   const location = useLocation();
-  const { isAdmin } = useAuth();
+  const { isAdmin, avatar } = useAuth();
   const isMoviesActive = location.pathname === "/" || location.pathname.startsWith("/movie");
   const isSeriesActive = location.pathname.startsWith("/series");
   const isLiveTVActive = location.pathname.startsWith("/livetv");
