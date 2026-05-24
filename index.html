@@ -37,7 +37,7 @@
     <meta name="referrer" content="strict-origin-when-cross-origin" />
 
     <!-- Permissions Policy: desliga APIs sensíveis do navegador que o app não usa. -->
-    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()" />
+    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=(self https://js.stripe.com https://*.stripe.com), usb=(), magnetometer=(), gyroscope=(), accelerometer=()" />
 
     <!-- X-Content-Type-Options simulado (a versão header é a que conta de verdade). -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
