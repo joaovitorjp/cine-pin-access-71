@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { getHomeBanners, HomeBanner } from "@/services/bannerService";
+import SafeImage from "@/components/SafeImage";
 
 const HomeBannerCarousel: React.FC = () => {
   const [banners, setBanners] = useState<HomeBanner[]>([]);
