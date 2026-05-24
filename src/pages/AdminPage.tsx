@@ -261,12 +261,13 @@ const AdminPage: React.FC = () => {
             <div className="flex justify-center">
               <TabsList className="w-full max-w-3xl flex-wrap h-auto">
                 <TabsTrigger 
-                  value="pins" 
+                  value="background" 
                   className="flex items-center justify-center gap-2 flex-1 py-2 px-2 text-xs sm:text-sm"
                 >
-                  <Key className="w-4 h-4 flex-shrink-0" />
-                  <span className="truncate">PINs</span>
+                  <ImageIcon className="w-4 h-4 flex-shrink-0" />
+                  <span className="truncate">Fundo</span>
                 </TabsTrigger>
+
                 <TabsTrigger 
                   value="background" 
                   className="flex items-center justify-center gap-2 flex-1 py-2 px-2 text-xs sm:text-sm"
