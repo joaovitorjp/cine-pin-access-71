@@ -21,7 +21,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const isPlayerPage = location.pathname.includes("/player/");
   const isListing = LISTING_ROUTES.includes(location.pathname);
 
-  const needsAvatar = isLoggedIn && !isAdmin && !loading && !avatar;
+  const needsAvatar = isLoggedIn && !isAdmin && !loading && !isValidAvatar(avatar);
 
   if (!isLoggedIn) {
     return (
