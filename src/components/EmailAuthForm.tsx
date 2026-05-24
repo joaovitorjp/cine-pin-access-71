@@ -114,7 +114,7 @@ const EmailAuthForm: React.FC = () => {
     <div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden">
       {/* Background dos pôsteres passando (mantido obrigatório) */}
       <FeaturedLoginCarousel />
-      <div className="fixed inset-0 z-10 bg-gradient-to-b from-black/50 via-black/30 to-black/65 pointer-events-none" />
+      <div className="fixed inset-0 z-10 bg-gradient-to-b from-black/35 via-black/15 to-black/45 pointer-events-none" />
 
       <div className="relative z-20 w-full max-w-md px-4 py-10">
         <div className="flex flex-col items-center mb-8">
@@ -125,7 +125,7 @@ const EmailAuthForm: React.FC = () => {
           <p className="text-sm text-white/60 mt-1">Filmes, séries e TV ao vivo</p>
         </div>
 
-        <div className="rounded-2xl border border-white/15 bg-black/50 backdrop-blur-2xl shadow-[0_25px_80px_-12px_rgba(0,0,0,0.6)] p-6 sm:p-8 ring-1 ring-white/10">
+        <div className="rounded-2xl border border-white/15 bg-black/30 backdrop-blur-xl shadow-[0_25px_80px_-12px_rgba(0,0,0,0.5)] p-6 sm:p-8 ring-1 ring-white/10">
           <div className="flex gap-2 mb-6 p-1 bg-white/10 rounded-xl border border-white/10">
             <button
               type="button"
