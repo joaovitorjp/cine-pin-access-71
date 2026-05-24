@@ -1,23 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { Movie, Series, LiveTV, PinAccess } from "@/types";
+import { Movie, Series, LiveTV } from "@/types";
 import { getAllMovies, deleteMovie } from "@/services/movieService";
 import { getAllSeries, deleteSeries } from "@/services/seriesService";
 import { getAllLiveTVChannels, deleteLiveTVChannel } from "@/services/liveTvService";
-import { getAllPins, deactivatePin, deletePin } from "@/services/pinService";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Trash, Edit, Plus, Film, Key, Tv, Sparkles, Image as ImageIcon, Star, Layout as LayoutIcon, LogOut, Inbox } from "lucide-react";
+import { Trash, Edit, Plus, Film, Tv, Sparkles, Image as ImageIcon, Star, Layout as LayoutIcon, LogOut, Inbox } from "lucide-react";
 import RequestsManager from "@/components/admin/RequestsManager";
 import CollectionsManager from "@/components/admin/CollectionsManager";
 import AdminNotificationsBell from "@/components/admin/AdminNotificationsBell";
 import AddEditMovieForm from "@/components/AddEditMovieForm";
 import BulkUploadMoviesForm from "@/components/BulkUploadMoviesForm";
-import CreatePinForm from "@/components/CreatePinForm";
-import EditPinForm from "@/components/EditPinForm";
-import { formatDate, isPinValid } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
 import AddEditSeriesForm from "@/components/AddEditSeriesForm";
 import AddEditLiveTVForm from "@/components/AddEditLiveTVForm";
@@ -28,6 +24,7 @@ import FeaturedLoginManager from "@/components/FeaturedLoginManager";
 import BannerManager from "@/components/BannerManager";
 import AdminSearchBar from "@/components/AdminSearchBar";
 import { ChevronLeft } from "lucide-react";
+
 
 const AdminPage: React.FC = () => {
   const { isAdmin, isLoggedIn, logout } = useAuth();
