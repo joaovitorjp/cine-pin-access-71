@@ -11,6 +11,7 @@ import { FavoritesProvider } from "@/contexts/FavoritesContext";
 import { HistoryProvider } from "@/contexts/HistoryContext";
 import { WatchProgressProvider } from "@/contexts/WatchProgressContext";
 import { PreferencesProvider } from "@/contexts/PreferencesContext";
+import { WalletProvider } from "@/contexts/WalletContext";
 import Layout from "@/components/Layout";
 import HomePage from "@/pages/HomePage";
 import { SearchProvider } from "@/contexts/SearchContext";
@@ -42,6 +43,7 @@ const App = () => (
             <HistoryProvider>
               <WatchProgressProvider>
                 <PreferencesProvider>
+                  <WalletProvider>
                   <BrowserRouter>
                     <SearchProvider>
                       <Layout>
@@ -66,6 +68,7 @@ const App = () => (
                       </Layout>
                     </SearchProvider>
                   </BrowserRouter>
+                  </WalletProvider>
                 </PreferencesProvider>
               </WatchProgressProvider>
             </HistoryProvider>

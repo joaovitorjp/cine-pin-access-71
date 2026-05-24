@@ -13,6 +13,8 @@ import PlayerActions from "@/components/PlayerActions";
 import Suggestions from "@/components/Suggestions";
 import { useTrackWatchProgress } from "@/hooks/useTrackWatchProgress";
 import { makeMovieProgressId } from "@/contexts/WatchProgressContext";
+import { useWallet } from "@/contexts/WalletContext";
+import MoviePaywall from "@/components/MoviePaywall";
 
 
 const PlayerPage: React.FC = () => {
@@ -24,6 +26,8 @@ const PlayerPage: React.FC = () => {
   const navigate = useNavigate();
   const { isLoggedIn } = useAuth();
   const { addToHistory } = useHistory();
+  const { isUnlocked } = useWallet();
+  const unlocked = movie ? isUnlocked(movie.id) : false;
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -105,7 +109,19 @@ const PlayerPage: React.FC = () => {
 
   return (
     <div className="bg-black min-h-screen pb-24">
-      {movie && <VideoPlayer videoUrl={videoUrl} posterUrl={movie.imageUrl} />}
+      {movie && (
+        <div className="relative w-full">
+          <VideoPlayer videoUrl={videoUrl} posterUrl={movie.imageUrl} />
+          {!unlocked && (
+            <MoviePaywall
+              movieId={movie.id}
+              movieTitle={movie.title}
+              posterUrl={movie.imageUrl}
+              onUnlocked={() => { /* re-render via wallet state */ }}
+            />
+          )}
+        </div>
+      )}
       {movie && (
         <div className="container mx-auto px-4 py-6 space-y-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
