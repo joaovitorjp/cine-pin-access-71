@@ -38,6 +38,12 @@ export const useAuth = () => useContext(AuthContext);
 
 const SESSION_ID_KEY = "cf_session_id";
 
+type ClaimedProfile = {
+  display_name: string | null;
+  avatar: string | null;
+  active_session_id: string | null;
+};
+
 const ensureSessionId = (): string => {
   let id = localStorage.getItem(SESSION_ID_KEY);
   if (!id) {
@@ -58,6 +64,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [profileLoaded, setProfileLoaded] = useState(false);
   const sessionIdRef = useRef<string>(ensureSessionId());
   const claimedRef = useRef<boolean>(false);
+  const activeUserRef = useRef<string>("");
+  const profileRequestRef = useRef<Promise<void> | null>(null);
 
   // Bootstrap admin from localStorage
   useEffect(() => {
@@ -78,60 +86,109 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Supabase auth listener + single-device claim
   useEffect(() => {
-    const claimSession = async (uid: string) => {
-      const sid = sessionIdRef.current;
-      const { error } = await supabase
-        .from("profiles")
-        .update({ active_session_id: sid })
-        .eq("id", uid);
-      if (!error) claimedRef.current = true;
+    let cancelled = false;
+
+    const displayNameFromUser = (authUser: User) =>
+      authUser.user_metadata?.display_name ||
+      authUser.user_metadata?.full_name ||
+      authUser.email?.split("@")[0] ||
+      "";
+
+    const resetProfileState = () => {
+      claimedRef.current = false;
+      activeUserRef.current = "";
+      profileRequestRef.current = null;
+      setProfileLoaded(false);
+      setClientName("");
+      setAvatar("");
     };
 
-    const loadProfile = async (uid: string) => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("display_name, avatar")
-        .eq("id", uid)
-        .maybeSingle();
-      if (data) {
-        setClientName(data.display_name || "");
-        setAvatar(resolveAvatar(data.avatar || ""));
-      }
-      setProfileLoaded(true);
+    const claimAndLoadProfile = async (authSession: Session) => {
+      const uid = authSession.user.id;
+      if (activeUserRef.current === uid && claimedRef.current) return;
+      if (profileRequestRef.current) return profileRequestRef.current;
+
+      activeUserRef.current = uid;
+      setProfileLoaded(false);
+
+      const request = (async () => {
+        const sid = sessionIdRef.current;
+        const rpc = supabase.rpc as unknown as (
+          fn: string,
+          args: Record<string, unknown>
+        ) => Promise<{ data: ClaimedProfile[] | null; error: Error | null }>;
+
+        const { data, error } = await rpc("claim_user_session", { _session_id: sid });
+
+        let profile = data?.[0] ?? null;
+
+        if (error) {
+          const fallbackName = displayNameFromUser(authSession.user);
+          await supabase.from("profiles").upsert(
+            { id: uid, display_name: fallbackName, active_session_id: sid },
+            { onConflict: "id" }
+          );
+          const { data: fallback } = await supabase
+            .from("profiles")
+            .select("display_name, avatar, active_session_id")
+            .eq("id", uid)
+            .maybeSingle();
+          profile = fallback ?? null;
+        }
+
+        if (cancelled || activeUserRef.current !== uid) return;
+
+        claimedRef.current = true;
+        setClientName(profile?.display_name || displayNameFromUser(authSession.user));
+        setAvatar(resolveAvatar(profile?.avatar || ""));
+        setProfileLoaded(true);
+      })()
+        .catch((error) => {
+          console.error("Erro ao carregar perfil:", error);
+          if (!cancelled && activeUserRef.current === uid) {
+            setClientName(displayNameFromUser(authSession.user));
+            setAvatar("");
+            setProfileLoaded(true);
+          }
+        })
+        .finally(() => {
+          if (profileRequestRef.current === request) profileRequestRef.current = null;
+        });
+
+      profileRequestRef.current = request;
+      return request;
     };
 
-    const { data: sub } = supabase.auth.onAuthStateChange((event, newSession) => {
+    const applySession = (newSession: Session | null) => {
       setSession(newSession);
       setUser(newSession?.user ?? null);
       if (newSession?.user) {
-        const uid = newSession.user.id;
-        // Defer to avoid deadlocks
-        setTimeout(() => {
-          claimSession(uid).catch(() => undefined);
-          loadProfile(uid).catch(() => undefined);
-        }, 0);
+        setLoading(false);
+        claimAndLoadProfile(newSession).catch(() => undefined);
       } else {
-        claimedRef.current = false;
-        setProfileLoaded(false);
-        setClientName("");
-        setAvatar("");
+        resetProfileState();
+        setLoading(false);
       }
+    };
+
+    const { data: sub } = supabase.auth.onAuthStateChange((event, newSession) => {
+      if (event === "SIGNED_OUT" || !newSession) {
+        applySession(null);
+        return;
+      }
+      // Defer DB work to avoid auth callback deadlocks.
+      setTimeout(() => applySession(newSession), 0);
     });
 
     supabase.auth.getSession().then(({ data: { session: s } }) => {
-      setSession(s);
-      setUser(s?.user ?? null);
-      if (s?.user) {
-        const uid = s.user.id;
-        claimSession(uid).catch(() => undefined);
-        loadProfile(uid).catch(() => undefined);
-      } else {
-        setProfileLoaded(true);
-      }
-      setLoading(false);
+      applySession(s);
+      if (!s) setProfileLoaded(true);
     });
 
-    return () => sub.subscription.unsubscribe();
+    return () => {
+      cancelled = true;
+      sub.subscription.unsubscribe();
+    };
   }, []);
 
   // Realtime: detect when another device takes over the session
