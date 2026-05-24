@@ -120,7 +120,7 @@ const BottomNavigation: React.FC = () => {
                 <span className={`text-xs mt-1 transition-all duration-300 ${
                   isInfoActive ? 'opacity-100' : 'opacity-70'
                 }`}>
-                  Info
+                  Perfil
                 </span>
               </div>
             </Link>
