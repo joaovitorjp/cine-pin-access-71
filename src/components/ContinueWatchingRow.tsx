@@ -38,14 +38,10 @@ const ContinueWatchingRow: React.FC = () => {
             >
               <Link to={getLink(it)} className="block">
                 <div className="relative aspect-video bg-muted">
-                  <img
+                  <SafeImage
                     src={it.imageUrl}
                     alt={it.title}
                     className="w-full h-full object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src =
-                        "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b";
-                    }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
