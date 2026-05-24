@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Series } from "@/types";
 import { getAllSeries } from "@/services/seriesService";
 import SeriesCard from "@/components/SeriesCard";
-import PinLoginForm from "@/components/PinLoginForm";
+import EmailAuthForm from "@/components/EmailAuthForm";
 import { useAuth } from "@/contexts/AuthContext";
 import SearchBar from "@/components/SearchBar";
 import GenreFilter from "@/components/GenreFilter";
@@ -88,7 +88,7 @@ const SeriesPage: React.FC = () => {
   if (!isLoggedIn) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
-        <PinLoginForm />
+        <EmailAuthForm />
       </div>
     );
   }

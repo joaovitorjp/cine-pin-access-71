@@ -14,24 +14,13 @@ import AvatarPickerDialog from "@/components/AvatarPickerDialog";
 import { toast } from "@/components/ui/use-toast";
 
 const ClientInfo: React.FC = () => {
-  const { clientName, daysRemaining, logout, isAdmin, avatar, updateAvatar } = useAuth();
+  const { clientName, logout, isAdmin, avatar, updateAvatar } = useAuth();
   const [pickerOpen, setPickerOpen] = useState(false);
   const { favoriteMovies, favoriteSeries, favoriteLiveTV } = useFavorites();
   const { history } = useHistory();
 
   const totalFavorites = favoriteMovies.length + favoriteSeries.length + favoriteLiveTV.length;
 
-  const formatDaysRemaining = (days: number) => {
-    if (days === 0) return "Expira hoje";
-    if (days === 1) return "1 dia restante";
-    return `${days} dias restantes`;
-  };
-
-  const getStatusColor = (days: number) => {
-    if (days <= 3) return "text-red-500";
-    if (days <= 7) return "text-yellow-500";
-    return "text-green-500";
-  };
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -74,37 +63,6 @@ const ClientInfo: React.FC = () => {
                 )}
               </div>
 
-              {isAdmin && (
-                <>
-                  <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center">
-                        <Calendar className="w-6 h-6 text-green-500" />
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground">Status da Assinatura</p>
-                        <p className={`font-semibold text-lg ${getStatusColor(daysRemaining)}`}>
-                          {formatDaysRemaining(daysRemaining)}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center">
-                        <Clock className="w-6 h-6 text-blue-500" />
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground">Renovação Necessária</p>
-                        <p className="font-semibold text-lg">
-                          {daysRemaining <= 7 ? "Em breve" : "Não necessária"}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </>
-              )}
             </div>
 
             <div className="pt-4 border-t">
@@ -179,10 +137,9 @@ const ClientInfo: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-3 text-sm text-muted-foreground">
-              <p>• Apenas um dispositivo pode estar logado por vez com este PIN.</p>
-              <p>• Se você fizer login em outro dispositivo, este será desconectado automaticamente.</p>
-              <p>• Para renovar seu acesso, entre em contato com o administrador.</p>
-              <p>• Mantenha seu PIN seguro e não compartilhe com outras pessoas.</p>
+              <p>• Apenas um dispositivo pode estar logado por vez nesta conta.</p>
+              <p>• Se você entrar em outro dispositivo, este será desconectado automaticamente.</p>
+              <p>• Mantenha sua senha segura e não compartilhe com outras pessoas.</p>
             </div>
           </CardContent>
         </Card>

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { LiveTV } from "@/types";
 import { getAllLiveTVChannels } from "@/services/liveTvService";
 import LiveTVCard from "@/components/LiveTVCard";
-import PinLoginForm from "@/components/PinLoginForm";
+import EmailAuthForm from "@/components/EmailAuthForm";
 import { useAuth } from "@/contexts/AuthContext";
 import SearchBar from "@/components/SearchBar";
 import GenreFilter from "@/components/GenreFilter";
@@ -82,7 +82,7 @@ const LiveTVPage: React.FC = () => {
   if (!isLoggedIn) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
-        <PinLoginForm />
+        <EmailAuthForm />
       </div>
     );
   }
