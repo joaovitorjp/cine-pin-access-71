@@ -1,11 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Gauge, PictureInPicture2 } from "lucide-react";
-import { PLAYBACK_SPEEDS, usePreferences } from "@/contexts/PreferencesContext";
-import { toast } from "@/components/ui/use-toast";
+import React, { useEffect, useRef } from "react";
+import { usePreferences } from "@/contexts/PreferencesContext";
 
 interface VideoPlayerProps {
   videoUrl: string;
@@ -14,17 +8,8 @@ interface VideoPlayerProps {
 
 const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, posterUrl }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { playbackSpeed, setPlaybackSpeed } = usePreferences();
-  const [currentSpeed, setCurrentSpeed] = useState<number>(playbackSpeed);
-  const [iframeLoaded, setIframeLoaded] = useState(false);
-  const [iframeError, setIframeError] = useState(false);
-  const [videoError, setVideoError] = useState(false);
-  const [reloadKey, setReloadKey] = useState(0);
+  const { playbackSpeed } = usePreferences();
 
-  // Hardened URL validation: only allow https:// absolute URLs.
-  // Blocks javascript:, data:, vbscript:, file:, http:, relative paths, etc.
   const isSafeUrl = (() => {
     if (typeof videoUrl !== "string" || videoUrl.trim() === "") return false;
     try {
@@ -35,13 +20,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, posterUrl }) => {
     }
   })();
 
-  if (!isSafeUrl) {
-    return (
-      <div className="w-full aspect-video flex items-center justify-center bg-black text-netflix-gray text-sm px-4 text-center">
-        URL de vídeo inválida ou insegura. Apenas links HTTPS são permitidos.
-      </div>
-    );
-  }
+  if (!isSafeUrl) return null;
 
   const isDirectVideo = videoUrl.match(/\.(mp4|webm|ogg|avi|mov|wmv|flv|m3u8)(\?.*)?$/i);
   const isHLS = videoUrl.includes(".m3u8");
@@ -50,122 +29,14 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, posterUrl }) => {
     if (isHLS && videoRef.current) videoRef.current.src = videoUrl;
   }, [videoUrl, isHLS]);
 
-  // Apply saved playback speed to HTML5 video
   useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.playbackRate = playbackSpeed;
-      setCurrentSpeed(playbackSpeed);
-    }
+    if (videoRef.current) videoRef.current.playbackRate = playbackSpeed;
   }, [playbackSpeed, isDirectVideo]);
-
-  const handleSpeedChange = (s: number) => {
-    setPlaybackSpeed(s as any);
-    setCurrentSpeed(s);
-    if (videoRef.current) videoRef.current.playbackRate = s;
-    toast({ title: `Velocidade ${s}x` });
-  };
-
-  const enterPiP = async () => {
-    try {
-      if (videoRef.current && document.pictureInPictureEnabled) {
-        if (document.pictureInPictureElement) {
-          await document.exitPictureInPicture();
-        } else {
-          await videoRef.current.requestPictureInPicture();
-        }
-      } else if (iframeRef.current) {
-        // Best-effort: try fullscreen as PiP fallback for iframes (cross-origin PiP not controllable)
-        if (iframeRef.current.requestFullscreen) {
-          await iframeRef.current.requestFullscreen();
-        } else {
-          toast({
-            title: "PiP indisponível",
-            description: "Este player externo não permite controle de PiP a partir do app.",
-            variant: "destructive",
-          });
-        }
-      }
-    } catch {
-      toast({ title: "Não foi possível ativar o PiP", variant: "destructive" });
-    }
-  };
-
-  // Floating controls overlay
-  const Controls = (
-    <div className="absolute top-2 right-2 z-10 flex gap-1">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            size="sm"
-            variant="secondary"
-            className="h-8 px-2 bg-black/60 text-white hover:bg-black/80 backdrop-blur"
-          >
-            <Gauge className="w-4 h-4 mr-1" /> {currentSpeed}x
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          {PLAYBACK_SPEEDS.map((s) => (
-            <DropdownMenuItem key={s} onClick={() => handleSpeedChange(s)}>
-              {s}x {currentSpeed === s && "✓"}
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
-      <Button
-        size="sm"
-        variant="secondary"
-        onClick={enterPiP}
-        className="h-8 px-2 bg-black/60 text-white hover:bg-black/80 backdrop-blur"
-        title="Picture-in-Picture"
-      >
-        <PictureInPicture2 className="w-4 h-4" />
-      </Button>
-    </div>
-  );
-
-  const retryPlayback = () => {
-    setIframeError(false);
-    setIframeLoaded(false);
-    setVideoError(false);
-    setReloadKey((k) => k + 1);
-  };
-
-  const ErrorOverlay = ({ message }: { message: string }) => (
-    <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 bg-black/90 text-center px-4">
-      {posterUrl && (
-        <img
-          src={posterUrl}
-          alt=""
-          aria-hidden
-          className="absolute inset-0 w-full h-full object-cover opacity-20"
-          onError={(e) => ((e.target as HTMLImageElement).style.display = "none")}
-        />
-      )}
-      <p className="text-white text-sm relative z-10">{message}</p>
-      <Button size="sm" variant="secondary" onClick={retryPlayback} className="relative z-10">
-        Tentar novamente
-      </Button>
-    </div>
-  );
-
-  // Iframe load timeout fallback (15s)
-  useEffect(() => {
-    if (isDirectVideo) return;
-    setIframeLoaded(false);
-    setIframeError(false);
-    const t = window.setTimeout(() => {
-      setIframeError((prev) => prev || !iframeLoaded);
-    }, 15000);
-    return () => window.clearTimeout(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [videoUrl, reloadKey]);
 
   if (isDirectVideo) {
     return (
-      <div className="relative w-full aspect-video" ref={containerRef}>
-        {Controls}
+      <div className="relative w-full aspect-video bg-black">
         <video
-          key={reloadKey}
           ref={videoRef}
           className="w-full h-full absolute inset-0 bg-black"
           controls
@@ -173,45 +44,24 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, posterUrl }) => {
           onLoadedMetadata={() => {
             if (videoRef.current) videoRef.current.playbackRate = playbackSpeed;
           }}
-          onError={() => setVideoError(true)}
         >
           <source src={videoUrl} type={isHLS ? "application/x-mpegURL" : "video/mp4"} />
-          Seu navegador não suporta a reprodução deste vídeo.
         </video>
-        {videoError && (
-          <ErrorOverlay message="Não foi possível carregar o vídeo. Verifique sua conexão." />
-        )}
       </div>
     );
   }
 
   return (
-    <div className="w-full">
-      <div className="relative w-full aspect-video bg-black" ref={containerRef}>
-        {Controls}
-        {!iframeLoaded && !iframeError && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black z-10">
-            <div className="animate-pulse text-netflix-gray text-sm">Carregando player...</div>
-          </div>
-        )}
-        <iframe
-          key={reloadKey}
-          ref={iframeRef}
-          src={videoUrl}
-          className="w-full h-full absolute inset-0"
-          allowFullScreen
-          referrerPolicy="no-referrer"
-          allow="autoplay; encrypted-media; picture-in-picture"
-          sandbox="allow-same-origin allow-scripts allow-forms allow-pointer-lock allow-top-navigation"
-          style={{ border: "none" }}
-          loading="lazy"
-          onLoad={() => setIframeLoaded(true)}
-          onError={() => setIframeError(true)}
-        />
-        {iframeError && (
-          <ErrorOverlay message="Falha ao carregar o player. A mídia pode estar indisponível ou o Drive bloqueou o acesso." />
-        )}
-      </div>
+    <div className="relative w-full aspect-video bg-black">
+      <iframe
+        src={videoUrl}
+        className="w-full h-full absolute inset-0"
+        allowFullScreen
+        referrerPolicy="no-referrer"
+        allow="autoplay; encrypted-media; picture-in-picture"
+        sandbox="allow-same-origin allow-scripts allow-forms allow-pointer-lock allow-top-navigation"
+        style={{ border: "none" }}
+      />
     </div>
   );
 };
