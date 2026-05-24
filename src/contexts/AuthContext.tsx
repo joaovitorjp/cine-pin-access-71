@@ -158,11 +158,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         
         // Fetch full pin record to recover the stored avatar (if any)
-        let storedAvatar = "";
+        let storedAvatarRaw = "";
         try {
           const fullPin = await getPinByCode(pin);
-          storedAvatar = fullPin?.avatar || "";
+          storedAvatarRaw = fullPin?.avatar || "";
         } catch { /* ignore */ }
+        // Normalize to stable id when possible for persistence
+        const avatarForStorage = getAvatarId(storedAvatarRaw) || storedAvatarRaw;
 
         // Save auth state with session info
         const authState = {
@@ -172,7 +174,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           clientName: pinData.clientName,
           pinCode: pin,
           sessionId: pinData.sessionId,
-          avatar: storedAvatar,
+          avatar: avatarForStorage,
         };
         localStorage.setItem("authState", JSON.stringify(authState));
 
@@ -186,7 +188,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setIsLoggedIn(true);
         setIsAdmin(false);
         setClientName(pinData.clientName);
-        setAvatar(storedAvatar);
+        setAvatar(resolveAvatar(storedAvatarRaw));
         setDaysRemaining(Math.max(0, diffDays));
         
         toast({
