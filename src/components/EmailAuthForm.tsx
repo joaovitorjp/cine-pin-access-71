@@ -42,7 +42,10 @@ const EmailAuthForm: React.FC = () => {
       if (mode === "signin") {
         const parsed = signInSchema.safeParse({ email, password });
         if (!parsed.success) throw new Error(parsed.error.errors[0].message);
-        const { error } = await supabase.auth.signInWithPassword(parsed.data);
+        const { error } = await supabase.auth.signInWithPassword({
+          email: parsed.data.email,
+          password: parsed.data.password,
+        });
         if (error) {
           if (error.message.toLowerCase().includes("email not confirmed")) {
             throw new Error("Confirme seu email antes de entrar. Verifique sua caixa de entrada.");
