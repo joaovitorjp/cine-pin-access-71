@@ -104,14 +104,15 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="container mx-auto py-4 px-3 sm:px-4">
-      <ContinueWatchingRow items={allItems} movies={movies} series={seriesList} />
+      <ContinueWatchingRow />
       <EditorsCollectionsSection movies={movies} series={seriesList} />
       <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
         <h1 className="text-2xl sm:text-3xl font-bold">Filmes</h1>
         <RequestContentDialog />
       </div>
-      <MoodFilter selected={selectedMood} onChange={setSelectedMood} />
-      <GenreFilter genres={genres} selected={selectedGenre} onSelect={setSelectedGenre} />
+      <MoodFilter selected={selectedMood} onSelect={setSelectedMood} />
+      <GenreFilter genres={genres} selectedGenre={selectedGenre} onGenreSelect={setSelectedGenre} />
+
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 mt-4">
         {filteredMovies.map((movie) => <MovieCard key={movie.id} movie={movie} />)}
       </div>
