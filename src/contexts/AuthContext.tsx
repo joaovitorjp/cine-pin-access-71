@@ -245,6 +245,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // Update avatar (persist in Firebase + local session)
+  const updateAvatar = async (url: string) => {
+    const stored = localStorage.getItem("authState");
+    if (!stored) return;
+    const parsed = JSON.parse(stored);
+    const pinCode = parsed?.pinCode as string | undefined;
+    if (!pinCode) return;
+    const pin = await getPinByCode(pinCode);
+    if (!pin) throw new Error("PIN não encontrado");
+    await updatePinSelf(pin.id, { avatar: url });
+    parsed.avatar = url;
+    localStorage.setItem("authState", JSON.stringify(parsed));
+    setAvatar(url);
+  };
+
   // Logout
   const logout = () => {
     const wasAdmin = isAdmin;
@@ -267,9 +282,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         clientName,
         daysRemaining,
         adminUsername,
+        avatar,
         loginWithPin,
         loginAsAdmin,
         logout,
+        updateAvatar,
       }}
     >
       {children}
