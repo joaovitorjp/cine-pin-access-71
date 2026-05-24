@@ -114,7 +114,7 @@ const EmailAuthForm: React.FC = () => {
     <div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden">
       {/* Background dos pôsteres passando (mantido obrigatório) */}
       <FeaturedLoginCarousel />
-      <div className="fixed inset-0 z-10 bg-gradient-to-b from-black/85 via-black/80 to-black/95 pointer-events-none" />
+      <div className="fixed inset-0 z-10 bg-gradient-to-b from-black/50 via-black/30 to-black/65 pointer-events-none" />
 
       <div className="relative z-20 w-full max-w-md px-4 py-10">
         <div className="flex flex-col items-center mb-8">
