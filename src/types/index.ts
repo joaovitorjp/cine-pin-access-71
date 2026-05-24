@@ -46,17 +46,3 @@ export interface Episode {
   description?: string;
   thumbnail?: string;
 }
-
-// PIN type
-export interface PinAccess {
-  id: string;
-  pin: string;
-  expiryDate: string;
-  createdAt: string;
-  daysValid: number;
-  isActive: boolean;
-  clientName: string;
-  sessionId?: string;
-  createdBy?: string;
-  avatar?: string;
-}
