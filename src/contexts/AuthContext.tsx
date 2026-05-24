@@ -199,11 +199,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       .on(
         "postgres_changes",
         { event: "UPDATE", schema: "public", table: "profiles", filter: `id=eq.${user.id}` },
-        (payload) => {
-          // Ignore events that fire before we've successfully claimed our own session.
+        async (payload) => {
+          // Ignore avatar/name updates and events that fire before our own claim is stable.
           if (!claimedRef.current) return;
-          const remote = (payload.new as { active_session_id?: string })?.active_session_id;
-          if (remote && remote !== sessionIdRef.current) {
+          const previous = (payload.old as { active_session_id?: string | null })?.active_session_id;
+          const remote = (payload.new as { active_session_id?: string | null })?.active_session_id;
+          if (!remote || remote === sessionIdRef.current || remote === previous) return;
+
+          const { data } = await supabase
+            .from("profiles")
+            .select("active_session_id")
+            .eq("id", user.id)
+            .maybeSingle();
+
+          if (data?.active_session_id && data.active_session_id !== sessionIdRef.current) {
             toast({
               title: "Sessão encerrada",
               description: "Sua conta foi acessada em outro dispositivo.",
@@ -266,9 +275,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updateAvatar = async (value: string) => {
     if (!user) throw new Error("Não autenticado");
     const idToStore = getAvatarId(value) || value;
-    const { error } = await supabase.from("profiles").update({ avatar: idToStore }).eq("id", user.id);
+    const { data, error } = await supabase
+      .from("profiles")
+      .update({ avatar: idToStore })
+      .eq("id", user.id)
+      .select("avatar")
+      .maybeSingle();
     if (error) throw error;
-    setAvatar(resolveAvatar(idToStore));
+    if (!data) {
+      const { error: upsertError } = await supabase
+        .from("profiles")
+        .upsert({ id: user.id, display_name: clientName || user.email?.split("@")[0] || "", avatar: idToStore }, { onConflict: "id" });
+      if (upsertError) throw upsertError;
+    }
+    setAvatar(resolveAvatar(data?.avatar || idToStore));
+    setProfileLoaded(true);
   };
 
   const updateDisplayName = async (name: string) => {
