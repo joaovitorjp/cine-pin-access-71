@@ -239,7 +239,7 @@ const EmailAuthForm: React.FC = () => {
             )}
           </Button>
 
-          <p className="text-[11px] text-white/50 text-center mt-5 leading-relaxed">
+          <p className="text-[11px] text-white/60 text-center mt-5 leading-relaxed">
             {mode === "signup"
               ? "Ao criar a conta, você receberá um email de confirmação."
               : "Acesso liberado em 1 dispositivo por vez."}
