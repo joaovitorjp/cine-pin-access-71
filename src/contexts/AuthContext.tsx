@@ -8,6 +8,7 @@ interface AuthContextType {
   isLoggedIn: boolean;
   isAdmin: boolean;
   loading: boolean;
+  profileLoaded: boolean;
   clientName: string;
   adminUsername: string;
   avatar: string;
