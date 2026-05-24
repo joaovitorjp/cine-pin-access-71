@@ -217,9 +217,9 @@ const EmailAuthForm: React.FC = () => {
           </form>
 
           <div className="my-5 flex items-center gap-3">
-            <div className="h-px flex-1 bg-white/10" />
-            <span className="text-[10px] uppercase tracking-wider text-white/40">ou</span>
-            <div className="h-px flex-1 bg-white/10" />
+            <div className="h-px flex-1 bg-white/20" />
+            <span className="text-[10px] uppercase tracking-wider text-white/55">ou</span>
+            <div className="h-px flex-1 bg-white/20" />
           </div>
 
           <Button
