@@ -225,8 +225,8 @@ const AdminPage: React.FC = () => {
           moviesCount={movies.length} 
           seriesCount={series.length} 
           animesCount={liveTVChannels.length}
-          pinsCount={pins.length} 
         />
+
         
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="mb-6 space-y-3">
