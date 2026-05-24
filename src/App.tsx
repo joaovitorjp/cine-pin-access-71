@@ -29,6 +29,9 @@ const FavoritesPage = lazy(() => import("@/pages/FavoritesPage"));
 const HistoryPage = lazy(() => import("@/pages/HistoryPage"));
 const ClientInfo = lazy(() => import("@/components/ClientInfo"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const CheckoutReturn = lazy(() => import("@/pages/CheckoutReturn"));
+
+import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +50,7 @@ const App = () => (
                   <BrowserRouter>
                     <SearchProvider>
                       <Layout>
+                        <PaymentTestModeBanner />
                         <Suspense fallback={null}>
                           <Routes>
                             <Route path="/" element={<HomePage />} />
@@ -62,6 +66,7 @@ const App = () => (
                             <Route path="/info" element={<ClientInfo />} />
                             <Route path="/admin" element={<AdminPage />} />
                             <Route path="/admin-access" element={<AdminAccess />} />
+                            <Route path="/checkout/return" element={<CheckoutReturn />} />
                             <Route path="*" element={<NotFound />} />
                           </Routes>
                         </Suspense>
