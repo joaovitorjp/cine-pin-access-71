@@ -113,14 +113,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       const request = (async () => {
         const sid = sessionIdRef.current;
-        const rpc = supabase.rpc as unknown as (
-          fn: string,
-          args: Record<string, unknown>
-        ) => Promise<{ data: ClaimedProfile[] | null; error: Error | null }>;
+        const { data, error } = await (supabase.rpc as any)("claim_user_session", { _session_id: sid });
 
-        const { data, error } = await rpc("claim_user_session", { _session_id: sid });
+        let profile: ClaimedProfile | null = (data as ClaimedProfile[] | null)?.[0] ?? null;
 
-        let profile = data?.[0] ?? null;
 
         if (error) {
           const fallbackName = displayNameFromUser(authSession.user);
