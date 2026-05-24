@@ -80,7 +80,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const claimSession = async (uid: string) => {
       const sid = sessionIdRef.current;
-      await supabase.from("profiles").update({ active_session_id: sid }).eq("id", uid);
+      const { error } = await supabase
+        .from("profiles")
+        .update({ active_session_id: sid })
+        .eq("id", uid);
+      if (!error) claimedRef.current = true;
     };
 
     const loadProfile = async (uid: string) => {
@@ -93,6 +97,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setClientName(data.display_name || "");
         setAvatar(resolveAvatar(data.avatar || ""));
       }
+      setProfileLoaded(true);
     };
 
     const { data: sub } = supabase.auth.onAuthStateChange((event, newSession) => {
@@ -106,6 +111,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           loadProfile(uid).catch(() => undefined);
         }, 0);
       } else {
+        claimedRef.current = false;
+        setProfileLoaded(false);
         setClientName("");
         setAvatar("");
       }
@@ -118,6 +125,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const uid = s.user.id;
         claimSession(uid).catch(() => undefined);
         loadProfile(uid).catch(() => undefined);
+      } else {
+        setProfileLoaded(true);
       }
       setLoading(false);
     });
