@@ -703,48 +703,8 @@ const AdminPage: React.FC = () => {
             </ScrollArea>
           </DialogContent>
         </Dialog>
-        
-        <Dialog open={showCreatePinModal} onOpenChange={setShowCreatePinModal}>
-          <DialogContent className="w-[95vw] max-w-[425px] max-h-[90vh] bg-netflix-dark text-white">
-            <DialogHeader>
-              <DialogTitle className="text-lg">Criar Novo PIN de Acesso</DialogTitle>
-            </DialogHeader>
-            <ScrollArea className="max-h-[75vh] pr-4">
-              <CreatePinForm
-                onSuccess={() => {
-                  setShowCreatePinModal(false);
-                  handleRefreshData();
-                }}
-              />
-            </ScrollArea>
-          </DialogContent>
-        </Dialog>
 
-        <Dialog
-          open={showEditPinModal}
-          onOpenChange={(open) => {
-            setShowEditPinModal(open);
-            if (!open) setSelectedPin(null);
-          }}
-        >
-          <DialogContent className="w-[95vw] max-w-[480px] max-h-[90vh] bg-netflix-dark text-white">
-            <DialogHeader>
-              <DialogTitle className="text-lg">Editar PIN / Usuário</DialogTitle>
-            </DialogHeader>
-            <ScrollArea className="max-h-[75vh] pr-4">
-              {selectedPin && (
-                <EditPinForm
-                  pin={selectedPin}
-                  onSuccess={() => {
-                    setShowEditPinModal(false);
-                    setSelectedPin(null);
-                    handleRefreshData();
-                  }}
-                />
-              )}
-            </ScrollArea>
-          </DialogContent>
-        </Dialog>
+
       </div>
     </div>
   );
