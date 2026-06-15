@@ -62,27 +62,6 @@ export type Database = {
         }
         Relationships: []
       }
-      movie_unlocks: {
-        Row: {
-          created_at: string
-          id: string
-          movie_id: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          movie_id: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          movie_id?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       profiles: {
         Row: {
           active_session_id: string | null
@@ -110,77 +89,17 @@ export type Database = {
         }
         Relationships: []
       }
-      wallet_transactions: {
-        Row: {
-          amount: number
-          created_at: string
-          id: string
-          kind: string
-          reference: string | null
-          user_id: string
-        }
-        Insert: {
-          amount: number
-          created_at?: string
-          id?: string
-          kind: string
-          reference?: string | null
-          user_id: string
-        }
-        Update: {
-          amount?: number
-          created_at?: string
-          id?: string
-          kind?: string
-          reference?: string | null
-          user_id?: string
-        }
-        Relationships: []
-      }
-      wallets: {
-        Row: {
-          balance: number
-          created_at: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          balance?: number
-          created_at?: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          balance?: number
-          created_at?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      add_coins: { Args: { _amount: number }; Returns: number }
       claim_user_session: {
         Args: { _session_id: string }
         Returns: {
           active_session_id: string
           avatar: string
           display_name: string
-        }[]
-      }
-      credit_coins_from_payment: {
-        Args: { _amount: number; _reference: string; _user_id: string }
-        Returns: number
-      }
-      get_payment_pin: {
-        Args: { _payment_id: string }
-        Returns: {
-          generated_pin: string
-          status: string
         }[]
       }
       set_admin_password: {
@@ -190,14 +109,6 @@ export type Database = {
           _username: string
         }
         Returns: boolean
-      }
-      unlock_movie: {
-        Args: { _movie_id: string }
-        Returns: {
-          out_already: boolean
-          out_balance: number
-          out_unlocked: boolean
-        }[]
       }
       validate_admin_credentials: {
         Args: { _password: string; _username: string }

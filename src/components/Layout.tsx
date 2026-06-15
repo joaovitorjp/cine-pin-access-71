@@ -6,7 +6,7 @@ import SearchBar from "@/components/SearchBar";
 import HomeBannerCarousel from "@/components/HomeBannerCarousel";
 import { useSearch } from "@/contexts/SearchContext";
 import UserNotificationsBell from "@/components/UserNotificationsBell";
-import CoinBalanceBadge from "@/components/CoinBalanceBadge";
+
 import AvatarPickerDialog from "@/components/AvatarPickerDialog";
 import { toast } from "@/components/ui/use-toast";
 import logo from "@/assets/cineflex-logo.png";
@@ -44,7 +44,6 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 <span className="font-bold text-lg text-white tracking-wide">CINE FLEX</span>
               </div>
               <div className="flex items-center gap-2">
-                {!isAdmin && <CoinBalanceBadge />}
                 {!isAdmin && <UserNotificationsBell />}
               </div>
             </div>
