@@ -11,7 +11,6 @@ import { FavoritesProvider } from "@/contexts/FavoritesContext";
 import { HistoryProvider } from "@/contexts/HistoryContext";
 import { WatchProgressProvider } from "@/contexts/WatchProgressContext";
 import { PreferencesProvider } from "@/contexts/PreferencesContext";
-import { WalletProvider } from "@/contexts/WalletContext";
 import Layout from "@/components/Layout";
 import HomePage from "@/pages/HomePage";
 import { SearchProvider } from "@/contexts/SearchContext";
@@ -29,9 +28,6 @@ const FavoritesPage = lazy(() => import("@/pages/FavoritesPage"));
 const HistoryPage = lazy(() => import("@/pages/HistoryPage"));
 const ClientInfo = lazy(() => import("@/components/ClientInfo"));
 const NotFound = lazy(() => import("./pages/NotFound"));
-const CheckoutReturn = lazy(() => import("@/pages/CheckoutReturn"));
-
-import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 
 const queryClient = new QueryClient();
 
@@ -46,11 +42,9 @@ const App = () => (
             <HistoryProvider>
               <WatchProgressProvider>
                 <PreferencesProvider>
-                  <WalletProvider>
                   <BrowserRouter>
                     <SearchProvider>
                       <Layout>
-                        <PaymentTestModeBanner />
                         <Suspense fallback={null}>
                           <Routes>
                             <Route path="/" element={<HomePage />} />
@@ -66,14 +60,12 @@ const App = () => (
                             <Route path="/info" element={<ClientInfo />} />
                             <Route path="/admin" element={<AdminPage />} />
                             <Route path="/admin-access" element={<AdminAccess />} />
-                            <Route path="/checkout/return" element={<CheckoutReturn />} />
                             <Route path="*" element={<NotFound />} />
                           </Routes>
                         </Suspense>
                       </Layout>
                     </SearchProvider>
                   </BrowserRouter>
-                  </WalletProvider>
                 </PreferencesProvider>
               </WatchProgressProvider>
             </HistoryProvider>
