@@ -355,3 +355,75 @@
   25% { transform: translateX(-5px); }
   75% { transform: translateX(5px); }
 }
+
+/* ============================================================
+   TV MODE — SmartTV optimized layout (D-pad / 10-foot UI)
+   Activated by .tv-mode on <html> (see src/lib/tvMode.ts)
+   ============================================================ */
+html.tv-mode {
+  font-size: 20px; /* scales rem-based spacing/typography */
+}
+html.tv-mode body {
+  /* TV-safe area (~4% on each side) so nothing is clipped by overscan */
+  padding: 3vh 3vw;
+  background: #000;
+  cursor: none;
+}
+html.tv-mode .container {
+  max-width: 100% !important;
+}
+/* Hide UI not designed for TV (avatar dialog hover bits, hover-only tooltips) */
+html.tv-mode .hover\:scale-105:hover { transform: none; }
+
+/* Strong, always-visible focus ring for D-pad navigation */
+html.tv-mode *:focus,
+html.tv-mode *:focus-visible {
+  outline: 4px solid #e50914 !important;
+  outline-offset: 4px !important;
+  border-radius: 10px;
+  box-shadow: 0 0 0 8px rgba(229, 9, 20, 0.25), 0 12px 40px rgba(229, 9, 20, 0.45) !important;
+  transform: scale(1.06);
+  transition: transform 160ms ease, box-shadow 160ms ease;
+  z-index: 5;
+  position: relative;
+}
+
+/* Bigger cards & rows */
+html.tv-mode .grid {
+  gap: 1.5rem !important;
+}
+html.tv-mode h1 { font-size: 3rem !important; line-height: 1.1; }
+html.tv-mode h2 { font-size: 2.25rem !important; }
+html.tv-mode h3 { font-size: 1.5rem !important; }
+html.tv-mode p, html.tv-mode span, html.tv-mode a, html.tv-mode button { font-size: 1.05rem; }
+
+/* Bottom navigation → full-bar TV nav, bigger icons & labels */
+html.tv-mode nav,
+html.tv-mode .fixed.bottom-0 {
+  padding: 1rem 2rem !important;
+}
+html.tv-mode .fixed.bottom-0 svg {
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+}
+html.tv-mode .fixed.bottom-0 span {
+  font-size: 1rem !important;
+  margin-top: 0.5rem !important;
+}
+
+/* Movie/series card hover overlay always visible on TV (no hover on TV) */
+html.tv-mode .group .opacity-0.group-hover\:opacity-100 {
+  opacity: 1 !important;
+}
+
+/* Make tap targets at least 64px tall for D-pad comfort */
+html.tv-mode button,
+html.tv-mode a {
+  min-height: 3rem;
+}
+
+/* Disable smooth-scroll snap surprises */
+html.tv-mode * {
+  scroll-behavior: smooth;
+}
+
