@@ -1,6 +1,7 @@
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
+import { initTvMode } from './lib/tvMode'
 
 const applySavedThemeBeforeRender = () => {
   const keys = ["cineflex:theme", "theme:user", "theme:admin", "theme", "vite-ui-theme", "ui-theme"];
@@ -36,5 +37,6 @@ const applySavedThemeBeforeRender = () => {
 };
 
 applySavedThemeBeforeRender();
+initTvMode();
 
 createRoot(document.getElementById("root")!).render(<App />);
