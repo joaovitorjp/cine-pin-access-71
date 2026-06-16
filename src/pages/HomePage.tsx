@@ -105,7 +105,6 @@ const HomePage: React.FC = () => {
       <EditorsCollectionsSection movies={movies} series={seriesList} />
       <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
         <h1 className="text-2xl sm:text-3xl font-bold">Filmes</h1>
-        <RequestContentDialog />
       </div>
       <GenreFilter genres={genres} selectedGenre={selectedGenre} onGenreSelect={setSelectedGenre} />
 
