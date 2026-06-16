@@ -6,6 +6,9 @@ import SearchBar from "@/components/SearchBar";
 import HomeBannerCarousel from "@/components/HomeBannerCarousel";
 import { useSearch } from "@/contexts/SearchContext";
 import UserNotificationsBell from "@/components/UserNotificationsBell";
+import RequestContentDialog from "@/components/RequestContentDialog";
+import { Button } from "@/components/ui/button";
+import { MessageSquarePlus } from "lucide-react";
 
 import AvatarPickerDialog from "@/components/AvatarPickerDialog";
 import { toast } from "@/components/ui/use-toast";
@@ -44,6 +47,21 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 <span className="font-bold text-lg text-white tracking-wide">CINE FLEX</span>
               </div>
               <div className="flex items-center gap-2">
+                {!isAdmin && (
+                  <RequestContentDialog
+                    trigger={
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-white hover:bg-white/10"
+                        aria-label="Solicitar filme ou série"
+                        title="Solicitar filme ou série"
+                      >
+                        <MessageSquarePlus className="w-5 h-5" />
+                      </Button>
+                    }
+                  />
+                )}
                 {!isAdmin && <UserNotificationsBell />}
               </div>
             </div>

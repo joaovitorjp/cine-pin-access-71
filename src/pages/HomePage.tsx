@@ -10,7 +10,7 @@ import { getUniqueGenres, matchesGenre } from "@/lib/genre";
 import ContinueWatchingRow from "@/components/ContinueWatchingRow";
 
 import EditorsCollectionsSection from "@/components/EditorsCollectionsSection";
-import RequestContentDialog from "@/components/RequestContentDialog";
+
 import { getAllSeries } from "@/services/seriesService";
 import { Series } from "@/types";
 import { retry } from "@/lib/retry";
@@ -105,7 +105,6 @@ const HomePage: React.FC = () => {
       <EditorsCollectionsSection movies={movies} series={seriesList} />
       <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
         <h1 className="text-2xl sm:text-3xl font-bold">Filmes</h1>
-        <RequestContentDialog />
       </div>
       <GenreFilter genres={genres} selectedGenre={selectedGenre} onGenreSelect={setSelectedGenre} />
 
