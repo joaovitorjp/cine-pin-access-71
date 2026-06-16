@@ -6,6 +6,9 @@ import SearchBar from "@/components/SearchBar";
 import HomeBannerCarousel from "@/components/HomeBannerCarousel";
 import { useSearch } from "@/contexts/SearchContext";
 import UserNotificationsBell from "@/components/UserNotificationsBell";
+import RequestContentDialog from "@/components/RequestContentDialog";
+import { Button } from "@/components/ui/button";
+import { MessageSquarePlus } from "lucide-react";
 
 import AvatarPickerDialog from "@/components/AvatarPickerDialog";
 import { toast } from "@/components/ui/use-toast";

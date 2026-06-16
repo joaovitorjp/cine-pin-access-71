@@ -10,7 +10,7 @@ import { getUniqueGenres, matchesGenre } from "@/lib/genre";
 import ContinueWatchingRow from "@/components/ContinueWatchingRow";
 
 import EditorsCollectionsSection from "@/components/EditorsCollectionsSection";
-import RequestContentDialog from "@/components/RequestContentDialog";
+
 import { getAllSeries } from "@/services/seriesService";
 import { Series } from "@/types";
 import { retry } from "@/lib/retry";
