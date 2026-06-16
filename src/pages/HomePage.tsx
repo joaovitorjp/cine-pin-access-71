@@ -13,8 +13,6 @@ import EditorsCollectionsSection from "@/components/EditorsCollectionsSection";
 import RequestContentDialog from "@/components/RequestContentDialog";
 import { getAllSeries } from "@/services/seriesService";
 import { Series } from "@/types";
-import MoodFilter from "@/components/MoodFilter";
-import { MoodKey, matchesMood } from "@/lib/mood";
 import { retry } from "@/lib/retry";
 import CardGridSkeleton from "@/components/CardGridSkeleton";
 import { Button } from "@/components/ui/button";
@@ -28,7 +26,7 @@ const HomePage: React.FC = () => {
   const [error, setError] = useState("");
   const { query: searchQuery } = useSearch();
   const [selectedGenre, setSelectedGenre] = useState("all");
-  const [selectedMood, setSelectedMood] = useState<MoodKey | null>(null);
+  
   const { isLoggedIn, loading: authLoading } = useAuth();
   
 
@@ -67,10 +65,9 @@ const HomePage: React.FC = () => {
     let result = movies;
     if (searchQuery) result = result.filter((m) => m.title.toLowerCase().includes(searchQuery.toLowerCase()));
     if (selectedGenre !== "all") result = result.filter((m) => matchesGenre(m.genre, selectedGenre));
-    if (selectedMood) result = result.filter((m) => matchesMood(m, selectedMood));
     result = result.sort((a, b) => (parseInt(b.year || "0") - parseInt(a.year || "0")));
     setFilteredMovies(result);
-  }, [searchQuery, selectedGenre, selectedMood, movies]);
+  }, [searchQuery, selectedGenre, movies]);
 
   if (authLoading) {
     return (
@@ -110,7 +107,6 @@ const HomePage: React.FC = () => {
         <h1 className="text-2xl sm:text-3xl font-bold">Filmes</h1>
         <RequestContentDialog />
       </div>
-      <MoodFilter selected={selectedMood} onSelect={setSelectedMood} />
       <GenreFilter genres={genres} selectedGenre={selectedGenre} onGenreSelect={setSelectedGenre} />
 
       <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 xl:grid-cols-8 gap-2 sm:gap-3 mt-4">
