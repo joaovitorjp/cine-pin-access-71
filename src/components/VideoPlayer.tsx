@@ -44,8 +44,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, posterUrl }) => {
     }
   })();
 
-  if (!isSafeUrl) return null;
-
   const isDirectVideo = videoUrl.match(/\.(mp4|webm|ogg|avi|mov|wmv|flv|m3u8)(\?.*)?$/i);
   const isHLS = videoUrl.includes(".m3u8");
   const useExternalPlayerFallback = !isDirectVideo && isRunningInsideSandboxedFrame();
@@ -62,6 +60,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, posterUrl }) => {
   useEffect(() => {
     if (videoRef.current) videoRef.current.playbackRate = playbackSpeed;
   }, [playbackSpeed, isDirectVideo]);
+
+  if (!isSafeUrl) return null;
 
   if (isDirectVideo) {
     return (
