@@ -57,3 +57,9 @@ export const deleteLiveTVChannel = async (id: string): Promise<void> => {
   const liveTvRef = ref(database, `livetv/${id}`);
   await remove(liveTvRef);
 };
+
+// Delete ALL live TV channels
+export const deleteAllLiveTVChannels = async (): Promise<void> => {
+  const liveTvRef = ref(database, 'livetv');
+  await remove(liveTvRef);
+};

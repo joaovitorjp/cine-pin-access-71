@@ -58,3 +58,9 @@ export const deleteSeries = async (id: string): Promise<void> => {
   const seriesRef = ref(database, `series/${id}`);
   await remove(seriesRef);
 };
+
+// Delete ALL series
+export const deleteAllSeries = async (): Promise<void> => {
+  const seriesRef = ref(database, 'series');
+  await remove(seriesRef);
+};

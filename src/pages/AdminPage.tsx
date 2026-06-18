@@ -2,9 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Movie, Series, LiveTV } from "@/types";
-import { getAllMovies, deleteMovie } from "@/services/movieService";
-import { getAllSeries, deleteSeries } from "@/services/seriesService";
-import { getAllLiveTVChannels, deleteLiveTVChannel } from "@/services/liveTvService";
+import { getAllMovies, deleteMovie, deleteAllMovies } from "@/services/movieService";
+import { getAllSeries, deleteSeries, deleteAllSeries } from "@/services/seriesService";
+import { getAllLiveTVChannels, deleteLiveTVChannel, deleteAllLiveTVChannels } from "@/services/liveTvService";
+import * as XLSX from "xlsx";
+import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -180,6 +182,78 @@ const AdminPage: React.FC = () => {
     }
   };
 
+  const handleExportMovies = () => {
+    try {
+      const rows = movies.map((m) => [
+        m.title ?? "",
+        m.imageUrl ?? "",
+        m.videoUrl ?? "",
+        m.description ?? "",
+        m.year ?? "",
+        m.genre ?? "",
+        m.rating ?? "",
+      ]);
+      const ws = XLSX.utils.aoa_to_sheet(rows);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Filmes");
+      const ts = new Date().toISOString().slice(0, 10);
+      XLSX.writeFile(wb, `cineflex-filmes-${ts}.xlsx`);
+      toast({ title: "Exportação concluída", description: `${rows.length} filme(s) exportado(s).` });
+    } catch (e) {
+      console.error("Erro ao exportar filmes:", e);
+      toast({ title: "Erro", description: "Não foi possível exportar os filmes.", variant: "destructive" });
+    }
+  };
+
+  const confirmDeleteAll = (label: string, count: number) => {
+    if (count === 0) {
+      toast({ title: "Nada para excluir", description: `Não há ${label} cadastrados.` });
+      return false;
+    }
+    const first = window.confirm(
+      `ATENÇÃO: isso irá excluir TODOS os ${count} ${label} do banco de dados. Esta ação não pode ser desfeita. Deseja continuar?`
+    );
+    if (!first) return false;
+    const typed = window.prompt(`Digite EXCLUIR para confirmar a exclusão de todos os ${label}:`);
+    return typed?.trim().toUpperCase() === "EXCLUIR";
+  };
+
+  const handleDeleteAllMovies = async () => {
+    if (!confirmDeleteAll("filmes", movies.length)) return;
+    try {
+      await deleteAllMovies();
+      setMovies([]);
+      toast({ title: "Filmes excluídos", description: "Todos os filmes foram removidos." });
+    } catch (e) {
+      console.error(e);
+      toast({ title: "Erro", description: "Falha ao excluir filmes.", variant: "destructive" });
+    }
+  };
+
+  const handleDeleteAllSeries = async () => {
+    if (!confirmDeleteAll("séries", series.length)) return;
+    try {
+      await deleteAllSeries();
+      setSeries([]);
+      toast({ title: "Séries excluídas", description: "Todas as séries foram removidas." });
+    } catch (e) {
+      console.error(e);
+      toast({ title: "Erro", description: "Falha ao excluir séries.", variant: "destructive" });
+    }
+  };
+
+  const handleDeleteAllLiveTV = async () => {
+    if (!confirmDeleteAll("canais", liveTVChannels.length)) return;
+    try {
+      await deleteAllLiveTVChannels();
+      setLiveTVChannels([]);
+      toast({ title: "Canais excluídos", description: "Todos os canais foram removidos." });
+    } catch (e) {
+      console.error(e);
+      toast({ title: "Erro", description: "Falha ao excluir canais.", variant: "destructive" });
+    }
+  };
+
   // Filtros de pesquisa
   const filteredMovies = movies.filter(
     (movie) =>
@@ -329,17 +403,37 @@ const AdminPage: React.FC = () => {
               title="Gerenciar Filmes"
               count={filteredMovies.length}
               action={
-                <Button
-                  onClick={() => {
-                    setSelectedMovie(null);
-                    setShowAddEditModal(true);
-                  }}
-                  className="bg-gradient-to-r from-netflix-red to-red-700 hover:from-red-600 hover:to-red-800 text-white font-semibold shadow-lg shadow-netflix-red/30 border-0 rounded-xl"
-                >
-                  <Plus className="w-4 h-4 mr-1.5" />
-                  <span className="hidden sm:inline">Adicionar Filme</span>
-                  <span className="sm:hidden">Adicionar</span>
-                </Button>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button
+                    onClick={handleExportMovies}
+                    variant="outline"
+                    className="bg-white/[0.04] border-white/15 text-white hover:bg-white/10 rounded-xl"
+                  >
+                    <Download className="w-4 h-4 mr-1.5" />
+                    <span className="hidden sm:inline">Exportar Excel</span>
+                    <span className="sm:hidden">Exportar</span>
+                  </Button>
+                  <Button
+                    onClick={handleDeleteAllMovies}
+                    variant="outline"
+                    className="bg-red-500/10 border-red-500/30 text-red-300 hover:bg-red-500/20 hover:text-red-200 rounded-xl"
+                  >
+                    <Trash className="w-4 h-4 mr-1.5" />
+                    <span className="hidden sm:inline">Excluir tudo</span>
+                    <span className="sm:hidden">Limpar</span>
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setSelectedMovie(null);
+                      setShowAddEditModal(true);
+                    }}
+                    className="bg-gradient-to-r from-netflix-red to-red-700 hover:from-red-600 hover:to-red-800 text-white font-semibold shadow-lg shadow-netflix-red/30 border-0 rounded-xl"
+                  >
+                    <Plus className="w-4 h-4 mr-1.5" />
+                    <span className="hidden sm:inline">Adicionar Filme</span>
+                    <span className="sm:hidden">Adicionar</span>
+                  </Button>
+                </div>
               }
             >
               <AdminSearchBar
@@ -383,17 +477,28 @@ const AdminPage: React.FC = () => {
               title="Gerenciar Séries"
               count={filteredSeries.length}
               action={
-                <Button
-                  onClick={() => {
-                    setSelectedSeries(null);
-                    setShowAddEditSeriesModal(true);
-                  }}
-                  className="bg-gradient-to-r from-netflix-red to-red-700 hover:from-red-600 hover:to-red-800 text-white font-semibold shadow-lg shadow-netflix-red/30 border-0 rounded-xl"
-                >
-                  <Plus className="w-4 h-4 mr-1.5" />
-                  <span className="hidden sm:inline">Adicionar Série</span>
-                  <span className="sm:hidden">Adicionar</span>
-                </Button>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button
+                    onClick={handleDeleteAllSeries}
+                    variant="outline"
+                    className="bg-red-500/10 border-red-500/30 text-red-300 hover:bg-red-500/20 hover:text-red-200 rounded-xl"
+                  >
+                    <Trash className="w-4 h-4 mr-1.5" />
+                    <span className="hidden sm:inline">Excluir tudo</span>
+                    <span className="sm:hidden">Limpar</span>
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setSelectedSeries(null);
+                      setShowAddEditSeriesModal(true);
+                    }}
+                    className="bg-gradient-to-r from-netflix-red to-red-700 hover:from-red-600 hover:to-red-800 text-white font-semibold shadow-lg shadow-netflix-red/30 border-0 rounded-xl"
+                  >
+                    <Plus className="w-4 h-4 mr-1.5" />
+                    <span className="hidden sm:inline">Adicionar Série</span>
+                    <span className="sm:hidden">Adicionar</span>
+                  </Button>
+                </div>
               }
             >
               <AdminSearchBar
@@ -440,17 +545,28 @@ const AdminPage: React.FC = () => {
               title="Gerenciar TV Ao Vivo"
               count={filteredLiveTVChannels.length}
               action={
-                <Button
-                  onClick={() => {
-                    setSelectedLiveTVChannel(null);
-                    setShowAddEditLiveTVModal(true);
-                  }}
-                  className="bg-gradient-to-r from-netflix-red to-red-700 hover:from-red-600 hover:to-red-800 text-white font-semibold shadow-lg shadow-netflix-red/30 border-0 rounded-xl"
-                >
-                  <Plus className="w-4 h-4 mr-1.5" />
-                  <span className="hidden sm:inline">Adicionar Canal</span>
-                  <span className="sm:hidden">Adicionar</span>
-                </Button>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button
+                    onClick={handleDeleteAllLiveTV}
+                    variant="outline"
+                    className="bg-red-500/10 border-red-500/30 text-red-300 hover:bg-red-500/20 hover:text-red-200 rounded-xl"
+                  >
+                    <Trash className="w-4 h-4 mr-1.5" />
+                    <span className="hidden sm:inline">Excluir tudo</span>
+                    <span className="sm:hidden">Limpar</span>
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setSelectedLiveTVChannel(null);
+                      setShowAddEditLiveTVModal(true);
+                    }}
+                    className="bg-gradient-to-r from-netflix-red to-red-700 hover:from-red-600 hover:to-red-800 text-white font-semibold shadow-lg shadow-netflix-red/30 border-0 rounded-xl"
+                  >
+                    <Plus className="w-4 h-4 mr-1.5" />
+                    <span className="hidden sm:inline">Adicionar Canal</span>
+                    <span className="sm:hidden">Adicionar</span>
+                  </Button>
+                </div>
               }
             >
               <AdminSearchBar

@@ -58,3 +58,9 @@ export const deleteMovie = async (id: string): Promise<void> => {
   const movieRef = ref(database, `movies/${id}`);
   await remove(movieRef);
 };
+
+// Delete ALL movies
+export const deleteAllMovies = async (): Promise<void> => {
+  const moviesRef = ref(database, 'movies');
+  await remove(moviesRef);
+};
