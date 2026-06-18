@@ -403,17 +403,37 @@ const AdminPage: React.FC = () => {
               title="Gerenciar Filmes"
               count={filteredMovies.length}
               action={
-                <Button
-                  onClick={() => {
-                    setSelectedMovie(null);
-                    setShowAddEditModal(true);
-                  }}
-                  className="bg-gradient-to-r from-netflix-red to-red-700 hover:from-red-600 hover:to-red-800 text-white font-semibold shadow-lg shadow-netflix-red/30 border-0 rounded-xl"
-                >
-                  <Plus className="w-4 h-4 mr-1.5" />
-                  <span className="hidden sm:inline">Adicionar Filme</span>
-                  <span className="sm:hidden">Adicionar</span>
-                </Button>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button
+                    onClick={handleExportMovies}
+                    variant="outline"
+                    className="bg-white/[0.04] border-white/15 text-white hover:bg-white/10 rounded-xl"
+                  >
+                    <Download className="w-4 h-4 mr-1.5" />
+                    <span className="hidden sm:inline">Exportar Excel</span>
+                    <span className="sm:hidden">Exportar</span>
+                  </Button>
+                  <Button
+                    onClick={handleDeleteAllMovies}
+                    variant="outline"
+                    className="bg-red-500/10 border-red-500/30 text-red-300 hover:bg-red-500/20 hover:text-red-200 rounded-xl"
+                  >
+                    <Trash className="w-4 h-4 mr-1.5" />
+                    <span className="hidden sm:inline">Excluir tudo</span>
+                    <span className="sm:hidden">Limpar</span>
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setSelectedMovie(null);
+                      setShowAddEditModal(true);
+                    }}
+                    className="bg-gradient-to-r from-netflix-red to-red-700 hover:from-red-600 hover:to-red-800 text-white font-semibold shadow-lg shadow-netflix-red/30 border-0 rounded-xl"
+                  >
+                    <Plus className="w-4 h-4 mr-1.5" />
+                    <span className="hidden sm:inline">Adicionar Filme</span>
+                    <span className="sm:hidden">Adicionar</span>
+                  </Button>
+                </div>
               }
             >
               <AdminSearchBar
