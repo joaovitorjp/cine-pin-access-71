@@ -164,21 +164,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } else {
         resetProfileState();
         setLoading(false);
+        setProfileLoaded(true);
       }
     };
 
     const { data: sub } = supabase.auth.onAuthStateChange((event, newSession) => {
-      if (event === "SIGNED_OUT" || !newSession) {
+      // Only react to genuine sign-out / sign-in transitions.
+      // TOKEN_REFRESHED / USER_UPDATED / INITIAL_SESSION just update tokens silently —
+      // re-running claim_user_session on every refresh causes RPC storms and 429s.
+      if (event === "SIGNED_OUT") {
         applySession(null);
         return;
       }
-      // Defer DB work to avoid auth callback deadlocks.
-      setTimeout(() => applySession(newSession), 0);
+      if (event === "SIGNED_IN") {
+        setTimeout(() => applySession(newSession), 0);
+        return;
+      }
+      // For TOKEN_REFRESHED / USER_UPDATED: just keep session/user in sync, no DB work.
+      if (newSession) {
+        setSession(newSession);
+        setUser(newSession.user);
+      }
     });
 
     supabase.auth.getSession().then(({ data: { session: s } }) => {
+      if (cancelled) return;
       applySession(s);
-      if (!s) setProfileLoaded(true);
     });
 
     return () => {
