@@ -56,8 +56,18 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, posterUrl }) => {
     }
     const id = videoUrl.match(/(?:video\/|vimeo\.com\/)(\d+)/)?.[1];
     if (!id) return;
+    let hash = "";
+    try {
+      const u = new URL(videoUrl);
+      hash = u.searchParams.get("h") || "";
+    } catch {
+      /* noop */
+    }
+    const vimeoUrl = hash
+      ? `https://vimeo.com/${id}/${hash}`
+      : `https://vimeo.com/${id}`;
     let cancelled = false;
-    fetch(`https://vimeo.com/api/oembed.json?url=https://vimeo.com/${id}`)
+    fetch(`https://vimeo.com/api/oembed.json?url=${encodeURIComponent(vimeoUrl)}`)
       .then((r) => r.json())
       .then((d) => {
         if (cancelled) return;
