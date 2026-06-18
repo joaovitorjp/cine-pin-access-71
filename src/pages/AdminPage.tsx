@@ -477,17 +477,28 @@ const AdminPage: React.FC = () => {
               title="Gerenciar Séries"
               count={filteredSeries.length}
               action={
-                <Button
-                  onClick={() => {
-                    setSelectedSeries(null);
-                    setShowAddEditSeriesModal(true);
-                  }}
-                  className="bg-gradient-to-r from-netflix-red to-red-700 hover:from-red-600 hover:to-red-800 text-white font-semibold shadow-lg shadow-netflix-red/30 border-0 rounded-xl"
-                >
-                  <Plus className="w-4 h-4 mr-1.5" />
-                  <span className="hidden sm:inline">Adicionar Série</span>
-                  <span className="sm:hidden">Adicionar</span>
-                </Button>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button
+                    onClick={handleDeleteAllSeries}
+                    variant="outline"
+                    className="bg-red-500/10 border-red-500/30 text-red-300 hover:bg-red-500/20 hover:text-red-200 rounded-xl"
+                  >
+                    <Trash className="w-4 h-4 mr-1.5" />
+                    <span className="hidden sm:inline">Excluir tudo</span>
+                    <span className="sm:hidden">Limpar</span>
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setSelectedSeries(null);
+                      setShowAddEditSeriesModal(true);
+                    }}
+                    className="bg-gradient-to-r from-netflix-red to-red-700 hover:from-red-600 hover:to-red-800 text-white font-semibold shadow-lg shadow-netflix-red/30 border-0 rounded-xl"
+                  >
+                    <Plus className="w-4 h-4 mr-1.5" />
+                    <span className="hidden sm:inline">Adicionar Série</span>
+                    <span className="sm:hidden">Adicionar</span>
+                  </Button>
+                </div>
               }
             >
               <AdminSearchBar
