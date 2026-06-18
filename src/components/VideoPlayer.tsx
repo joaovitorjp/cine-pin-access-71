@@ -103,22 +103,50 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, posterUrl }) => {
     );
   }
 
+  // Compute scale so the Vimeo iframe content covers the container (no letterbox).
+  // The Vimeo iframe auto-fits its video to its own bounds with letterboxing.
+  // To kill the bars, we resize the iframe to the video's aspect ratio and scale it up to cover the container.
+  let vimeoIframeStyle: React.CSSProperties = { border: "none" };
+  if (isVimeo && vimeoAspect && containerAspect) {
+    // Width/height of an iframe that matches the video's aspect, fitted inside container (contain).
+    // Then scale up so it covers the container.
+    const scale =
+      vimeoAspect > containerAspect
+        ? vimeoAspect / containerAspect // video wider than container -> scale to fill height
+        : containerAspect / vimeoAspect; // video taller -> scale to fill width
+    vimeoIframeStyle = {
+      border: "none",
+      transform: `translate(-50%, -50%) scale(${scale})`,
+      transformOrigin: "center center",
+      top: "50%",
+      left: "50%",
+      position: "absolute",
+      width: "100%",
+      height: "100%",
+    };
+  }
+
   return (
-    <div className="relative isolate w-full aspect-video overflow-hidden bg-black">
+    <div ref={containerRef} className="relative isolate w-full aspect-video overflow-hidden bg-black">
       <iframe
         ref={iframeRef}
         src={videoUrl}
         title="CINE FLEX player"
-        className="absolute inset-0 h-full w-full pointer-events-auto"
+        className={
+          isVimeo && vimeoAspect
+            ? "pointer-events-auto"
+            : "absolute inset-0 h-full w-full pointer-events-auto"
+        }
         tabIndex={0}
         allowFullScreen
         // IMPORTANTE: muitos players (vidsrc, vsembed, superembed, etc.) exigem Referer
         // para liberar o stream. Usamos a política padrão do navegador.
         referrerPolicy="origin-when-cross-origin"
         allow="autoplay; encrypted-media; fullscreen; picture-in-picture; clipboard-write; web-share"
-        style={{ border: "none" }}
+        style={vimeoIframeStyle}
         onLoad={() => setIframeLoading(false)}
       />
+
 
       {iframeLoading && (
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center bg-black/80 text-white">
