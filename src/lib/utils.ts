@@ -45,6 +45,26 @@ export const convertVideoLink = (url: string): string => {
     }
   }
 
+  // Vimeo links - Convert to player embed
+  // Supports: vimeo.com/{id}, vimeo.com/{id}/{hash}, player.vimeo.com/video/{id}
+  if (url.includes('vimeo.com')) {
+    if (url.includes('player.vimeo.com/video/')) {
+      return url;
+    }
+    const match = url.match(/vimeo\.com\/(?:video\/)?(\d+)(?:\/([a-zA-Z0-9]+))?/);
+    if (match && match[1]) {
+      const videoId = match[1];
+      const hash = match[2];
+      const params = new URLSearchParams();
+      if (hash) params.set('h', hash);
+      params.set('autoplay', '1');
+      params.set('title', '0');
+      params.set('byline', '0');
+      params.set('portrait', '0');
+      return `https://player.vimeo.com/video/${videoId}?${params.toString()}`;
+    }
+  }
+
   // Google Drive links
   if (url.includes('drive.google.com')) {
     // Already in the correct format
