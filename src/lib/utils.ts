@@ -46,21 +46,43 @@ export const convertVideoLink = (url: string): string => {
   }
 
   // Vimeo links - Convert to player embed
-  // Supports: vimeo.com/{id}, vimeo.com/{id}/{hash}, player.vimeo.com/video/{id}
+  // Supports:
+  //   vimeo.com/{id}
+  //   vimeo.com/{id}/{hash}
+  //   vimeo.com/{id}?h={hash}
+  //   player.vimeo.com/video/{id}
+  //   player.vimeo.com/video/{id}?h={hash}
   if (url.includes('vimeo.com')) {
-    if (url.includes('player.vimeo.com/video/')) {
-      return url;
+    let videoId = '';
+    let hash = '';
+    try {
+      const u = new URL(url);
+      const playerMatch = u.pathname.match(/\/video\/(\d+)/);
+      const rootMatch = u.pathname.match(/^\/(\d+)(?:\/([a-zA-Z0-9]+))?/);
+      if (playerMatch) {
+        videoId = playerMatch[1];
+      } else if (rootMatch) {
+        videoId = rootMatch[1];
+        if (rootMatch[2]) hash = rootMatch[2];
+      }
+      const qHash = u.searchParams.get('h');
+      if (qHash) hash = qHash;
+    } catch {
+      const m = url.match(/vimeo\.com\/(?:video\/)?(\d+)(?:\/([a-zA-Z0-9]+))?/);
+      if (m) {
+        videoId = m[1];
+        if (m[2]) hash = m[2];
+      }
     }
-    const match = url.match(/vimeo\.com\/(?:video\/)?(\d+)(?:\/([a-zA-Z0-9]+))?/);
-    if (match && match[1]) {
-      const videoId = match[1];
-      const hash = match[2];
+
+    if (videoId) {
       const params = new URLSearchParams();
       if (hash) params.set('h', hash);
       params.set('autoplay', '1');
       params.set('title', '0');
       params.set('byline', '0');
       params.set('portrait', '0');
+      params.set('dnt', '1');
       return `https://player.vimeo.com/video/${videoId}?${params.toString()}`;
     }
   }
