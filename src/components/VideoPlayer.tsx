@@ -52,13 +52,15 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, posterUrl }) => {
   }
 
   return (
-    <div className="relative w-full aspect-video bg-black">
+    <div className="relative isolate w-full aspect-video overflow-hidden bg-black">
       <iframe
         src={videoUrl}
-        className="w-full h-full absolute inset-0"
+        title="CINE FLEX player"
+        className="absolute inset-0 h-full w-full pointer-events-auto"
+        tabIndex={0}
         allowFullScreen
         referrerPolicy="no-referrer"
-        allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+        allow="autoplay; encrypted-media; fullscreen; picture-in-picture; clipboard-write; web-share"
         style={{ border: "none" }}
       />
     </div>
