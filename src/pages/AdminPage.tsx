@@ -182,6 +182,78 @@ const AdminPage: React.FC = () => {
     }
   };
 
+  const handleExportMovies = () => {
+    try {
+      const rows = movies.map((m) => [
+        m.title ?? "",
+        m.imageUrl ?? "",
+        m.videoUrl ?? "",
+        m.description ?? "",
+        m.year ?? "",
+        m.genre ?? "",
+        m.rating ?? "",
+      ]);
+      const ws = XLSX.utils.aoa_to_sheet(rows);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Filmes");
+      const ts = new Date().toISOString().slice(0, 10);
+      XLSX.writeFile(wb, `cineflex-filmes-${ts}.xlsx`);
+      toast({ title: "Exportação concluída", description: `${rows.length} filme(s) exportado(s).` });
+    } catch (e) {
+      console.error("Erro ao exportar filmes:", e);
+      toast({ title: "Erro", description: "Não foi possível exportar os filmes.", variant: "destructive" });
+    }
+  };
+
+  const confirmDeleteAll = (label: string, count: number) => {
+    if (count === 0) {
+      toast({ title: "Nada para excluir", description: `Não há ${label} cadastrados.` });
+      return false;
+    }
+    const first = window.confirm(
+      `ATENÇÃO: isso irá excluir TODOS os ${count} ${label} do banco de dados. Esta ação não pode ser desfeita. Deseja continuar?`
+    );
+    if (!first) return false;
+    const typed = window.prompt(`Digite EXCLUIR para confirmar a exclusão de todos os ${label}:`);
+    return typed?.trim().toUpperCase() === "EXCLUIR";
+  };
+
+  const handleDeleteAllMovies = async () => {
+    if (!confirmDeleteAll("filmes", movies.length)) return;
+    try {
+      await deleteAllMovies();
+      setMovies([]);
+      toast({ title: "Filmes excluídos", description: "Todos os filmes foram removidos." });
+    } catch (e) {
+      console.error(e);
+      toast({ title: "Erro", description: "Falha ao excluir filmes.", variant: "destructive" });
+    }
+  };
+
+  const handleDeleteAllSeries = async () => {
+    if (!confirmDeleteAll("séries", series.length)) return;
+    try {
+      await deleteAllSeries();
+      setSeries([]);
+      toast({ title: "Séries excluídas", description: "Todas as séries foram removidas." });
+    } catch (e) {
+      console.error(e);
+      toast({ title: "Erro", description: "Falha ao excluir séries.", variant: "destructive" });
+    }
+  };
+
+  const handleDeleteAllLiveTV = async () => {
+    if (!confirmDeleteAll("canais", liveTVChannels.length)) return;
+    try {
+      await deleteAllLiveTVChannels();
+      setLiveTVChannels([]);
+      toast({ title: "Canais excluídos", description: "Todos os canais foram removidos." });
+    } catch (e) {
+      console.error(e);
+      toast({ title: "Erro", description: "Falha ao excluir canais.", variant: "destructive" });
+    }
+  };
+
   // Filtros de pesquisa
   const filteredMovies = movies.filter(
     (movie) =>
