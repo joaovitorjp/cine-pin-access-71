@@ -10,9 +10,12 @@ interface VideoPlayerProps {
 const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, posterUrl }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const { playbackSpeed } = usePreferences();
   const [iframeLoading, setIframeLoading] = useState(true);
   const [iframeTimedOut, setIframeTimedOut] = useState(false);
+  const [vimeoAspect, setVimeoAspect] = useState<number | null>(null);
+  const [containerAspect, setContainerAspect] = useState<number>(16 / 9);
 
   const isSafeUrl = (() => {
     if (typeof videoUrl !== "string" || videoUrl.trim() === "") return false;
@@ -26,6 +29,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, posterUrl }) => {
 
   const isDirectVideo = videoUrl.match(/\.(mp4|webm|ogg|avi|mov|wmv|flv|m3u8)(\?.*)?$/i);
   const isHLS = videoUrl.includes(".m3u8");
+  const isVimeo = videoUrl.includes("player.vimeo.com") || videoUrl.includes("vimeo.com");
 
   useEffect(() => {
     if (isHLS && videoRef.current) videoRef.current.src = videoUrl;
@@ -43,6 +47,41 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, posterUrl }) => {
     const t = setTimeout(() => setIframeTimedOut(true), 12000);
     return () => clearTimeout(t);
   }, [videoUrl, isDirectVideo]);
+
+  // For Vimeo: fetch real video aspect via oEmbed so we can scale-to-cover
+  useEffect(() => {
+    if (!isVimeo) {
+      setVimeoAspect(null);
+      return;
+    }
+    const id = videoUrl.match(/(?:video\/|vimeo\.com\/)(\d+)/)?.[1];
+    if (!id) return;
+    let cancelled = false;
+    fetch(`https://vimeo.com/api/oembed.json?url=https://vimeo.com/${id}`)
+      .then((r) => r.json())
+      .then((d) => {
+        if (cancelled) return;
+        if (d?.width && d?.height) setVimeoAspect(d.width / d.height);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [videoUrl, isVimeo]);
+
+  // Track container aspect to compute cover-scale for Vimeo
+  useEffect(() => {
+    if (!isVimeo || !containerRef.current) return;
+    const el = containerRef.current;
+    const update = () => {
+      if (el.clientHeight > 0) setContainerAspect(el.clientWidth / el.clientHeight);
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [isVimeo, videoUrl]);
+
 
   if (!isSafeUrl) return null;
 
